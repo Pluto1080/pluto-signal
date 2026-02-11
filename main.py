@@ -1,7 +1,7 @@
 import os
 import json
 from datetime import datetime
-import pyswisseph as swe
+import swisseph as swe
 from flask import Flask, request, jsonify, render_template
 from google import genai
 import re
@@ -153,5 +153,6 @@ if __name__ == "__main__":
     # Railway가 정해준 포트를 읽어오고, 없으면 8080을 쓰라는 뜻입니다.
     port = int(os.environ.get("PORT", 8080)) 
     app.run(host='0.0.0.0', port=port)
+
 
 
