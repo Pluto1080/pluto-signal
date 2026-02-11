@@ -2,12 +2,11 @@ import os
 import json
 import re
 from datetime import datetime
-import swisseph as swe  # <--- pyswisseph에서 swisseph로 수정됨
+import swisseph as swe  # pyswisseph 설치 후 swisseph로 임포트하는 것이 정석입니다.
 from flask import Flask, request, jsonify, render_template
 from google import genai
 import pytz
 from timezonefinder import TimezoneFinder
-# ... 이하 코드 동일
 
 app = Flask(__name__, template_folder='templates', static_folder='templates')
 tf = TimezoneFinder()
@@ -55,18 +54,18 @@ def analyze():
         user_lang = data.get('language', 'ko-KR')
         lat, lon = float(data.get('lat')), float(data.get('lon'))
         
-        # 1. 태어난 시점 데이터
+        # 1. 태어난 시점 데이터 계산
         natal_data = calculate_astrology(data.get('date'), data.get('time'), lat, lon)
-      
-# [수정] 현재 시점 타임존 및 JD 자동 계산
+
+        # [수정] 현재 시점 타임존 및 JD 자동 계산
         tz_name = tf.timezone_at(lng=lon, lat=lat) or 'UTC'
         timezone = pytz.timezone(tz_name)
         
-        # 1. 2026년 전체 흐름 기준 (사용자가 원한 2026년 7월 1일 고정)
+        # 2. 2026년 전체 흐름 기준 (고정된 미래 시점)
         dt_year = timezone.localize(datetime(2026, 7, 1, 12, 0))
         jd_year = swe.julday(2026, 7, 1, 12.0 - (dt_year.utcoffset().total_seconds() / 3600.0))
         
-        # 2. [핵심 수정] "이번 달" 기준 - 실제 현재 서버 시간(now)을 사용
+        # 3. [핵심] 이번 달 기준 - 실제 현재 서버 시간(now)을 사용
         now = datetime.now(timezone)
         jd_now = swe.julday(now.year, now.month, now.day, now.hour - (now.utcoffset().total_seconds() / 3600.0))
 
@@ -78,9 +77,9 @@ def analyze():
             return res
 
         transit_year = get_transits(jd_year)
-        transit_now = get_transits(jd_now) # 현재 시점의 행성 위치
+        transit_now = get_transits(jd_now)
 
-        # 3. AI 프롬프트 수정
+        # 4. AI 프롬프트 구성
         prompt = f"""
         너는 먼 우주에서온 쪽집게 점성술사 플루토야. 반드시 '{user_lang}' 언어로, 반말 스타일로 대답해.
         [데이터]
@@ -105,9 +104,24 @@ def analyze():
             }}
         }}
         """
-        # [수정 끝] 이후 response = client.models.generate_content(...) 로 이어짐
 
-        response = client.models.generate_content(model='gemini-2.0-flash', contents=prompt)
+        # [할당량 초과 대응] 모델 폴백 로직
+        model_candidates = ['gemini-1.5-flash-8b', 'gemini-1.5-flash', 'gemini-2.0-flash-lite-preview-02-05']
+        response = None
+        error_msg = ""
+
+        for model_name in model_candidates:
+            try:
+                response = client.models.generate_content(model=model_name, contents=prompt)
+                if response and response.text:
+                    break
+            except Exception as e:
+                error_msg = str(e)
+                continue
+
+        if not response:
+            return jsonify({"error": f"모든 별과의 통신이 일시적으로 차단됐어. 나중에 다시 시도해. (사유: {error_msg})"}), 200
+
         cleaned_text = re.sub(r"```json|```", "", response.text).strip()
         return jsonify(json.loads(cleaned_text))
 
@@ -116,6 +130,3 @@ def analyze():
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 8080)))
-
-
-
