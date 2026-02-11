@@ -2,44 +2,157 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>AI 점성술사 플루토</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TERMINAL: PLUTO</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <style>
-        body { background: #000; color: #0f0; font-family: monospace; text-align: center; padding: 50px; }
-        #result-area { margin-top: 30px; padding: 20px; border: 1px solid #0f0; min-height: 50px; }
-        button { background: #0f0; color: #000; border: none; padding: 10px 20px; cursor: pointer; }
+        body {
+            background: radial-gradient(circle, #1a0033 0%, #000000 100%);
+            color: #00ff41; font-family: 'Courier New', Courier, monospace;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            min-height: 100vh; margin: 0; overflow-x: hidden; padding: 20px 0;
+        }
+
+        @keyframes glitch {
+            0% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+            100% { transform: translate(0); }
+        }
+
+        .container {
+            width: 90%; max-width: 650px; border: 1px solid #00ff41; padding: 30px;
+            background: rgba(20, 0, 40, 0.8);
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.2), inset 0 0 20px rgba(128, 0, 255, 0.2);
+        }
+
+        h1 { font-size: 1.8rem; letter-spacing: 5px; animation: glitch 0.3s infinite; text-shadow: 2px 0 #ff00ff, -2px 0 #00ffff; text-align: center; }
+
+        .input-group { margin-bottom: 20px; text-align: left; }
+        .input-group label { display: block; font-weight: bold; margin-bottom: 5px; color: #ff00ff; }
+        
+        input[type="text"], input[type="date"], input[type="time"] {
+            background: transparent; border: 1px solid #00ff41; color: #00ff41;
+            padding: 10px; width: calc(100% - 24px); font-size: 1rem; outline: none; margin-bottom: 5px;
+        }
+        
+        /* 다크/해커 테마에 맞게 지도 색상 반전 */
+        #map { height: 250px; width: 100%; border: 1px solid #00ff41; margin-bottom: 20px; filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(80%); }
+
+        button {
+            background: #00ff41; color: #000; border: none; padding: 15px; width: 100%;
+            font-weight: bold; font-size: 1.2rem; cursor: pointer; box-shadow: 0 0 15px #00ff41; transition: 0.2s; margin-top: 10px;
+        }
+        button:hover { background: #ff00ff; box-shadow: 0 0 20px #ff00ff; }
+
+        #result-area { margin-top: 30px; padding: 20px; border-top: 1px dashed rgba(0, 255, 65, 0.5); font-size: 1.1rem; line-height: 1.8; white-space: pre-wrap; }
+        .loading { color: #ff00ff; animation: blink 0.5s infinite; }
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
     </style>
 </head>
 <body>
-    <h1>🔮 AI 점성술사 플루토</h1>
-    <input type="text" id="userName" placeholder="이름을 입력하세요">
-    <button onclick="startComm()">교신 시작</button>
-    
-    <div id="result-area">
-        <p id="result-text">기다리는 중...</p>
+    <div class="container">
+        <h1>ACCESS: PLUTO</h1>
+        <p style="text-align: center; color: #8844ff; font-size: 0.9rem;">>> ASTRO_DATA_REQUIRED...</p>
+        
+        <div class="input-group">
+            <label>NAME</label>
+            <input type="text" id="userName" placeholder="이름을 입력해">
+        </div>
+        <div class="input-group">
+            <label>BIRTH_DATE</label>
+            <input type="date" id="birthDate">
+        </div>
+        <div class="input-group">
+            <label>BIRTH_TIME</label>
+            <input type="time" id="birthTime">
+            <div>
+                <input type="checkbox" id="timeUnknown" onchange="toggleTimeInput()" style="width: auto;">
+                <label for="timeUnknown" style="display: inline; color: #00ff41; font-weight: normal;">태어난 시간을 몰라 (정확도 하락)</label>
+            </div>
+        </div>
+        <div class="input-group">
+            <label>BIRTH_LOCATION (클릭해서 핀 고정)</label>
+            <div id="map"></div>
+            <span id="coordsDisplay" style="font-size: 0.8rem; color: #8844ff;">위도: 37.5665 / 경도: 126.9780 (기본값: 서울)</span>
+        </div>
+
+        <button onclick="startComm()">INITIATE_ANALYSIS</button>
+        
+        <div id="result-area">
+            <p id="result-text">READY...</p>
+        </div>
     </div>
 
     <script>
+        // 변수 초기화
+        let selectedLat = 37.5665;
+        let selectedLon = 126.9780;
+
+        // 지도 설정 (서울 기본 세팅)
+        const map = L.map('map').setView([selectedLat, selectedLon], 6);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        let marker = L.marker([selectedLat, selectedLon]).addTo(map);
+
+        // 지도 클릭 시 마커 이동
+        map.on('click', function(e) {
+            selectedLat = e.latlng.lat;
+            selectedLon = e.latlng.lng;
+            marker.setLatLng(e.latlng);
+            document.getElementById('coordsDisplay').innerText = `위도: ${selectedLat.toFixed(4)} / 경도: ${selectedLon.toFixed(4)}`;
+        });
+
+        // 시간 모름 체크박스 로직
+        function toggleTimeInput() {
+            const timeInput = document.getElementById('birthTime');
+            const isUnknown = document.getElementById('timeUnknown').checked;
+            if(isUnknown) {
+                timeInput.value = "";
+                timeInput.disabled = true;
+            } else {
+                timeInput.disabled = false;
+            }
+        }
+
         function startComm() {
             const name = document.getElementById('userName').value;
+            const date = document.getElementById('birthDate').value;
+            const isUnknown = document.getElementById('timeUnknown').checked;
+            let time = document.getElementById('birthTime').value;
             const resultText = document.getElementById('result-text');
-            resultText.innerText = "우주 신호 수신 중...";
+
+            if(!name || !date || (!isUnknown && !time)) {
+                alert("이름, 날짜, 시간(모르면 체크)을 모두 입력해라.");
+                return;
+            }
+
+            if(isUnknown) time = "12:00"; // 모를 경우 기본값
+
+            resultText.className = "loading";
+            resultText.innerText = ">> CALCULATING_PLANETARY_POSITIONS... [WAIT]";
 
             fetch('/analyze', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name: name })
+                body: JSON.stringify({
+                    name: name, date: date, time: time, time_unknown: isUnknown,
+                    lat: selectedLat, lon: selectedLon
+                })
             })
             .then(response => response.json())
             .then(data => {
-                // main.py의 {"result": ...}와 이름을 맞춤
-                if (data.result) {
-                    resultText.innerText = data.result;
-                } else {
-                    resultText.innerText = "신호가 끊겼어. 다시 시도해봐.";
-                }
+                resultText.className = "";
+                resultText.innerText = data.result;
             })
             .catch(err => {
-                resultText.innerText = "치익... 오류 발생: " + err;
+                resultText.className = "";
+                resultText.innerText = ">> CRITICAL_ERROR: " + err;
             });
         }
     </script>
