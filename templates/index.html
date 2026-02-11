@@ -7,16 +7,18 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <style>
+        /* [폰트] 레트로 둥근모꼴 */
         @import url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/DungGeunMo.woff');
 
-        /* [변수] 화면 배경 테마색 관리 */
+        /* [변수] 화면 중앙과 테두리 색상 관리 (JS에서 테마별로 조작) */
         :root {
-            --screen-bg-center: #444444; /* 기본 회색 중앙 */
-            --screen-bg-edge: #111111;   /* 기본 회색 테두리 */
+            --screen-bg-center: #444444;
+            --screen-bg-edge: #111111;
         }
 
         * { box-sizing: border-box; }
-        ::-webkit-scrollbar { display: none; } /* 스크롤바 숨김 */
+        ::-webkit-scrollbar { display: none; } /* 스크롤바 제거 */
+        * { -ms-overflow-style: none; scrollbar-width: none; }
 
         body {
             background: #050505; margin: 0; padding: 0;
@@ -25,7 +27,7 @@
             font-family: 'DungGeunMo', monospace;
         }
 
-        /* [프레임] 아이맥 G3 본디 블루 스타일 고정 프레임 */
+        /* [프레임] 아이맥 G3 본디 블루 스타일 고정 */
         .monitor-frame {
             width: 95vw; height: 90vh;
             max-width: 1000px; max-height: 800px;
@@ -35,7 +37,7 @@
             position: relative; display: flex; align-items: center; justify-content: center;
         }
 
-        /* [효과] 화면 전환 시 찌릿한 글리치 애니메이션 */
+        /* [애니메이션] 화면 전환 시 찌릿한 글리치 효과 */
         @keyframes glitch-short {
             0% { transform: translate(0); }
             20% { transform: translate(-3px, 0); filter: brightness(1.2); }
@@ -44,7 +46,6 @@
         }
         .glitch-active { animation: glitch-short 0.25s ease-out; }
 
-        /* [스크린] CRT 모니터 내부 용기 */
         .screen-container {
             width: 100%; height: 100%; background: #000; border-radius: 30px;
             position: relative; overflow: hidden; border: 12px solid #111;
@@ -59,7 +60,7 @@
             background-size: 100% 3px, 3px 100%; pointer-events: none; z-index: 100; opacity: 0.8;
         }
 
-        /* [배경] 숨쉬는 듯한 밝기 변화 및 그라데이션 질감 */
+        /* [배경 효과] 숨쉬는 듯한 밝기(Pulse)와 질감 */
         .screen-content {
             width: 100%; height: 100%;
             background: radial-gradient(circle at center, var(--screen-bg-center) 0%, var(--screen-bg-edge) 100%);
@@ -67,7 +68,7 @@
             animation: screen-pulse 8s ease-in-out infinite;
         }
 
-        /* [안개] 화면을 가로지르는 은은한 빛의 띠 */
+        /* [안개 효과] 화면을 흐르는 은은한 빛의 띠(Sweep) */
         .screen-content::after {
             content: "";
             position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
@@ -81,7 +82,7 @@
             50% { filter: brightness(1.15); }
         }
 
-        /* [섹션] 각 화면 레이아웃 공통 설정 */
+        /* [섹션] 모든 화면 요소의 기본 배치 */
         .screen {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -98,7 +99,7 @@
         }
         @keyframes shine-v { to { background-position: center 200%; } }
 
-        /* [별] 몽환적인 별똥별 효과 및 광채 */
+        /* [별 효과] 로딩 중 보라색 심연에서 떨어지는 별똥별 */
         .star { 
             position: absolute; background: #FFD700; border-radius: 0; opacity: 0; 
             box-shadow: 0 0 8px #FFD700, -2px -2px 0px rgba(255, 215, 0, 0.4);
@@ -110,7 +111,7 @@
             100% { transform: translate(300px, 300px); opacity: 0; } 
         }
 
-        /* [UI] 입력창, 버튼, 결과 박스 디자인 */
+        /* [UI 스타일] 입력창, 버튼, 결과 박스 */
         input, select { background: rgba(0,0,0,0.8); border: 2px solid #00ff41; color: #00ff41; padding: 12px; width: 100%; font-family: 'DungGeunMo'; outline: none; font-size: 1.1rem; }
         input[type="date"] { -webkit-appearance: none; min-height: 45px; }
 
@@ -125,6 +126,8 @@
         .result-box { border: 3px solid #00ff41; padding: 15px; background: rgba(0,0,0,0.85); margin-bottom: 15px; width: 100%; }
         .result-box h2 { font-size: 1.1rem; color: #ff00ff; border-bottom: 1px solid #00ff41; margin-bottom: 10px; margin-top:0; font-weight: 900; }
         .result-content { font-size: 0.95rem; line-height: 1.7; color: #00ff41; }
+        
+        /* 4개 버튼 배치를 위한 그리드 수정 */
         .button-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; }
         .hidden-btn { display: none !important; }
     </style>
@@ -178,10 +181,11 @@
                     <div style="width:100%; max-width:550px; text-align:center;">
                         <h1 class="shiny-title">DESTINY</h1>
                         <p style="color:#00ff41; margin-bottom:20px;">궤도 분석 완료. 운명을 선택하라.</p>
-                        <div class="button-grid">
+                        <div id="selection-buttons" class="button-grid">
                             <button id="btn-love" class="cyber-btn" style="border-color:#ff00ff; color:#ff00ff;" onclick="showFortune('love')">[♥] LOVE</button>
                             <button id="btn-money" class="cyber-btn" style="border-color:#ffd700; color:#ffd700;" onclick="showFortune('money')">[$] MONEY</button>
                             <button id="btn-career" class="cyber-btn" style="border-color:#00ffff; color:#00ffff;" onclick="showFortune('career')">[!] CAREER</button>
+                            <button id="btn-health" class="cyber-btn" style="border-color:#00ff41; color:#00ff41;" onclick="showFortune('health')">[+] HEALTH</button>
                         </div>
                         <button id="btn-final-report" class="cyber-btn hidden-btn" style="background:#fff; color:#000; border-color:#00ff41; margin-top:20px;" onclick="showFinalReport()">[!] 2026_YEARLY_WHISPER</button>
                     </div>
@@ -229,27 +233,28 @@
     </div>
 
     <script>
-        // 전역 변수 초기화
+        // 전역 상태 관리
         let selectedLat = 37.5665; let selectedLon = 126.9780;
         let globalData = null;
-        let viewedFortunes = { love: false, money: false, career: false };
+        // [수정] 건강운(health) 추가
+        let viewedFortunes = { love: false, money: false, career: false, health: false };
         let loadingInterval;
 
         const rootStyle = document.documentElement.style;
         
-        // 지도 초기화 (Leaflet)
+        // 지도 설정
         const map = L.map('map', { zoomControl: false }).setView([selectedLat, selectedLon], 6);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
         let marker = L.marker([selectedLat, selectedLon]).addTo(map);
         map.on('click', (e) => { selectedLat = e.latlng.lat; selectedLon = e.latlng.lng; marker.setLatLng(e.latlng); });
 
-        // 화면 테마색 변경 함수 (질감 유지)
+        // 화면 색상 변경
         function setScreenColor(center, edge) {
             rootStyle.setProperty('--screen-bg-center', center);
             rootStyle.setProperty('--screen-bg-edge', edge);
         }
 
-        // 화면 전환 로직 (글리치 효과 추가)
+        // 화면 전환 (글리치)
         function switchScreen(id) {
             const content = document.getElementById('content');
             content.classList.add('glitch-active');
@@ -261,7 +266,7 @@
             setTimeout(() => content.classList.remove('glitch-active'), 400);
         }
 
-        // 별 관측 애니메이션 (보라색 심연 배경)
+        // 로딩 시퀀스 (보라색 심연)
         function startLoadingAnimation() {
             switchScreen('screen-loading');
             setScreenColor('#1a0414', '#0a0208'); 
@@ -283,14 +288,13 @@
             }, 500);
         }
 
-        // 로딩 중단 및 초기 테마 복구
         function stopLoadingAnimation() {
             clearInterval(loadingInterval);
             setScreenColor('#444444', '#111111');
             document.querySelectorAll('.star').forEach(s => s.remove());
         }
 
-        // 서버 데이터 요청 및 분석
+        // 분석 요청
         function startAnalysis() {
             const name = document.getElementById('userName').value;
             const date = document.getElementById('birthDate').value;
@@ -315,13 +319,14 @@
             .catch(err => { stopLoadingAnimation(); switchScreen('screen-input'); });
         }
 
-        // 운세 표시 및 배경 테마 전환
+        // [핵심] 운세 상세 출력 및 테마색 관리
         function showFortune(type) {
             const bgColors = { 
-                'love': ['#3a0d2e', '#1a0515'], 
-                'money': ['#3a2e0d', '#1a1505'], 
-                'career': ['#0d2e3a', '#05151a'], 
-                'monthly': ['#1a0414', '#0a0208'] // 월별 운세는 로딩 때처럼 보라색 심연 테마
+                'love': ['#3a0d2e', '#1a0515'],    // 자주
+                'money': ['#3a2e0d', '#1a1505'],   // 황금
+                'career': ['#0d2e3a', '#05151a'],  // 청록
+                'health': ['#0d3a2e', '#051a14'],  // 에메랄드 (건강)
+                'monthly': ['#1a0414', '#0a0208']  // 보라 심연 (마지막)
             };
             
             if(type !== 'monthly') {
@@ -329,31 +334,35 @@
                 if(document.getElementById(`btn-${type}`)) document.getElementById(`btn-${type}`).classList.add('hidden-btn');
                 setScreenColor(bgColors[type][0], bgColors[type][1]);
                 
-                // 상세 정보 업데이트
                 const t = document.getElementById('fortune-title'), st = document.getElementById('fortune-sub-title'), c = document.getElementById('res-fortune-content');
+                
                 if (type === 'love') { t.innerText = "2026_LOVE"; st.innerText = "[♥] RELATIONSHIP_LOG"; c.innerText = globalData.fortune_2026.love; }
                 else if (type === 'money') { t.innerText = "2026_MONEY"; st.innerText = "[$] WEALTH_STATUS"; c.innerText = globalData.fortune_2026.money; }
                 else if (type === 'career') { t.innerText = "2026_CAREER"; st.innerText = "[!] CAREER_UPDATE"; c.innerText = globalData.fortune_2026.career; }
+                // [추가] 건강운 데이터 연결
+                else if (type === 'health') { t.innerText = "2026_HEALTH"; st.innerText = "[+] VITALITY_LOG"; c.innerText = globalData.fortune_2026.health; }
+                
                 switchScreen('screen-fortune-detail');
             } else {
-                // [수정] 마지막 월별 운세 시퀀스
+                // 월별 운세 최종 화면
                 setScreenColor(bgColors.monthly[0], bgColors.monthly[1]);
                 document.getElementById('res-monthly-content').innerText = globalData.fortune_2026.monthly;
                 switchScreen('screen-monthly-final');
             }
 
-            if(viewedFortunes.love && viewedFortunes.money && viewedFortunes.career) {
+            // [수정] 4개 운세를 다 봤을 때만 최종 버튼 노출
+            if(viewedFortunes.love && viewedFortunes.money && viewedFortunes.career && viewedFortunes.health) {
                 document.getElementById('btn-final-report').classList.remove('hidden-btn');
             }
         }
 
-        // 선택 화면으로 복귀
+        // 선택 화면으로
         function returnToSelection() {
             setScreenColor('#444444', '#111111');
             switchScreen('screen-selection');
         }
 
-        // 총평 보고서 표시
+        // 최종 리포트 출력
         function showFinalReport() {
             document.getElementById('res-summary').innerText = globalData.fortune_2026.summary;
             document.getElementById('res-final-advice').innerText = globalData.fortune_2026.final_advice;
