@@ -56,40 +56,55 @@ def analyze():
         
         # 1. 태어난 시점 데이터
         natal_data = calculate_astrology(data.get('date'), data.get('time'), lat, lon)
-
-        # 2. [추가] 2026년 7월 1일 Transit 데이터 실시간 계산
+      
+# [수정] 현재 시점 타임존 및 JD 자동 계산
         tz_name = tf.timezone_at(lng=lon, lat=lat) or 'UTC'
         timezone = pytz.timezone(tz_name)
-        # 2026년 기준 정오 시간의 JD 계산
-        dt_2026 = timezone.localize(datetime(2026, 7, 1, 12, 0))
-        jd_2026 = swe.julday(2026, 7, 1, 12.0 - (dt_2026.utcoffset().total_seconds() / 3600.0))
         
-        transit_2026 = {}
-        for p_name, p_code in zip(["Jupiter", "Saturn", "Uranus", "Pluto"], 
-                                  [swe.JUPITER, swe.SATURN, swe.URANUS, swe.PLUTO]):
-            pos = swe.calc_ut(jd_2026, p_code)[0][0]
-            transit_2026[p_name] = ZODIAC_SIGNS[int(pos // 30)]
+        # 1. 2026년 전체 흐름 기준 (사용자가 원한 2026년 7월 1일 고정)
+        dt_year = timezone.localize(datetime(2026, 7, 1, 12, 0))
+        jd_year = swe.julday(2026, 7, 1, 12.0 - (dt_year.utcoffset().total_seconds() / 3600.0))
+        
+        # 2. [핵심 수정] "이번 달" 기준 - 실제 현재 서버 시간(now)을 사용
+        now = datetime.now(timezone)
+        jd_now = swe.julday(now.year, now.month, now.day, now.hour - (now.utcoffset().total_seconds() / 3600.0))
 
-        # 3. AI 프롬프트 구성
+        def get_transits(jd):
+            res = {}
+            for p_name, p_code in zip(["Jupiter", "Saturn", "Uranus", "Pluto"], [swe.JUPITER, swe.SATURN, swe.URANUS, swe.PLUTO]):
+                pos = swe.calc_ut(jd, p_code)[0][0]
+                res[p_name] = ZODIAC_SIGNS[int(pos // 30)]
+            return res
+
+        transit_year = get_transits(jd_year)
+        transit_now = get_transits(jd_now) # 현재 시점의 행성 위치
+
+        # 3. AI 프롬프트 수정
         prompt = f"""
-        너는 먼 우주에서온 딱 중요한 것만 보는 쪽집게 점성술사 플루토야. 반드시 '{user_lang}' 언어로, 냉철한 반말 스타일로 대답해.
+        너는 먼 우주에서온 쪽집게 점성술사 플루토야. 반드시 '{user_lang}' 언어로, 반말 스타일로 대답해.
         [데이터]
-        - 네이탈(탄생): {json.dumps(natal_data, ensure_ascii=False)}
-        - 2026년 7월 Transit: {json.dumps(transit_2026, ensure_ascii=False)}
+        - 탄생 데이터: {json.dumps(natal_data, ensure_ascii=False)}
+        - 2026년 전체 흐름: {json.dumps(transit_year, ensure_ascii=False)}
+        - {now.year}년 {now.month}월 현재 흐름: {json.dumps(transit_now, ensure_ascii=False)}
 
-        위 데이터를 비교해서 {data.get('name')}의 성격과 2026년 운세를 분석해.
+        위 데이터를 비교해서 {data.get('name')}을 분석해.
         **반드시 아래 JSON 형식으로만 응답해:**
         {{
             "personality": "성격 분석",
             "pros": "장점",
             "cons": "단점",
+            "current_month": "{now.year}.{now.month:02d}", 
             "fortune_2026": {{
                 "love": "2026년 연애운",
                 "money": "2026년 재물운",
-                "career": "2026년 직장/학업운"
+                "career": "2026년 직장/학업운",
+                "summary": "2026년 종합 정리",
+                "final_advice": "마지막 조언",
+                "monthly": "{now.month}월 이번 달의 상세 운세"
             }}
         }}
         """
+        # [수정 끝] 이후 response = client.models.generate_content(...) 로 이어짐
 
         response = client.models.generate_content(model='gemini-2.0-flash', contents=prompt)
         cleaned_text = re.sub(r"```json|```", "", response.text).strip()
@@ -100,4 +115,5 @@ def analyze():
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 8080)))
+
 
