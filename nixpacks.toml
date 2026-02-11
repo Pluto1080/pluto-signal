@@ -1,3 +1,2 @@
-# Railway에게 필요한 시스템 부품을 알려주는 설계도입니다.
 [phases.setup]
 nixPkgs = ["python3", "sqlite"]
