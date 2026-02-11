@@ -7,16 +7,67 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <style>
-        /* 폰트: 고전 컴퓨터 감성의 '둥근모' 폰트 적용 */
         @import url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/DungGeunMo.woff');
 
         * { box-sizing: border-box; }
+        
+        /* 전체 배경: 방 안의 어두운 느낌 */
         body {
-            background: radial-gradient(circle at center, #1a0033 0%, #000000 100%);
-            color: #00ff41; 
-            font-family: 'DungGeunMo', 'Courier New', monospace; /* 전체 폰트 적용 */
-            margin: 0; padding: 0; overflow: hidden;
+            background: #0a0a0a;
+            margin: 0; padding: 0;
+            display: flex; align-items: center; justify-content: center;
             height: 100vh; width: 100vw;
+            overflow: hidden;
+            font-family: 'DungGeunMo', monospace;
+        }
+
+        /* 아이맥/CRT 모니터 외관 프레임 */
+        .monitor-frame {
+            width: 95vw; height: 90vh;
+            max-width: 1000px; max-height: 800px;
+            background: #2a2a2a; /* 케이스 색상 */
+            border-radius: 40px;
+            padding: 30px;
+            box-shadow: 
+                inset 0 0 20px #000,
+                0 20px 50px rgba(0,0,0,0.8),
+                0 0 0 10px #1a1a1a;
+            position: relative;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        /* 실제 화면 영역 */
+        .screen-container {
+            width: 100%; height: 100%;
+            background: #000;
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+            border: 10px solid #111;
+            /* 화면이 살짝 튀어나온 듯한 효과 */
+            box-shadow: inset 0 0 100px rgba(0, 255, 65, 0.1);
+        }
+
+        /* CRT 스캔라인 및 플리커 효과 overlay */
+        .crt-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 4px, 3px 100%;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        /* 화면 미세 떨림 애니메이션 */
+        @keyframes flicker {
+            0% { opacity: 0.98; } 50% { opacity: 1; } 100% { opacity: 0.99; }
+        }
+        .screen-content {
+            width: 100%; height: 100%;
+            position: relative;
+            animation: flicker 0.1s infinite;
+            background: radial-gradient(circle at center, #1a0033 0%, #000000 100%);
+            overflow-y: auto;
         }
 
         .screen {
@@ -26,24 +77,33 @@
             transition: opacity 0.5s ease-in-out;
             opacity: 0; pointer-events: none; z-index: 0;
         }
-        .screen.active {
-            opacity: 1; pointer-events: auto; z-index: 10;
-        }
+        .screen.active { opacity: 1; pointer-events: auto; z-index: 10; }
 
-        /* [요구사항] 흔들림 제거 및 광택 효과 타이틀 */
+        /* 타이틀: 광택 효과 */
         h1.shiny-title { 
-            font-size: 2rem; letter-spacing: 2px; text-align: center; margin-bottom: 30px; 
+            font-size: 2rem; letter-spacing: 2px; text-align: center; margin-bottom: 20px; 
             background: linear-gradient(90deg, #00ff41, #ffffff, #00ff41);
             background-size: 200% auto;
             color: transparent;
             -webkit-background-clip: text;
             background-clip: text;
             animation: shine 3s linear infinite;
-            filter: drop-shadow(0 0 5px rgba(0, 255, 65, 0.5));
+            filter: drop-shadow(0 0 8px #00ff41);
         }
-        @keyframes shine {
-            to { background-position: 200% center; }
+        @keyframes shine { to { background-position: 200% center; } }
+
+        .container {
+            width: 100%; max-width: 500px;
+            padding: 20px;
         }
+
+        /* 인풋 및 버튼 도트 스타일 */
+        input, select {
+            background: rgba(0, 0, 0, 0.5); border: 2px solid #00ff41; color: #00ff41; 
+            padding: 10px; width: 100%; font-family: 'DungGeunMo'; font-size: 1rem;
+            margin-top: 5px; outline: none;
+        }
+        .input-group label { color: #ff00ff; font-size: 0.9rem; text-shadow: 0 0 5px #ff00ff; }
 
         button.cyber-btn {
             background: #00ff41; color: #000; border: 4px solid #008f11; padding: 15px; width: 100%;
@@ -52,215 +112,164 @@
         }
         button.cyber-btn:hover { background: #ff00ff; border-color: #aa00aa; box-shadow: 4px 4px 0 #550055; color: #fff; }
 
-        #screen-input .container {
-            width: 100%; max-width: 600px; max-height: 90vh; overflow-y: auto;
-            border: 4px solid #00ff41; padding: 25px;
-            background: rgba(20, 0, 40, 0.9);
-        }
-        .input-group { margin-bottom: 15px; width: 100%; }
-        .input-group label { display: block; margin-bottom: 5px; color: #ff00ff; font-size: 1rem; }
-        
-        input, select {
-            background: #000; border: 2px solid #00ff41; color: #00ff41; padding: 10px; width: 100%;
-            font-size: 1rem; font-family: 'DungGeunMo'; outline: none;
-        }
-        /* 데이트피커 등 아이콘 색상 조정 */
-        input::-webkit-calendar-picker-indicator { filter: invert(1) sepia(1) saturate(5) hue-rotate(80deg); }
+        #map { height: 150px; width: 100%; border: 3px solid #00ff41; margin-top: 10px; filter: invert(100%) hue-rotate(180deg); }
 
-        #map { height: 200px; width: 100%; border: 4px solid #00ff41; filter: invert(100%) hue-rotate(180deg); }
-
-        #screen-loading { background: #000; overflow: hidden; }
-        
         #loading-text { 
-            font-size: 1.8rem; color: #FFD700; z-index: 20; text-align: center;
-            text-shadow: 0 0 10px #FFD700;
+            font-size: 1.8rem; color: #FFD700; text-shadow: 0 0 10px #FFD700;
             animation: blink 0.8s steps(2) infinite;
         }
         @keyframes blink { to { visibility: hidden; } }
 
-        /* [요구사항] 픽셀 스타일 별똥별 */
+        /* 픽셀 별똥별 */
         .star { 
-            position: absolute; 
-            width: 6px; height: 6px; /* 도트 크기 */
-            background: #FFD700; 
-            border-radius: 0; /* 완벽한 네모 */
-            /* 픽셀 꼬리 효과: 그림자를 계단식으로 배치 */
-            box-shadow: 
-                -6px -6px 0 0 rgba(255, 215, 0, 0.6),
-                -12px -12px 0 0 rgba(255, 215, 0, 0.4),
-                -18px -18px 0 0 rgba(255, 215, 0, 0.2);
-            animation: shooting-star linear infinite; 
-            opacity: 0;
+            position: absolute; width: 6px; height: 6px; background: #FFD700; 
+            box-shadow: -6px -6px 0 rgba(255, 215, 0, 0.6), -12px -12px 0 rgba(255, 215, 0, 0.3);
+            animation: shooting-star linear infinite; opacity: 0;
         }
         @keyframes shooting-star { 
             0% { transform: translate(0, 0); opacity: 1; } 
-            100% { transform: translate(-80vw, 80vh); opacity: 0; } 
+            100% { transform: translate(-70vw, 70vh); opacity: 0; } 
         }
 
-        #screen-result { padding: 20px 10px; overflow-y: auto; display: block; }
-        #screen-result .container { width: 100%; max-width: 700px; margin: 0 auto; }
-        .result-box { margin-bottom: 25px; border: 4px solid #00ff41; padding: 20px; background: rgba(0, 0, 0, 0.8); }
-        .result-box h2 { margin-top: 0; color: #ff00ff; border-bottom: 2px solid #00ff41; padding-bottom: 10px; font-size: 1.2rem; }
-        .result-content { white-space: pre-wrap; line-height: 1.6; font-size: 1.1rem; word-break: keep-all; }
-        .pros-box { border-color: #00ffff; }
-        .cons-box { border-color: #ff0055; }
-        .pros-box h2 { color: #00ffff; }
-        .cons-box h2 { color: #ff0055; }
+        .result-box { border: 3px solid #00ff41; padding: 15px; background: rgba(0,0,0,0.7); margin-bottom: 15px; }
+        .result-box h2 { font-size: 1.1rem; color: #ff00ff; border-bottom: 1px solid #00ff41; margin: 0 0 10px 0; padding-bottom: 5px; }
+        .result-content { font-size: 1rem; line-height: 1.5; color: #00ff41; }
     </style>
 </head>
 <body>
-    <section id="screen-input" class="screen active">
-        <div class="container">
-            <h1 class="shiny-title">ACCESS: PLUTO</h1>
-            <p style="text-align: center; color: #8844ff; font-size: 0.8rem; margin-top:-15px;">>> ASTRO_DATA_REQUIRED...</p>
-            
-            <div class="input-group">
-                <label>NAME</label>
-                <input type="text" id="userName" placeholder="이름 입력">
-            </div>
-            <div class="input-group" style="display: flex; gap: 10px;">
-                <div style="flex: 2;">
-                    <label>BIRTH_DATE</label>
-                    <input type="date" id="birthDate" max="9999-12-31">
-                </div>
-                <div style="flex: 1.5;">
-                    <label>BIRTH_TIME (24H)</label>
-                    <input type="time" id="birthTime" lang="en-GB">
-                </div>
-            </div>
-            <div style="margin-bottom: 15px; display: flex; align-items: center;">
-                <input type="checkbox" id="timeUnknown" onchange="toggleTimeInput()" style="width: auto; margin-right: 8px;">
-                <label for="timeUnknown" style="display: inline; color: #00ff41; margin:0; font-size:0.9rem;">시간 모름 (정확도 ↓)</label>
-            </div>
-            <div class="input-group">
-                <label>LOCATION (터치하여 핀 고정)</label>
-                <div id="map"></div>
-                <span id="coordsDisplay" style="font-size: 0.7rem; color: #8844ff;">위도: 37.5665 / 경도: 126.9780 (서울)</span>
-            </div>
-            <button class="cyber-btn" onclick="startAnalysis()">INITIATE_SEQUENCE</button>
-        </div>
-    </section>
 
-    <section id="screen-loading" class="screen">
-        <div id="loading-text">별의 소리를 관측하는 중</div>
-    </section>
+    <div class="monitor-frame">
+        <div class="screen-container">
+            <div class="crt-overlay"></div>
+            <div class="screen-content">
+                
+                <section id="screen-input" class="screen active">
+                    <div class="container">
+                        <h1 class="shiny-title">ACCESS: PLUTO</h1>
+                        <div class="input-group" style="margin-bottom:10px;">
+                            <label>NAME</label>
+                            <input type="text" id="userName" placeholder="이름 입력">
+                        </div>
+                        <div style="display: flex; gap: 10px; margin-bottom:10px;">
+                            <div style="flex: 1;">
+                                <label>DATE</label>
+                                <input type="date" id="birthDate" max="9999-12-31">
+                            </div>
+                            <div style="flex: 1;">
+                                <label>TIME (24H)</label>
+                                <input type="time" id="birthTime" lang="en-GB">
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                            <input type="checkbox" id="timeUnknown" onchange="toggleTimeInput()" style="width: 20px; margin-right: 10px;">
+                            <label for="timeUnknown" style="color: #00ff41; font-size: 0.8rem;">시간 모름</label>
+                        </div>
+                        <div class="input-group">
+                            <label>LOCATION</label>
+                            <div id="map"></div>
+                        </div>
+                        <button class="cyber-btn" onclick="startAnalysis()">INITIATE_SEQUENCE</button>
+                    </div>
+                </section>
 
-    <section id="screen-result" class="screen">
-        <div class="container" style="padding-top: 30px;">
-             <h1 class="shiny-title" style="font-size: 1.5rem;">ANALYSIS_COMPLETE</h1>
-             <div class="result-box personality-box">
-                 <h2>>> CORE_PERSONALITY (성격)</h2>
-                 <div id="res-personality" class="result-content">데이터 로딩 중...</div>
-             </div>
-             <div class="result-box pros-box">
-                 <h2>[+] STRENGTHS (장점)</h2>
-                 <div id="res-pros" class="result-content">데이터 로딩 중...</div>
-             </div>
-             <div class="result-box cons-box">
-                 <h2>[-] WEAKNESSES (단점)</h2>
-                 <div id="res-cons" class="result-content">데이터 로딩 중...</div>
-             </div>
-             <button class="cyber-btn" onclick="location.reload()" style="margin-bottom: 30px;">RESTART_SESSION</button>
+                <section id="screen-loading" class="screen">
+                    <div id="loading-text">별의 소리를 관측하는 중</div>
+                </section>
+
+                <section id="screen-result" class="screen">
+                    <div class="container" style="max-height: 90%; overflow-y: auto;">
+                        <h1 class="shiny-title" style="font-size: 1.5rem;">ANALYSIS_COMPLETE</h1>
+                        <div class="result-box">
+                            <h2>>> CORE_PERSONALITY</h2>
+                            <div id="res-personality" class="result-content"></div>
+                        </div>
+                        <div class="result-box" style="border-color: #00ffff;">
+                            <h2 style="color: #00ffff;">[+] STRENGTHS</h2>
+                            <div id="res-pros" class="result-content"></div>
+                        </div>
+                        <div class="result-box" style="border-color: #ff0055;">
+                            <h2 style="color: #ff0055;">[-] WEAKNESSES</h2>
+                            <div id="res-cons" class="result-content"></div>
+                        </div>
+                        <button class="cyber-btn" onclick="location.reload()">RESTART</button>
+                    </div>
+                </section>
+
+            </div>
         </div>
-    </section>
+    </div>
 
     <script>
         let selectedLat = 37.5665; let selectedLon = 126.9780;
         const map = L.map('map', { zoomControl: false }).setView([selectedLat, selectedLon], 6);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '' }).addTo(map);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
         let marker = L.marker([selectedLat, selectedLon]).addTo(map);
-        map.on('click', function(e) {
+        map.on('click', (e) => {
             selectedLat = e.latlng.lat; selectedLon = e.latlng.lng;
             marker.setLatLng(e.latlng);
-            document.getElementById('coordsDisplay').innerText = `위도: ${selectedLat.toFixed(4)} / 경도: ${selectedLon.toFixed(4)}`;
         });
 
         function toggleTimeInput() {
             const timeInput = document.getElementById('birthTime');
-            const isUnknown = document.getElementById('timeUnknown').checked;
-            timeInput.disabled = isUnknown;
-            timeInput.style.opacity = isUnknown ? "0.5" : "1";
+            timeInput.disabled = document.getElementById('timeUnknown').checked;
+            timeInput.style.opacity = timeInput.disabled ? "0.3" : "1";
         }
 
-        function switchScreen(screenId) {
+        function switchScreen(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(screenId).classList.add('active');
+            document.getElementById(id).classList.add('active');
         }
 
         let loadingInterval;
         function startLoadingAnimation() {
             switchScreen('screen-loading');
-            const loadingScreen = document.getElementById('screen-loading');
-            
-            // [요구사항] 픽셀 별똥별 생성 로직
-            for(let i=0; i<30; i++) {
+            const screen = document.querySelector('.screen-content');
+            for(let i=0; i<25; i++) {
                 let star = document.createElement('div');
                 star.className = 'star';
-                star.style.left = `${Math.floor(Math.random() * 150)}vw`; 
+                star.style.left = `${Math.random() * 120}vw`;
                 star.style.top = `-${Math.random() * 20}vh`;
-                
-                const duration = Math.random() * 0.8 + 0.4;
-                star.style.animationDuration = `${duration}s`;
+                star.style.animationDuration = `${Math.random() * 0.7 + 0.3}s`;
                 star.style.animationDelay = `${Math.random() * 2}s`;
-                
-                loadingScreen.appendChild(star);
+                screen.appendChild(star);
             }
-            
-            const textElement = document.getElementById('loading-text');
             let dots = 0;
             loadingInterval = setInterval(() => {
                 dots = (dots + 1) % 4;
-                textElement.innerText = "별의 소리를 관측하는 중" + ".".repeat(dots);
+                document.getElementById('loading-text').innerText = "별의 소리를 관측하는 중" + ".".repeat(dots);
             }, 500);
         }
 
         function stopLoadingAnimation() {
             clearInterval(loadingInterval);
-            document.querySelectorAll('.star').forEach(e => e.remove());
+            document.querySelectorAll('.star').forEach(s => s.remove());
         }
 
         function startAnalysis() {
             const name = document.getElementById('userName').value;
             const date = document.getElementById('birthDate').value;
-            const isUnknown = document.getElementById('timeUnknown').checked;
+            const unknown = document.getElementById('timeUnknown').checked;
             let time = document.getElementById('birthTime').value;
-
-            const userLang = navigator.language || 'ko-KR';
-
-            if(!name || !date || (!isUnknown && !time)) { alert("필수 데이터를 모두 입력하라."); return; }
-            if(isUnknown) time = "12:00";
-
+            if(!name || !date || (!unknown && !time)) { alert("데이터를 입력하라."); return; }
+            if(unknown) time = "12:00";
+            
             startLoadingAnimation();
 
             fetch('/analyze', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    name, date, time, 
-                    time_unknown: isUnknown, 
-                    lat: selectedLat, 
-                    lon: selectedLon,
-                    language: userLang
-                })
+                body: JSON.stringify({ name, date, time, time_unknown: unknown, lat: selectedLat, lon: selectedLon, language: navigator.language })
             })
-            .then(response => response.json())
+            .then(res => res.json())
             .then(data => {
                 stopLoadingAnimation();
-                if (data.error) {
-                    alert("오류 발생: " + data.error);
-                    switchScreen('screen-input');
-                    return;
-                }
-                document.getElementById('res-personality').innerText = data.personality || "분석 실패";
-                document.getElementById('res-pros').innerText = data.pros || "데이터 없음";
-                document.getElementById('res-cons').innerText = data.cons || "데이터 없음";
+                if(data.error) { alert(data.error); switchScreen('screen-input'); return; }
+                document.getElementById('res-personality').innerText = data.personality;
+                document.getElementById('res-pros').innerText = data.pros;
+                document.getElementById('res-cons').innerText = data.cons;
                 switchScreen('screen-result');
             })
-            .catch(err => {
-                stopLoadingAnimation();
-                alert("치명적 통신 오류: " + err);
-                switchScreen('screen-input');
-            });
+            .catch(err => { stopLoadingAnimation(); switchScreen('screen-input'); });
         }
     </script>
 </body>
