@@ -2,16 +2,19 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>TERMINAL: PLUTO</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <style>
+        /* 모든 요소의 여백 계산을 테두리 기준으로 맞춰서 삐져나감 방지 */
+        * { box-sizing: border-box; }
+
         body {
             background: radial-gradient(circle, #1a0033 0%, #000000 100%);
             color: #00ff41; font-family: 'Courier New', Courier, monospace;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            min-height: 100vh; margin: 0; overflow-x: hidden; padding: 20px 0;
+            min-height: 100vh; margin: 0; padding: 15px; overflow-x: hidden;
         }
 
         @keyframes glitch {
@@ -24,39 +27,53 @@
         }
 
         .container {
-            width: 90%; max-width: 650px; border: 1px solid #00ff41; padding: 30px;
+            width: 100%; max-width: 650px; border: 1px solid #00ff41; padding: 30px;
             background: rgba(20, 0, 40, 0.8);
             box-shadow: 0 0 30px rgba(0, 255, 65, 0.2), inset 0 0 20px rgba(128, 0, 255, 0.2);
         }
 
-        h1 { font-size: 1.8rem; letter-spacing: 5px; animation: glitch 0.3s infinite; text-shadow: 2px 0 #ff00ff, -2px 0 #00ffff; text-align: center; }
+        h1 { font-size: 1.8rem; letter-spacing: 5px; animation: glitch 0.3s infinite; text-shadow: 2px 0 #ff00ff, -2px 0 #00ffff; text-align: center; word-break: keep-all; }
 
-        .input-group { margin-bottom: 20px; text-align: left; }
-        .input-group label { display: block; font-weight: bold; margin-bottom: 5px; color: #ff00ff; }
+        .input-group { margin-bottom: 20px; text-align: left; width: 100%; }
+        .input-group label { display: block; font-weight: bold; margin-bottom: 5px; color: #ff00ff; font-size: 0.9rem; }
         
         input[type="text"], input[type="date"], input[type="time"] {
             background: transparent; border: 1px solid #00ff41; color: #00ff41;
-            padding: 10px; width: calc(100% - 24px); font-size: 1rem; outline: none; margin-bottom: 5px;
+            padding: 12px; width: 100%; font-size: 1rem; outline: none; margin-bottom: 5px;
+            /* 모바일 브라우저 기본 스타일 제거 */
+            -webkit-appearance: none; appearance: none; border-radius: 0;
         }
         
-        /* 다크/해커 테마에 맞게 지도 색상 반전 */
-        #map { height: 250px; width: 100%; border: 1px solid #00ff41; margin-bottom: 20px; filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(80%); }
+        #map { height: 250px; width: 100%; border: 1px solid #00ff41; margin-bottom: 10px; filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(80%); }
 
         button {
             background: #00ff41; color: #000; border: none; padding: 15px; width: 100%;
             font-weight: bold; font-size: 1.2rem; cursor: pointer; box-shadow: 0 0 15px #00ff41; transition: 0.2s; margin-top: 10px;
+            -webkit-appearance: none; appearance: none; border-radius: 0;
         }
-        button:hover { background: #ff00ff; box-shadow: 0 0 20px #ff00ff; }
+        button:hover { background: #ff00ff; box-shadow: 0 0 20px #ff00ff; color: #fff; }
 
-        #result-area { margin-top: 30px; padding: 20px; border-top: 1px dashed rgba(0, 255, 65, 0.5); font-size: 1.1rem; line-height: 1.8; white-space: pre-wrap; }
+        #result-area { margin-top: 30px; padding: 20px; border-top: 1px dashed rgba(0, 255, 65, 0.5); font-size: 1.05rem; line-height: 1.6; white-space: pre-wrap; word-break: break-word; }
         .loading { color: #ff00ff; animation: blink 0.5s infinite; }
         @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
+        /* 📱 스마트폰(가로 600px 이하)을 위한 반응형 최적화 */
+        @media (max-width: 600px) {
+            body { padding: 10px; }
+            .container { padding: 20px 15px; }
+            h1 { font-size: 1.4rem; letter-spacing: 2px; }
+            input[type="text"], input[type="date"], input[type="time"] { padding: 10px; font-size: 0.95rem; }
+            button { padding: 12px; font-size: 1.1rem; }
+            #map { height: 200px; } /* 모바일에서는 지도를 살짝 작게 */
+            #result-area { padding: 15px 10px; font-size: 0.95rem; }
+            #coordsDisplay { font-size: 0.75rem; }
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>ACCESS: PLUTO</h1>
-        <p style="text-align: center; color: #8844ff; font-size: 0.9rem;">>> ASTRO_DATA_REQUIRED...</p>
+        <p style="text-align: center; color: #8844ff; font-size: 0.8rem; margin-top:-10px;">>> ASTRO_DATA_REQUIRED...</p>
         
         <div class="input-group">
             <label>NAME</label>
@@ -69,15 +86,15 @@
         <div class="input-group">
             <label>BIRTH_TIME</label>
             <input type="time" id="birthTime">
-            <div>
-                <input type="checkbox" id="timeUnknown" onchange="toggleTimeInput()" style="width: auto;">
-                <label for="timeUnknown" style="display: inline; color: #00ff41; font-weight: normal;">태어난 시간을 몰라 (정확도 하락)</label>
+            <div style="margin-top: 5px; display: flex; align-items: center;">
+                <input type="checkbox" id="timeUnknown" onchange="toggleTimeInput()" style="width: 18px; height: 18px; margin-right: 8px;">
+                <label for="timeUnknown" style="display: inline; color: #00ff41; font-weight: normal; margin-bottom: 0;">태어난 시간을 몰라 (정확도 하락)</label>
             </div>
         </div>
         <div class="input-group">
-            <label>BIRTH_LOCATION (클릭해서 핀 고정)</label>
+            <label>BIRTH_LOCATION (터치해서 핀 고정)</label>
             <div id="map"></div>
-            <span id="coordsDisplay" style="font-size: 0.8rem; color: #8844ff;">위도: 37.5665 / 경도: 126.9780 (기본값: 서울)</span>
+            <span id="coordsDisplay" style="font-size: 0.8rem; color: #8844ff; word-break: break-all;">위도: 37.5665 / 경도: 126.9780 (기본값: 서울)</span>
         </div>
 
         <button onclick="startComm()">INITIATE_ANALYSIS</button>
@@ -88,11 +105,9 @@
     </div>
 
     <script>
-        // 변수 초기화
         let selectedLat = 37.5665;
         let selectedLon = 126.9780;
 
-        // 지도 설정 (서울 기본 세팅)
         const map = L.map('map').setView([selectedLat, selectedLon], 6);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap'
@@ -100,7 +115,6 @@
 
         let marker = L.marker([selectedLat, selectedLon]).addTo(map);
 
-        // 지도 클릭 시 마커 이동
         map.on('click', function(e) {
             selectedLat = e.latlng.lat;
             selectedLon = e.latlng.lng;
@@ -108,15 +122,16 @@
             document.getElementById('coordsDisplay').innerText = `위도: ${selectedLat.toFixed(4)} / 경도: ${selectedLon.toFixed(4)}`;
         });
 
-        // 시간 모름 체크박스 로직
         function toggleTimeInput() {
             const timeInput = document.getElementById('birthTime');
             const isUnknown = document.getElementById('timeUnknown').checked;
             if(isUnknown) {
                 timeInput.value = "";
                 timeInput.disabled = true;
+                timeInput.style.opacity = "0.5";
             } else {
                 timeInput.disabled = false;
+                timeInput.style.opacity = "1";
             }
         }
 
@@ -132,10 +147,13 @@
                 return;
             }
 
-            if(isUnknown) time = "12:00"; // 모를 경우 기본값
+            if(isUnknown) time = "12:00"; 
 
             resultText.className = "loading";
             resultText.innerText = ">> CALCULATING_PLANETARY_POSITIONS... [WAIT]";
+
+            // 화면을 살짝 아래로 스크롤하여 결과창이 보이게 함 (모바일 배려)
+            document.getElementById('result-area').scrollIntoView({ behavior: 'smooth' });
 
             fetch('/analyze', {
                 method: 'POST',
