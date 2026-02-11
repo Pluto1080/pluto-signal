@@ -25,7 +25,7 @@
             font-family: 'DungGeunMo', monospace;
         }
 
-        /* 모니터 프레임 고정 (절대 변하지 않음) */
+        /* [프레임] 모니터 외관 고정 */
         .monitor-frame {
             width: 95vw; height: 90vh;
             max-width: 1000px; max-height: 800px;
@@ -35,7 +35,7 @@
             position: relative; display: flex; align-items: center; justify-content: center;
         }
 
-        /* 찌릿한 짧은 글리치 효과 */
+        /* [글리치] 찌릿한 짧은 효과 */
         @keyframes glitch-short {
             0% { transform: translate(0); }
             20% { transform: translate(-3px, 0); filter: brightness(1.2); }
@@ -50,7 +50,7 @@
             box-shadow: inset 0 0 80px rgba(0, 255, 65, 0.1);
         }
 
-        /* CRT 질감 레이어 */
+        /* [질감] CRT 스캔라인 */
         .crt-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
@@ -58,7 +58,7 @@
             background-size: 100% 3px, 3px 100%; pointer-events: none; z-index: 100; opacity: 0.8;
         }
 
-        /* [복구] 화면 내용 배경: 질감 유지 및 밝기 변화(Pulse) */
+        /* [배경] 숨쉬는 밝기 효과 복구 */
         .screen-content {
             width: 100%; height: 100%;
             background: radial-gradient(circle at center, var(--screen-bg-center) 0%, var(--screen-bg-edge) 100%);
@@ -66,7 +66,7 @@
             animation: screen-pulse 8s ease-in-out infinite;
         }
 
-        /* [복구] 뿌연 안개 느낌을 주는 움직이는 광원(Sweep) */
+        /* [안개] 흐르는 빛 복구 */
         .screen-content::after {
             content: "";
             position: absolute; top: 0; left: -100%;
@@ -97,12 +97,9 @@
         }
         @keyframes shine-v { to { background-position: center 200%; } }
 
-        /* [복구] 별들의 광채 및 슈팅 애니메이션 (화면 안에서만 움직이도록 수정) */
+        /* [별] 광채 복구 */
         .star { 
-            position: absolute; 
-            background: #FFD700; 
-            border-radius: 0; 
-            opacity: 0; 
+            position: absolute; background: #FFD700; border-radius: 0; opacity: 0; 
             box-shadow: 0 0 8px #FFD700, -2px -2px 0px rgba(255, 215, 0, 0.4);
             animation: shooting-star linear infinite; 
         }
@@ -176,7 +173,7 @@
                     </div>
                 </section>
 
-                <section id="selection-buttons" class="screen">
+                <section id="screen-selection" class="screen">
                     <div style="width:100%; max-width:550px; text-align:center;">
                         <h1 class="shiny-title">DESTINY</h1>
                         <p style="color:#00ff41; margin-bottom:20px;">궤도 분석 완료. 운명을 선택하라.</p>
@@ -185,7 +182,7 @@
                             <button id="btn-money" class="cyber-btn" style="border-color:#ffd700; color:#ffd700;" onclick="showFortune('money')">[$] MONEY</button>
                             <button id="btn-career" class="cyber-btn" style="border-color:#00ffff; color:#00ffff;" onclick="showFortune('career')">[!] CAREER</button>
                         </div>
-                        <button id="btn-final-report" class="cyber-btn hidden-btn" style="background:#fff; color:#000; border-color:#00ff41;" onclick="showFinalReport()">[!] 2026_YEARLY_WHISPER</button>
+                        <button id="btn-final-report" class="cyber-btn hidden-btn" style="background:#fff; color:#000; border-color:#00ff41; margin-top:20px;" onclick="showFinalReport()">[!] 2026_YEARLY_WHISPER</button>
                     </div>
                 </section>
 
@@ -243,18 +240,17 @@
             content.classList.add('glitch-active');
             setTimeout(() => {
                 document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-                document.getElementById(id).classList.add('active');
+                const target = document.getElementById(id);
+                if(target) target.classList.add('active'); // ID가 맞으면 화면 표시
             }, 150);
             setTimeout(() => content.classList.remove('glitch-active'), 400);
         }
 
         function startLoadingAnimation() {
             switchScreen('screen-loading');
-            // [수정] 심연처럼 어두운 보라색 톤 적용
-            setScreenColor('#1a0414', '#0a0208'); 
+            setScreenColor('#1a0414', '#0a0208'); // 어두운 심연 보라색 복구
             
             const screen = document.getElementById('content');
-            // [수정] 별들을 화면 안쪽(%)에 배치하고 광채 추가
             for(let i=0; i<35; i++) {
                 let star = document.createElement('div');
                 star.className = 'star';
@@ -304,6 +300,7 @@
         }
 
         function showFortune(type) {
+            // 버튼별 배경색 설정
             const bgColors = { 
                 'love': ['#3a0d2e', '#1a0515'], 
                 'money': ['#3a2e0d', '#1a1505'], 
@@ -320,13 +317,18 @@
             else if (type === 'money') { t.innerText = "2026_MONEY"; st.innerText = "[$] WEALTH_STATUS"; c.innerText = globalData.fortune_2026.money; }
             else if (type === 'career') { t.innerText = "2026_CAREER"; st.innerText = "[!] CAREER_UPDATE"; c.innerText = globalData.fortune_2026.career; }
             else if (type === 'monthly') { t.innerText = "MONTHLY_LOG"; st.innerText = "[*] ORBIT_STATUS"; c.innerText = globalData.fortune_2026.monthly; }
-            switchScreen('screen-fortune-detail');
-            if(viewedFortunes.love && viewedFortunes.money && viewedFortunes.career) document.getElementById('btn-final-report').classList.remove('hidden-btn');
+            
+            switchScreen('screen-fortune-detail'); // 상세 화면으로 전환
+            
+            // 모든 운세를 다 봤으면 최종 리포트 버튼 표시
+            if(viewedFortunes.love && viewedFortunes.money && viewedFortunes.career) {
+                document.getElementById('btn-final-report').classList.remove('hidden-btn');
+            }
         }
 
         function returnToSelection() {
-            setScreenColor('#444444', '#111111');
-            switchScreen('selection-buttons');
+            setScreenColor('#444444', '#111111'); // 기본색으로 복귀
+            switchScreen('screen-selection'); // 선택 화면(DESTINY)으로 복귀
         }
 
         function showFinalReport() {
