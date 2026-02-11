@@ -8,212 +8,80 @@
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <style>
         @import url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/DungGeunMo.woff');
-
         * { box-sizing: border-box; }
-        
-        /* 스크롤바 숨기기 */
         ::-webkit-scrollbar { display: none; }
-        * { -ms-overflow-style: none; scrollbar-width: none; }
+        body { background: #050505; margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; overflow: hidden; font-family: 'DungGeunMo', monospace; }
 
-        body {
-            background: #050505;
-            margin: 0; padding: 0;
-            display: flex; align-items: center; justify-content: center;
-            height: 100vh; width: 100vw;
-            overflow: hidden;
-            font-family: 'DungGeunMo', monospace;
-        }
-
-        /* 아이맥 G3 본디 블루 스타일 프레임 */
         .monitor-frame {
-            width: 95vw; height: 90vh;
-            max-width: 1000px; max-height: 800px;
+            width: 95vw; height: 90vh; max-width: 1000px;
             background: radial-gradient(circle at 30% 30%, #00a8a8 0%, #006666 100%);
-            border-radius: 60px;
-            padding: 35px;
-            box-shadow: 
-                inset 0 0 30px rgba(255,255,255,0.2),
-                0 30px 60px rgba(0,0,0,0.8), 
-                0 0 0 10px #004d4d;
-            position: relative;
-            display: flex; align-items: center; justify-content: center;
-            transition: all 0.3s ease;
+            border-radius: 60px; padding: 35px; position: relative; display: flex; align-items: center; justify-content: center;
+            box-shadow: inset 0 0 30px rgba(255,255,255,0.2), 0 30px 60px rgba(0,0,0,0.8), 0 0 0 10px #004d4d;
         }
 
-        /* [요구사항] 모바일 대응 미디어 쿼리 */
         @media (max-width: 768px) {
-            .monitor-frame {
-                width: 98vw;
-                height: 95vh;
-                padding: 15px;
-                border-radius: 30px;
-            }
-            .screen-container {
-                border-width: 6px !important;
-                border-radius: 15px !important;
-            }
-            h1.shiny-title { font-size: 1.2rem !important; }
-            
-            /* 장단점 칸을 한 줄로 길게 변경 */
-            .result-split-row {
-                flex-direction: column !important;
-            }
-            .result-box { margin-bottom: 10px !important; }
-
-            /* 로딩 텍스트 가운데 정렬 및 폰트 조정 */
-            #loading-text {
-                font-size: 1.2rem !important;
-                width: 90%;
-                margin: 0 auto;
-            }
+            .monitor-frame { width: 98vw; height: 95vh; padding: 15px; border-radius: 30px; }
+            .result-split-row { flex-direction: column !important; }
+            #loading-text { font-size: 1.2rem !important; }
         }
 
-        .screen-container {
-            width: 100%; height: 100%;
-            background: #000;
-            border-radius: 30px;
-            position: relative;
-            overflow: hidden;
-            border: 12px solid #111;
-            box-shadow: inset 0 0 80px rgba(0, 255, 65, 0.1);
+        .screen-container { width: 100%; height: 100%; background: #000; border-radius: 30px; position: relative; overflow: hidden; border: 12px solid #111; }
+        .crt-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 100; pointer-events: none;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.05), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.05));
+            background-size: 100% 3px, 3px 100%; animation: ambient-light 4s ease-in-out infinite;
         }
+        @keyframes ambient-light { 0%, 100% { opacity: 0.7; } 50% { opacity: 1; } }
 
-        .crt-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
-                        linear-gradient(90deg, rgba(255, 0, 0, 0.05), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.05));
-            background-size: 100% 3px, 3px 100%;
-            pointer-events: none;
-            z-index: 100;
-            animation: ambient-light 4s ease-in-out infinite;
-        }
+        .screen-content { width: 100%; height: 100%; background: radial-gradient(circle at center, #222 0%, #000 100%); position: relative; animation: screen-pulse 8s ease-in-out infinite; }
+        @keyframes screen-pulse { 0%, 100% { filter: brightness(0.9); } 50% { filter: brightness(1.1); } }
 
-        @keyframes ambient-light {
-            0%, 100% { opacity: 0.7; }
-            50% { opacity: 1; }
-        }
-
-        .screen-content {
-            width: 100%; height: 100%;
-            background: radial-gradient(circle at center, #222222 0%, #000000 100%);
-            position: relative;
-            animation: screen-pulse 8s ease-in-out infinite;
-        }
-
-        @keyframes screen-pulse {
-            0%, 100% { filter: brightness(0.9); }
-            50% { filter: brightness(1.1); }
-        }
-
-        .screen {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            padding: 25px; opacity: 0; pointer-events: none; transition: opacity 0.5s;
-        }
+        .screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 25px; opacity: 0; pointer-events: none; transition: opacity 0.5s; }
         .screen.active { opacity: 1; pointer-events: auto; z-index: 10; }
 
-        h1.shiny-title { 
-            font-size: 1.8rem; text-align: center; margin-bottom: 20px; 
-            background: linear-gradient(90deg, #00ff41, #ffffff, #00ff41);
-            background-size: 200% auto;
-            color: transparent; -webkit-background-clip: text; background-clip: text;
-            animation: shine 3s linear infinite;
-        }
+        h1.shiny-title { font-size: 1.8rem; text-align: center; background: linear-gradient(90deg, #00ff41, #fff, #00ff41); background-size: 200% auto; -webkit-background-clip: text; color: transparent; animation: shine 3s linear infinite; }
         @keyframes shine { to { background-position: 200% center; } }
 
-        /* [수정] 별똥별 스타일 */
-        .star { 
-            position: absolute; 
-            background: #FFD700; 
-            border-radius: 0;
-            opacity: 0;
-            box-shadow: -2px -2px 0 #FFD700, -4px -4px 0 rgba(255, 215, 0, 0.3);
-            animation: shooting-star linear infinite;
-        }
+        .star { position: absolute; background: #FFD700; border-radius: 0; opacity: 0; box-shadow: -2px -2px 0 #FFD700; animation: shooting-star linear infinite; }
+        @keyframes shooting-star { 0% { transform: translate(0, 0); opacity: 0; } 10% { opacity: 1; } 100% { transform: translate(100vw, 100vh); opacity: 0; } }
 
-        @keyframes shooting-star { 
-            0% { transform: translate(0, 0); opacity: 0; } 
-            10% { opacity: 1; }
-            90% { opacity: 1; }
-            100% { transform: translate(100vw, 100vh); opacity: 0; } 
-        }
-
-        input, select {
-            background: rgba(0,0,0,0.7); border: 2px solid #00ff41; color: #00ff41; 
-            padding: 10px; width: 100%; font-family: 'DungGeunMo'; margin-top: 5px; outline: none;
-        }
-        .input-group label { color: #ff00ff; font-size: 0.9rem; }
-
-        button.cyber-btn {
-            background: #00ff41; color: #000; border: 4px solid #008f11; padding: 15px; width: 100%;
-            font-family: 'DungGeunMo'; font-weight: bold; font-size: 1.1rem; cursor: pointer; 
-            box-shadow: 4px 4px 0 #004411; margin-top: 15px;
-        }
+        input, select { background: rgba(0,0,0,0.7); border: 2px solid #00ff41; color: #00ff41; padding: 10px; width: 100%; font-family: 'DungGeunMo'; outline: none; }
+        button.cyber-btn { background: #00ff41; color: #000; border: 4px solid #008f11; padding: 15px; width: 100%; font-family: 'DungGeunMo'; font-weight: bold; cursor: pointer; box-shadow: 4px 4px 0 #004411; margin-top: 15px; }
         button.cyber-btn:hover { background: #ff00ff; border-color: #aa00aa; box-shadow: 4px 4px 0 #550055; color: #fff; }
 
-        #map { height: 150px; width: 100%; border: 3px solid #00ff41; margin-top: 5px; filter: invert(100%) hue-rotate(180deg); }
-
-        #loading-text { 
-            font-size: 1.5rem; color: #FFD700; text-shadow: 0 0 10px #FFD700; 
-            text-align: center;
-            animation: blink 0.8s steps(2) infinite; 
-        }
-        @keyframes blink { to { visibility: hidden; } }
-
         .result-box { border: 3px solid #00ff41; padding: 15px; background: rgba(0,0,0,0.8); margin-bottom: 15px; width: 100%; }
-        .result-box h2 { font-size: 1rem; color: #ff00ff; border-bottom: 1px solid #00ff41; margin-bottom: 10px; margin-top:0; }
+        .result-box h2 { font-size: 1rem; color: #ff00ff; border-bottom: 1px solid #00ff41; margin: 0 0 10px 0; }
         .result-content { font-size: 0.95rem; line-height: 1.6; color: #00ff41; }
-
-        .button-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; }
     </style>
 </head>
 <body>
-
     <div class="monitor-frame">
         <div class="screen-container">
             <div class="crt-overlay"></div>
             <div class="screen-content">
-                
                 <section id="screen-input" class="screen active">
                     <div style="width:100%; max-width:450px;">
                         <h1 class="shiny-title">ACCESS: PLUTO</h1>
-                        <div class="input-group" style="margin-bottom:10px;">
-                            <label>NAME</label>
-                            <input type="text" id="userName" placeholder="이름 입력">
-                        </div>
+                        <input type="text" id="userName" placeholder="이름 입력" style="margin-bottom:10px;">
                         <div style="display: flex; gap: 10px; margin-bottom:10px;">
-                            <div style="flex: 1;"><label>DATE</label><input type="date" id="birthDate" max="9999-12-31"></div>
-                            <div style="flex: 1;"><label>TIME</label><input type="time" id="birthTime" lang="en-GB"></div>
+                            <input type="date" id="birthDate" max="9999-12-31">
+                            <input type="time" id="birthTime" lang="en-GB">
                         </div>
-                        <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                            <input type="checkbox" id="timeUnknown" onchange="toggleTimeInput()" style="width:18px; height:18px; margin-right:8px;">
-                            <label for="timeUnknown" style="color:#00ff41; font-size:0.8rem;">시간 모름</label>
-                        </div>
-                        <div class="input-group"><label>LOCATION</label><div id="map"></div></div>
+                        <div id="map" style="height:150px; border:3px solid #00ff41; filter:invert(100%);"></div>
                         <button class="cyber-btn" onclick="startAnalysis()">INITIATE_SEQUENCE</button>
                     </div>
                 </section>
 
                 <section id="screen-loading" class="screen">
-                    <div id="loading-text">별의 소리를 관측하는 중</div>
+                    <div id="loading-text" style="color:#FFD700; text-align:center;">별의 소리를 관측하는 중</div>
                 </section>
 
                 <section id="screen-personality" class="screen">
-                    <div style="width:100%; max-width:600px; max-height:90%; overflow-y:auto; padding:10px;">
+                    <div style="width:100%; max-width:600px; max-height:90%; overflow-y:auto;">
                         <h1 class="shiny-title" style="font-size:1.4rem;">CORE_DATA_ANALYZED</h1>
-                        <div class="result-box">
-                            <h2>>> CORE_PERSONALITY</h2>
-                            <div id="res-personality" class="result-content"></div>
-                        </div>
+                        <div class="result-box"><h2>>> CORE_PERSONALITY</h2><div id="res-personality" class="result-content"></div></div>
                         <div class="result-split-row" style="display: flex; gap: 10px;">
-                            <div class="result-box" style="flex:1; border-color: #0044ff;">
-                                <h2 style="color: #0044ff;">[+] STRENGTHS</h2>
-                                <div id="res-pros" class="result-content" style="font-size:0.85rem;"></div>
-                            </div>
-                            <div class="result-box" style="flex:1; border-color:#ff0055;">
-                                <h2 style="color:#ff0055;">[-] WEAKNESSES</h2>
-                                <div id="res-cons" class="result-content" style="font-size:0.85rem;"></div>
-                            </div>
+                            <div class="result-box" style="flex:1; border-color:#0044ff;"><h2 style="color:#0044ff;">[+] STRENGTHS</h2><div id="res-pros" class="result-content"></div></div>
+                            <div class="result-box" style="flex:1; border-color:#ff0055;"><h2 style="color:#ff0055;">[-] WEAKNESSES</h2><div id="res-cons" class="result-content"></div></div>
                         </div>
                         <button class="cyber-btn" onclick="switchScreen('screen-selection')">PROCEED_TO_2026_FORTUNE</button>
                     </div>
@@ -222,8 +90,7 @@
                 <section id="screen-selection" class="screen">
                     <div style="width:100%; max-width:500px; text-align:center;">
                         <h1 class="shiny-title">CHOOSE_YOUR_DESTINY</h1>
-                        <p style="color:#00ff41; margin-bottom:20px;">2026년 행성 궤도 분석 완료.</p>
-                        <div class="button-grid">
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; width:100%;">
                             <button class="cyber-btn" style="border-color:#ff00ff; color:#ff00ff;" onclick="showFortune('love')">[♥] LOVE</button>
                             <button class="cyber-btn" style="border-color:#ffd700; color:#ffd700;" onclick="showFortune('money')">[$] MONEY</button>
                             <button class="cyber-btn" style="border-color:#00ffff; color:#00ffff;" onclick="showFortune('career')">[!] CAREER</button>
@@ -235,124 +102,50 @@
                 <section id="screen-fortune-detail" class="screen">
                     <div style="width:100%; max-width:500px;">
                         <h1 id="fortune-title" class="shiny-title" style="font-size:1.4rem;"></h1>
-                        <div id="fortune-box" class="result-box" style="min-height:200px;">
-                            <h2 id="fortune-sub-title"></h2>
-                            <div id="res-fortune-content" class="result-content"></div>
-                        </div>
+                        <div id="fortune-box" class="result-box"><h2 id="fortune-sub"></h2><div id="res-fortune-content" class="result-content"></div></div>
                         <button class="cyber-btn" onclick="switchScreen('screen-selection')">GO_BACK</button>
                     </div>
                 </section>
-
             </div>
         </div>
     </div>
 
     <script>
-        let selectedLat = 37.5665; let selectedLon = 126.9780;
-        let globalData = null;
-
+        let selectedLat = 37.5665, selectedLon = 126.9780, globalData = null;
         const map = L.map('map', { zoomControl: false }).setView([selectedLat, selectedLon], 6);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
         let marker = L.marker([selectedLat, selectedLon]).addTo(map);
-        map.on('click', (e) => {
-            selectedLat = e.latlng.lat; selectedLon = e.latlng.lng;
-            marker.setLatLng(e.latlng);
-        });
+        map.on('click', (e) => { selectedLat = e.latlng.lat; selectedLon = e.latlng.lng; marker.setLatLng(e.latlng); });
 
-        function toggleTimeInput() {
-            const timeInput = document.getElementById('birthTime');
-            timeInput.disabled = document.getElementById('timeUnknown').checked;
-            timeInput.style.opacity = timeInput.disabled ? "0.3" : "1";
-        }
-
-        function switchScreen(id) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-        }
-
-        function startLoadingAnimation() {
-            switchScreen('screen-loading');
-            const screen = document.querySelector('.screen-content');
-            
-            for(let i=0; i<30; i++) {
-                let star = document.createElement('div');
-                star.className = 'star';
-                const size = Math.floor(Math.random() * 9) + 2;
-                star.style.width = `${size}px`;
-                star.style.height = `${size}px`;
-                star.style.left = `${Math.random() * 120 - 40}vw`; 
-                star.style.top = `${Math.random() * 120 - 40}vh`;
-                const duration = Math.random() * 7 + 5;
-                star.style.animationDuration = `${duration}s`;
-                star.style.animationDelay = `${Math.random() * 5}s`;
-                screen.appendChild(star);
-            }
-            
-            let dots = 0;
-            loadingInterval = setInterval(() => {
-                dots = (dots + 1) % 4;
-                document.getElementById('loading-text').innerText = "별의 소리를 관측하는 중" + ".".repeat(dots);
-            }, 500);
-        }
-
-        function stopLoadingAnimation() {
-            clearInterval(loadingInterval);
-            document.querySelectorAll('.star').forEach(s => s.remove());
-        }
+        function switchScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
 
         function startAnalysis() {
-            const name = document.getElementById('userName').value;
-            const date = document.getElementById('birthDate').value;
-            const unknown = document.getElementById('timeUnknown').checked;
-            let time = document.getElementById('birthTime').value;
-            if(!name || !date || (!unknown && !time)) { alert("데이터를 모두 입력하라."); return; }
-            if(unknown) time = "12:00";
-            
-            startLoadingAnimation();
-
-            fetch('/analyze', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, date, time, time_unknown: unknown, lat: selectedLat, lon: selectedLon, language: navigator.language })
-            })
-            .then(res => res.json())
-            .then(data => {
-                stopLoadingAnimation();
-                if(data.error) { alert(data.error); switchScreen('screen-input'); return; }
+            const name = document.getElementById('userName').value, date = document.getElementById('birthDate').value, time = document.getElementById('birthTime').value;
+            if(!name || !date || !time) return alert("데이터 입력 필요");
+            switchScreen('screen-loading');
+            const screen = document.querySelector('.screen-content');
+            for(let i=0; i<30; i++) {
+                let s = document.createElement('div'); s.className = 'star';
+                const size = Math.random()*8+2; s.style.width = s.style.height = `${size}px`;
+                s.style.left = `${Math.random()*120-40}vw`; s.style.top = `${Math.random()*120-40}vh`;
+                s.style.animationDuration = `${Math.random()*7+5}s`; screen.appendChild(s);
+            }
+            fetch('/analyze', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, date, time, lat: selectedLat, lon: selectedLon }) })
+            .then(res => res.json()).then(data => {
+                document.querySelectorAll('.star').forEach(s => s.remove());
                 globalData = data;
                 document.getElementById('res-personality').innerText = data.personality;
                 document.getElementById('res-pros').innerText = data.pros;
                 document.getElementById('res-cons').innerText = data.cons;
                 switchScreen('screen-personality');
-            })
-            .catch(err => { stopLoadingAnimation(); switchScreen('screen-input'); });
+            });
         }
 
         function showFortune(type) {
-            const title = document.getElementById('fortune-title');
-            const subTitle = document.getElementById('fortune-sub-title');
-            const content = document.getElementById('res-fortune-content');
-            const box = document.getElementById('fortune-box');
-
-            if (type === 'love') {
-                title.innerText = "2026_LOVE_FORTUNE";
-                subTitle.innerText = "[♥] RELATIONSHIP_LOG";
-                content.innerText = globalData.fortune_2026.love;
-                box.style.borderColor = "#ff00ff";
-                subTitle.style.color = "#ff00ff";
-            } else if (type === 'money') {
-                title.innerText = "2026_MONEY_FORTUNE";
-                subTitle.innerText = "[$] WEALTH_STATUS";
-                content.innerText = globalData.fortune_2026.money;
-                box.style.borderColor = "#ffd700";
-                subTitle.style.color = "#ffd700";
-            } else if (type === 'career') {
-                title.innerText = "2026_CAREER_FORTUNE";
-                subTitle.innerText = "[!] CAREER_UPDATE";
-                content.innerText = globalData.fortune_2026.career;
-                box.style.borderColor = "#00ffff";
-                subTitle.style.color = "#00ffff";
-            }
+            const t = document.getElementById('fortune-title'), st = document.getElementById('fortune-sub'), c = document.getElementById('res-fortune-content'), b = document.getElementById('fortune-box');
+            if(type === 'love') { t.innerText = "2026_LOVE"; st.innerText = "[♥] RELATION_LOG"; c.innerText = globalData.fortune_2026.love; b.style.borderColor = "#ff00ff"; st.style.color = "#ff00ff"; }
+            else if(type === 'money') { t.innerText = "2026_MONEY"; st.innerText = "[$] WEALTH_STATUS"; c.innerText = globalData.fortune_2026.money; b.style.borderColor = "#ffd700"; st.style.color = "#ffd700"; }
+            else if(type === 'career') { t.innerText = "2026_CAREER"; st.innerText = "[!] PATH_UPDATE"; c.innerText = globalData.fortune_2026.career; b.style.borderColor = "#00ffff"; st.style.color = "#00ffff"; }
             switchScreen('screen-fortune-detail');
         }
     </script>
