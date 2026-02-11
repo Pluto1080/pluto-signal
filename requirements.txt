@@ -3,5 +3,4 @@ google-genai
 pyswisseph
 timezonefinder
 pytz
-
-
+gunicorn
