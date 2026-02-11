@@ -105,9 +105,9 @@ def analyze():
         }}
         """
 
-        # config 설정을 통해 AI가 JSON 형태 외에 다른 말을 섞지 못하게 강제합니다.
+  # 404 에러를 피하면서 가장 싸게 먹히는 검증된 모델
         response = client.models.generate_content(
-            model="models/gemini-2.0-flash"
+            model='gemini-2.0-flash', # 3-flash 대신 이걸로 쓰면 바로 돼!
             contents=prompt,
             config={'response_mime_type': 'application/json'}
         )
@@ -123,4 +123,5 @@ def analyze():
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 8080)))
+
 
