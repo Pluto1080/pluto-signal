@@ -58,10 +58,28 @@
             background-size: 100% 3px, 3px 100%; pointer-events: none; z-index: 100; opacity: 0.8;
         }
 
+        /* [복구] 화면 내용 배경: 질감 유지 및 밝기 변화(Pulse) */
         .screen-content {
             width: 100%; height: 100%;
             background: radial-gradient(circle at center, var(--screen-bg-center) 0%, var(--screen-bg-edge) 100%);
             position: relative; transition: background 0.8s ease;
+            animation: screen-pulse 8s ease-in-out infinite;
+        }
+
+        /* [복구] 뿌연 안개 느낌을 주는 움직이는 광원(Sweep) */
+        .screen-content::after {
+            content: "";
+            position: absolute; top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            animation: screen-sweep 10s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes screen-sweep { to { left: 200%; } }
+        @keyframes screen-pulse {
+            0%, 100% { filter: brightness(0.9); }
+            50% { filter: brightness(1.15); }
         }
 
         .screen {
@@ -79,8 +97,21 @@
         }
         @keyframes shine-v { to { background-position: center 200%; } }
 
-        .star { position: absolute; background: #FFD700; border-radius: 0; opacity: 0; animation: shooting-star linear infinite; }
-        @keyframes shooting-star { 0% { transform: translate(0, 0); opacity: 0; } 10% { opacity: 1; } 100% { transform: translate(100vw, 100vh); opacity: 0; } }
+        /* [복구] 별들의 광채 및 슈팅 애니메이션 (화면 안에서만 움직이도록 수정) */
+        .star { 
+            position: absolute; 
+            background: #FFD700; 
+            border-radius: 0; 
+            opacity: 0; 
+            box-shadow: 0 0 8px #FFD700, -2px -2px 0px rgba(255, 215, 0, 0.4);
+            animation: shooting-star linear infinite; 
+        }
+        @keyframes shooting-star { 
+            0% { transform: translate(0, 0); opacity: 0; } 
+            15% { opacity: 1; } 
+            85% { opacity: 1; }
+            100% { transform: translate(300px, 300px); opacity: 0; } 
+        }
 
         input, select { background: rgba(0,0,0,0.8); border: 2px solid #00ff41; color: #00ff41; padding: 12px; width: 100%; font-family: 'DungGeunMo'; outline: none; font-size: 1.1rem; }
         input[type="date"] { -webkit-appearance: none; min-height: 45px; }
@@ -145,15 +176,15 @@
                     </div>
                 </section>
 
-                <section id="screen-selection" class="screen">
+                <section id="selection-buttons" class="screen">
                     <div style="width:100%; max-width:550px; text-align:center;">
                         <h1 class="shiny-title">DESTINY</h1>
                         <p style="color:#00ff41; margin-bottom:20px;">궤도 분석 완료. 운명을 선택하라.</p>
-                        <div id="selection-buttons" class="button-grid">
+                        <div class="button-grid">
                             <button id="btn-love" class="cyber-btn" style="border-color:#ff00ff; color:#ff00ff;" onclick="showFortune('love')">[♥] LOVE</button>
                             <button id="btn-money" class="cyber-btn" style="border-color:#ffd700; color:#ffd700;" onclick="showFortune('money')">[$] MONEY</button>
                             <button id="btn-career" class="cyber-btn" style="border-color:#00ffff; color:#00ffff;" onclick="showFortune('career')">[!] CAREER</button>
-                            </div>
+                        </div>
                         <button id="btn-final-report" class="cyber-btn hidden-btn" style="background:#fff; color:#000; border-color:#00ff41;" onclick="showFinalReport()">[!] 2026_YEARLY_WHISPER</button>
                     </div>
                 </section>
@@ -219,16 +250,20 @@
 
         function startLoadingAnimation() {
             switchScreen('screen-loading');
-            // [수정] 훨씬 더 어둡고 깊은 진보라색 설정
-            setScreenColor('#3a0d2e', '#1a0515'); 
+            // [수정] 심연처럼 어두운 보라색 톤 적용
+            setScreenColor('#1a0414', '#0a0208'); 
+            
             const screen = document.getElementById('content');
-            for(let i=0; i<25; i++) {
+            // [수정] 별들을 화면 안쪽(%)에 배치하고 광채 추가
+            for(let i=0; i<35; i++) {
                 let star = document.createElement('div');
                 star.className = 'star';
                 const size = Math.random() * 4 + 2;
                 star.style.width = star.style.height = `${size}px`;
-                star.style.left = `${Math.random() * 100}vw`; star.style.top = `${Math.random() * 100}vh`;
-                star.style.animationDuration = `${Math.random() * 2 + 1}s`;
+                star.style.left = `${Math.random() * 90 + 5}%`; 
+                star.style.top = `${Math.random() * 90 + 5}%`;
+                star.style.animationDuration = `${Math.random() * 1.5 + 0.8}s`;
+                star.style.animationDelay = `${Math.random() * 2}s`;
                 screen.appendChild(star);
             }
             let dots = 0;
@@ -249,9 +284,7 @@
             const date = document.getElementById('birthDate').value;
             const time = document.getElementById('birthTime').value || "12:00";
             if(!name || !date) { alert("데이터를 입력하라."); return; }
-            
             startLoadingAnimation();
-
             fetch('/analyze', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -272,31 +305,28 @@
 
         function showFortune(type) {
             const bgColors = { 
-                'love': ['#441133', '#1a0515'], 
-                'money': ['#443311', '#1a1405'], 
-                'career': ['#113344', '#05141a'], 
+                'love': ['#3a0d2e', '#1a0515'], 
+                'money': ['#3a2e0d', '#1a1505'], 
+                'career': ['#0d2e3a', '#05151a'], 
                 'monthly': ['#444444', '#111111'] 
             };
-            
             if(type !== 'monthly') {
                 viewedFortunes[type] = true;
                 if(document.getElementById(`btn-${type}`)) document.getElementById(`btn-${type}`).classList.add('hidden-btn');
                 setScreenColor(bgColors[type][0], bgColors[type][1]);
             }
-
             const t = document.getElementById('fortune-title'), st = document.getElementById('fortune-sub-title'), c = document.getElementById('res-fortune-content');
             if (type === 'love') { t.innerText = "2026_LOVE"; st.innerText = "[♥] RELATIONSHIP_LOG"; c.innerText = globalData.fortune_2026.love; }
             else if (type === 'money') { t.innerText = "2026_MONEY"; st.innerText = "[$] WEALTH_STATUS"; c.innerText = globalData.fortune_2026.money; }
             else if (type === 'career') { t.innerText = "2026_CAREER"; st.innerText = "[!] CAREER_UPDATE"; c.innerText = globalData.fortune_2026.career; }
             else if (type === 'monthly') { t.innerText = "MONTHLY_LOG"; st.innerText = "[*] ORBIT_STATUS"; c.innerText = globalData.fortune_2026.monthly; }
-            
             switchScreen('screen-fortune-detail');
             if(viewedFortunes.love && viewedFortunes.money && viewedFortunes.career) document.getElementById('btn-final-report').classList.remove('hidden-btn');
         }
 
         function returnToSelection() {
             setScreenColor('#444444', '#111111');
-            switchScreen('screen-selection');
+            switchScreen('selection-buttons');
         }
 
         function showFinalReport() {
