@@ -7,170 +7,263 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <style>
-        /* 모든 요소의 여백 계산을 테두리 기준으로 맞춰서 삐져나감 방지 */
         * { box-sizing: border-box; }
-
         body {
-            background: radial-gradient(circle, #1a0033 0%, #000000 100%);
+            background: radial-gradient(circle at center, #1a0033 0%, #000000 100%);
             color: #00ff41; font-family: 'Courier New', Courier, monospace;
+            margin: 0; padding: 0; overflow: hidden; /* 스크롤 방지 */
+            height: 100vh; width: 100vw;
+        }
+
+        /* === 화면 공통 스타일 === */
+        .screen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            min-height: 100vh; margin: 0; padding: 15px; overflow-x: hidden;
+            padding: 20px;
+            transition: opacity 0.5s ease-in-out; /* 부드러운 전환 효과 */
+            opacity: 0; pointer-events: none; z-index: 0; /* 기본적으로 숨김 */
+        }
+        .screen.active {
+            opacity: 1; pointer-events: auto; z-index: 10; /* 활성화된 화면만 보임 */
         }
 
+        /* === 글리치 및 공통 UI === */
         @keyframes glitch {
-            0% { transform: translate(0); }
-            20% { transform: translate(-2px, 2px); }
-            40% { transform: translate(-2px, -2px); }
-            60% { transform: translate(2px, 2px); }
-            80% { transform: translate(2px, -2px); }
-            100% { transform: translate(0); }
+            0% { transform: translate(0); } 20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); } 60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); } 100% { transform: translate(0); }
         }
-
-        .container {
-            width: 100%; max-width: 650px; border: 1px solid #00ff41; padding: 30px;
-            background: rgba(20, 0, 40, 0.8);
-            box-shadow: 0 0 30px rgba(0, 255, 65, 0.2), inset 0 0 20px rgba(128, 0, 255, 0.2);
-        }
-
-        h1 { font-size: 1.8rem; letter-spacing: 5px; animation: glitch 0.3s infinite; text-shadow: 2px 0 #ff00ff, -2px 0 #00ffff; text-align: center; word-break: keep-all; }
-
-        .input-group { margin-bottom: 20px; text-align: left; width: 100%; }
-        .input-group label { display: block; font-weight: bold; margin-bottom: 5px; color: #ff00ff; font-size: 0.9rem; }
-        
-        input[type="text"], input[type="date"], input[type="time"] {
-            background: transparent; border: 1px solid #00ff41; color: #00ff41;
-            padding: 12px; width: 100%; font-size: 1rem; outline: none; margin-bottom: 5px;
-            /* 모바일 브라우저 기본 스타일 제거 */
-            -webkit-appearance: none; appearance: none; border-radius: 0;
-        }
-        
-        #map { height: 250px; width: 100%; border: 1px solid #00ff41; margin-bottom: 10px; filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(80%); }
-
-        button {
+        h1.glitch-title { font-size: 1.8rem; letter-spacing: 5px; animation: glitch 0.3s infinite; text-shadow: 2px 0 #ff00ff, -2px 0 #00ffff; text-align: center; margin-bottom: 30px; }
+        button.cyber-btn {
             background: #00ff41; color: #000; border: none; padding: 15px; width: 100%;
-            font-weight: bold; font-size: 1.2rem; cursor: pointer; box-shadow: 0 0 15px #00ff41; transition: 0.2s; margin-top: 10px;
-            -webkit-appearance: none; appearance: none; border-radius: 0;
+            font-weight: bold; font-size: 1.2rem; cursor: pointer; box-shadow: 0 0 15px #00ff41; margin-top: 20px;
         }
-        button:hover { background: #ff00ff; box-shadow: 0 0 20px #ff00ff; color: #fff; }
+        button.cyber-btn:hover { background: #ff00ff; box-shadow: 0 0 20px #ff00ff; color: #fff; }
 
-        #result-area { margin-top: 30px; padding: 20px; border-top: 1px dashed rgba(0, 255, 65, 0.5); font-size: 1.05rem; line-height: 1.6; white-space: pre-wrap; word-break: break-word; }
-        .loading { color: #ff00ff; animation: blink 0.5s infinite; }
-        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
-
-        /* 📱 스마트폰(가로 600px 이하)을 위한 반응형 최적화 */
-        @media (max-width: 600px) {
-            body { padding: 10px; }
-            .container { padding: 20px 15px; }
-            h1 { font-size: 1.4rem; letter-spacing: 2px; }
-            input[type="text"], input[type="date"], input[type="time"] { padding: 10px; font-size: 0.95rem; }
-            button { padding: 12px; font-size: 1.1rem; }
-            #map { height: 200px; } /* 모바일에서는 지도를 살짝 작게 */
-            #result-area { padding: 15px 10px; font-size: 0.95rem; }
-            #coordsDisplay { font-size: 0.75rem; }
+        /* === [화면 1] 입력 스크린 스타일 === */
+        #screen-input .container {
+            width: 100%; max-width: 600px; max-height: 90vh; overflow-y: auto; /* 내용 많으면 스크롤 */
+            border: 1px solid #00ff41; padding: 25px;
+            background: rgba(20, 0, 40, 0.8);
+            box-shadow: inset 0 0 20px rgba(128, 0, 255, 0.2);
         }
+        .input-group { margin-bottom: 15px; width: 100%; }
+        .input-group label { display: block; font-weight: bold; margin-bottom: 5px; color: #ff00ff; font-size: 0.9rem; }
+        input, select {
+            background: transparent; border: 1px solid #00ff41; color: #00ff41; padding: 10px; width: 100%;
+            font-size: 1rem; outline: none; -webkit-appearance: none;
+        }
+        #map { height: 200px; width: 100%; border: 1px solid #00ff41; filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(80%); }
+
+        /* === [화면 2] 로딩 스크린 (별 떨어지는 효과) === */
+        #screen-loading {
+            background: #000; overflow: hidden;
+        }
+        #loading-text {
+            font-size: 1.5rem; color: #00ff41; text-shadow: 0 0 10px #00ff41;
+            z-index: 20; text-align: center;
+        }
+        /* 떨어지는 별 스타일 */
+        .star {
+            position: absolute; width: 2px; height: 2px; background: #fff;
+            box-shadow: 0 0 10px #fff, 0 0 20px #ff00ff, 0 0 30px #00ffff;
+            animation: fall linear infinite;
+        }
+        @keyframes fall {
+            from { transform: translateY(-10vh); opacity: 1; }
+            to { transform: translateY(110vh); opacity: 0; }
+        }
+
+        /* === [화면 3] 결과 스크린 (3단 구성) === */
+        #screen-result {
+            padding: 20px 10px; /* 모바일 여백 조정 */
+            overflow-y: auto; /* 결과가 길면 스크롤 */
+            display: block; /* flex 해제하고 block으로 변경하여 스크롤 가능하게 함 */
+        }
+        #screen-result .container {
+            width: 100%; max-width: 700px; margin: 0 auto; /* 중앙 정렬 */
+        }
+        .result-box {
+            margin-bottom: 25px; border: 1px solid #00ff41; padding: 20px;
+            background: rgba(20, 0, 40, 0.6); position: relative;
+        }
+        /* 각 결과 박스 제목 스타일 */
+        .result-box h2 {
+            margin-top: 0; color: #ff00ff; font-size: 1.3rem; border-bottom: 1px dashed #00ff41;
+            padding-bottom: 10px; letter-spacing: 2px;
+        }
+        .result-content {
+            white-space: pre-wrap; line-height: 1.6; font-size: 1.05rem; word-break: keep-all;
+        }
+        /* 장점/단점 박스 전용 스타일 포인트 */
+        .pros-box { border-color: #00ffff; box-shadow: 0 0 15px rgba(0, 255, 255, 0.3); }
+        .cons-box { border-color: #ff0055; box-shadow: 0 0 15px rgba(255, 0, 85, 0.3); }
+        .pros-box h2 { color: #00ffff; }
+        .cons-box h2 { color: #ff0055; }
+
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>ACCESS: PLUTO</h1>
-        <p style="text-align: center; color: #8844ff; font-size: 0.8rem; margin-top:-10px;">>> ASTRO_DATA_REQUIRED...</p>
-        
-        <div class="input-group">
-            <label>NAME</label>
-            <input type="text" id="userName" placeholder="이름을 입력해">
-        </div>
-        <div class="input-group">
-            <label>BIRTH_DATE</label>
-            <input type="date" id="birthDate">
-        </div>
-        <div class="input-group">
-            <label>BIRTH_TIME</label>
-            <input type="time" id="birthTime">
-            <div style="margin-top: 5px; display: flex; align-items: center;">
-                <input type="checkbox" id="timeUnknown" onchange="toggleTimeInput()" style="width: 18px; height: 18px; margin-right: 8px;">
-                <label for="timeUnknown" style="display: inline; color: #00ff41; font-weight: normal; margin-bottom: 0;">태어난 시간을 몰라 (정확도 하락)</label>
+    <section id="screen-input" class="screen active">
+        <div class="container">
+            <h1 class="glitch-title">ACCESS: PLUTO</h1>
+            <p style="text-align: center; color: #8844ff; font-size: 0.8rem; margin-top:-15px;">>> ASTRO_DATA_REQUIRED...</p>
+            
+            <div class="input-group">
+                <label>NAME</label>
+                <input type="text" id="userName" placeholder="이름 입력">
             </div>
+            <div class="input-group" style="display: flex; gap: 10px;">
+                <div style="flex: 2;">
+                    <label>BIRTH_DATE</label>
+                    <input type="date" id="birthDate">
+                </div>
+                <div style="flex: 1.5;">
+                    <label>BIRTH_TIME</label>
+                    <input type="time" id="birthTime">
+                </div>
+            </div>
+            <div style="margin-bottom: 15px; display: flex; align-items: center;">
+                <input type="checkbox" id="timeUnknown" onchange="toggleTimeInput()" style="width: auto; margin-right: 8px;">
+                <label for="timeUnknown" style="display: inline; color: #00ff41; margin:0; font-size:0.9rem;">시간 모름 (정확도 ↓)</label>
+            </div>
+            <div class="input-group">
+                <label>LOCATION (터치하여 핀 고정)</label>
+                <div id="map"></div>
+                <span id="coordsDisplay" style="font-size: 0.7rem; color: #8844ff;">위도: 37.5665 / 경도: 126.9780 (서울)</span>
+            </div>
+            <button class="cyber-btn" onclick="startAnalysis()">INITIATE_SEQUENCE</button>
         </div>
-        <div class="input-group">
-            <label>BIRTH_LOCATION (터치해서 핀 고정)</label>
-            <div id="map"></div>
-            <span id="coordsDisplay" style="font-size: 0.8rem; color: #8844ff; word-break: break-all;">위도: 37.5665 / 경도: 126.9780 (기본값: 서울)</span>
-        </div>
+    </section>
 
-        <button onclick="startComm()">INITIATE_ANALYSIS</button>
-        
-        <div id="result-area">
-            <p id="result-text">READY...</p>
+    <section id="screen-loading" class="screen">
+        <div id="loading-text">별의 소리를 관측하는 중</div>
+    </section>
+
+    <section id="screen-result" class="screen">
+        <div class="container" style="padding-top: 30px;">
+             <h1 class="glitch-title" style="font-size: 1.5rem;">ANALYSIS_COMPLETE</h1>
+             
+             <div class="result-box personality-box">
+                 <h2>>> CORE_PERSONALITY (성격)</h2>
+                 <div id="res-personality" class="result-content">데이터 로딩 중...</div>
+             </div>
+
+             <div class="result-box pros-box">
+                 <h2>[+] STRENGTHS (장점)</h2>
+                 <div id="res-pros" class="result-content">데이터 로딩 중...</div>
+             </div>
+
+             <div class="result-box cons-box">
+                 <h2>[-] WEAKNESSES (단점)</h2>
+                 <div id="res-cons" class="result-content">데이터 로딩 중...</div>
+             </div>
+
+             <button class="cyber-btn" onclick="location.reload()" style="margin-bottom: 30px;">RESTART_SESSION</button>
         </div>
-    </div>
+    </section>
+
 
     <script>
-        let selectedLat = 37.5665;
-        let selectedLon = 126.9780;
-
-        const map = L.map('map').setView([selectedLat, selectedLon], 6);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap'
-        }).addTo(map);
-
+        // === 지도 초기화 ===
+        let selectedLat = 37.5665; let selectedLon = 126.9780;
+        const map = L.map('map', { zoomControl: false }).setView([selectedLat, selectedLon], 6); // 줌 컨트롤 숨김
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '' }).addTo(map);
         let marker = L.marker([selectedLat, selectedLon]).addTo(map);
-
         map.on('click', function(e) {
-            selectedLat = e.latlng.lat;
-            selectedLon = e.latlng.lng;
+            selectedLat = e.latlng.lat; selectedLon = e.latlng.lng;
             marker.setLatLng(e.latlng);
             document.getElementById('coordsDisplay').innerText = `위도: ${selectedLat.toFixed(4)} / 경도: ${selectedLon.toFixed(4)}`;
         });
 
+        // === UI 로직 ===
         function toggleTimeInput() {
             const timeInput = document.getElementById('birthTime');
             const isUnknown = document.getElementById('timeUnknown').checked;
-            if(isUnknown) {
-                timeInput.value = "";
-                timeInput.disabled = true;
-                timeInput.style.opacity = "0.5";
-            } else {
-                timeInput.disabled = false;
-                timeInput.style.opacity = "1";
-            }
+            timeInput.disabled = isUnknown;
+            timeInput.style.opacity = isUnknown ? "0.5" : "1";
         }
 
-        function startComm() {
+        // === 화면 전환 관리자 ===
+        function switchScreen(screenId) {
+            // 모든 스크린 비활성화
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            // 선택된 스크린만 활성화
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        // === 로딩 애니메이션 관리자 ===
+        let loadingInterval;
+        function startLoadingAnimation() {
+            switchScreen('screen-loading');
+            
+            // 1. 별 생성 (DOM에 추가)
+            const loadingScreen = document.getElementById('screen-loading');
+            for(let i=0; i<30; i++) { // 별 30개 생성
+                let star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = `${Math.random() * 100}vw`;
+                star.style.animationDuration = `${Math.random() * 2 + 1}s`; // 1~3초 랜덤 속도
+                star.style.animationDelay = `${Math.random()}s`;
+                loadingScreen.appendChild(star);
+            }
+
+            // 2. 텍스트 점(...) 애니메이션
+            const textElement = document.getElementById('loading-text');
+            let dots = 0;
+            loadingInterval = setInterval(() => {
+                dots = (dots + 1) % 4;
+                textElement.innerText = "별의 소리를 관측하는 중" + ".".repeat(dots);
+            }, 500);
+        }
+
+        function stopLoadingAnimation() {
+            clearInterval(loadingInterval);
+            // 생성했던 별들 제거 (메모리 관리)
+            document.querySelectorAll('.star').forEach(e => e.remove());
+        }
+
+
+        // === 메인 통신 함수 ===
+        function startAnalysis() {
             const name = document.getElementById('userName').value;
             const date = document.getElementById('birthDate').value;
             const isUnknown = document.getElementById('timeUnknown').checked;
             let time = document.getElementById('birthTime').value;
-            const resultText = document.getElementById('result-text');
 
-            if(!name || !date || (!isUnknown && !time)) {
-                alert("이름, 날짜, 시간(모르면 체크)을 모두 입력해라.");
-                return;
-            }
+            if(!name || !date || (!isUnknown && !time)) { alert("필수 데이터를 모두 입력하라."); return; }
+            if(isUnknown) time = "12:00";
 
-            if(isUnknown) time = "12:00"; 
-
-            resultText.className = "loading";
-            resultText.innerText = ">> CALCULATING_PLANETARY_POSITIONS... [WAIT]";
-
-            // 화면을 살짝 아래로 스크롤하여 결과창이 보이게 함 (모바일 배려)
-            document.getElementById('result-area').scrollIntoView({ behavior: 'smooth' });
+            // 로딩 화면 시작
+            startLoadingAnimation();
 
             fetch('/analyze', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    name: name, date: date, time: time, time_unknown: isUnknown,
-                    lat: selectedLat, lon: selectedLon
-                })
+                body: JSON.stringify({ name, date, time, time_unknown: isUnknown, lat: selectedLat, lon: selectedLon })
             })
             .then(response => response.json())
             .then(data => {
-                resultText.className = "";
-                resultText.innerText = data.result;
+                stopLoadingAnimation(); // 로딩 종료
+
+                if (data.error) {
+                    alert("오류 발생: " + data.error);
+                    switchScreen('screen-input'); // 입력 화면으로 복귀
+                    return;
+                }
+
+                // JSON 데이터를 각 영역에 뿌려줌
+                document.getElementById('res-personality').innerText = data.personality || "분석 실패";
+                document.getElementById('res-pros').innerText = data.pros || "데이터 없음";
+                document.getElementById('res-cons').innerText = data.cons || "데이터 없음";
+
+                // 결과 화면으로 전환
+                switchScreen('screen-result');
             })
             .catch(err => {
-                resultText.className = "";
-                resultText.innerText = ">> CRITICAL_ERROR: " + err;
+                stopLoadingAnimation();
+                alert("치명적 통신 오류: " + err);
+                switchScreen('screen-input');
             });
         }
     </script>
