@@ -105,10 +105,9 @@ def analyze():
         }}
         """
 
-        # 5. 최신 가성비 모델 Gemini 3 Flash 사용
         # config 설정을 통해 AI가 JSON 형태 외에 다른 말을 섞지 못하게 강제합니다.
         response = client.models.generate_content(
-            model='gemini-3-flash', 
+            model="models/gemini-2.0-flash"
             contents=prompt,
             config={'response_mime_type': 'application/json'}
         )
@@ -124,3 +123,4 @@ def analyze():
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 8080)))
+
