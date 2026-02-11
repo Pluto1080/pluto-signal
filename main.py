@@ -128,8 +128,8 @@ def analyze():
         **반드시 아래의 JSON 형식으로만 대답해. 마크다운 기호(```)를 쓰지 말고 순수 JSON만 출력해.**
         {{
             "personality": "성격과 기질 분석 (반드시 {user_lang}로 작성)",
-            "pros": "핵심 장점 요약 (반드시 {user_lang}로 작성)",
-            "cons": "핵심 단점 팩트폭력 (반드시 {user_lang}로 작성)"
+            "pros": "잘하는 것을 팩트로 요약 (반드시 {user_lang}로 작성)",
+            "cons": "잘 못 하는것 을 팩트로 요약 (반드시 {user_lang}로 작성)"
         }}
 
         [데이터]
@@ -153,6 +153,7 @@ if __name__ == "__main__":
     # Railway가 정해준 포트를 읽어오고, 없으면 8080을 쓰라는 뜻입니다.
     port = int(os.environ.get("PORT", 8080)) 
     app.run(host='0.0.0.0', port=port)
+
 
 
 
