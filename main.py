@@ -1,7 +1,7 @@
 import os
 import json
 from datetime import datetime
-import swisseph as swe
+import pyswisseph as swe
 from flask import Flask, request, jsonify, render_template
 from google import genai
 import re
@@ -152,4 +152,5 @@ def analyze():
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 8080))
     app.run(host='0.0.0.0', port=port)
+
 
