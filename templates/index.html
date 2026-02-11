@@ -7,9 +7,10 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <style>
-        /* 레트로 감성의 둥근모꼴 폰트 */
+        /* [폰트] 레트로 둥근모꼴 */
         @import url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/DungGeunMo.woff');
 
+        /* [변수] 화면 중앙과 테두리 색상 관리 (JS에서 테마별로 조작) */
         :root {
             --screen-bg-center: #444444;
             --screen-bg-edge: #111111;
@@ -21,14 +22,15 @@
 
         body {
             background: #050505; margin: 0; padding: 0;
+            /* [수정] 모니터와 받침대를 세로로 배치하기 위해 column으로 변경 */
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             height: 100vh; width: 100vw; overflow: hidden;
             font-family: 'DungGeunMo', monospace;
         }
 
-        /* [수정] 모니터 본체 프레임 */
+        /* [프레임] 아이맥 G3 본디 블루 스타일 본체 */
         .monitor-frame {
-            width: 95vw; height: 75vh;
+            width: 95vw; height: 75vh; /* 받침대 공간을 위해 높이 약간 축소 */
             max-width: 950px; max-height: 700px;
             background: radial-gradient(circle at 30% 30%, #00a8a8 0%, #006666 100%);
             border-radius: 50px; padding: 30px;
@@ -37,16 +39,16 @@
             z-index: 3;
         }
 
-        /* [추가/수정] 모니터 받침대 (목 부분) */
+        /* [추가] 모니터 목 (Neck) - 자연스럽게 이어지는 부분 */
         .monitor-neck {
             width: 140px; height: 35px;
             background: linear-gradient(to bottom, #005555 0%, #002222 100%);
-            margin-top: -15px; /* 모니터 본체와 자연스럽게 겹치도록 설정 */
+            margin-top: -15px; /* 모니터 본체 뒤로 살짝 숨김 */
             z-index: 2;
             box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
         }
 
-        /* [추가/수정] 모니터 받침대 (바닥 부분) */
+        /* [추가] 모니터 바닥 지지대 (Base) - 묵직한 하단부 */
         .monitor-base {
             width: 350px; height: 25px;
             background: linear-gradient(to bottom, #004d4d 0%, #001111 100%);
@@ -55,7 +57,7 @@
             box-shadow: 0 15px 25px rgba(0,0,0,0.9);
         }
 
-        /* 화면 전환 글리치 애니메이션 */
+        /* [애니메이션] 화면 전환 시 찌릿한 글리치 효과 */
         @keyframes glitch-short {
             0% { transform: translate(0); }
             20% { transform: translate(-3px, 0); filter: brightness(1.2); }
@@ -70,15 +72,15 @@
             box-shadow: inset 0 0 60px rgba(0, 255, 65, 0.1);
         }
 
-        /* CRT 스캔라인 오버레이 */
+        /* [질감] CRT 스캔라인 오버레이 */
         .crt-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
                         linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
-            background-size: 100% 3px, 3px 100%; pointer-events: none; z-index: 100; opacity: 0.7;
+            background-size: 100% 3px, 3px 100%; pointer-events: none; z-index: 100; opacity: 0.8;
         }
 
-        /* 숨쉬는 화면 밝기 변화 및 그라데이션 */
+        /* [배경 효과] 숨쉬는 듯한 밝기(Pulse)와 질감 */
         .screen-content {
             width: 100%; height: 100%;
             background: radial-gradient(circle at center, var(--screen-bg-center) 0%, var(--screen-bg-edge) 100%);
@@ -86,17 +88,17 @@
             animation: screen-pulse 8s ease-in-out infinite;
         }
 
-        /* 화면을 가로지르는 안개빛 효과 */
+        /* [안개 효과] 화면을 흐르는 은은한 빛의 띠(Sweep) */
         .screen-content::after {
             content: ""; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
             animation: screen-sweep 10s linear infinite; pointer-events: none;
         }
 
         @keyframes screen-sweep { to { left: 200%; } }
         @keyframes screen-pulse { 0%, 100% { filter: brightness(0.95); } 50% { filter: brightness(1.1); } }
 
-        /* 화면 섹션 기본 레이아웃 (잔상 방지 포함) */
+        /* [섹션] 스쳐지나가는 버그 수정을 위해 잔상 방지 속성 추가 */
         .screen {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -105,7 +107,7 @@
         }
         .screen.active { opacity: 1; pointer-events: auto; }
 
-        /* 네온 텍스트 타이틀 */
+        /* [타이틀] 빛나고 움직이는 네온 텍스트 */
         h1.shiny-title { 
             font-size: 3.2rem; font-weight: 900; text-align: center; margin-bottom: 20px; 
             background: linear-gradient(180deg, #00ff41 0%, #ffffff 50%, #00ff41 100%);
@@ -114,15 +116,16 @@
         }
         @keyframes shine-v { to { background-position: center 200%; } }
 
-        /* 별똥별 애니메이션 */
+        /* [별 효과] 로딩 중 보라색 심연에서 떨어지는 별똥별 */
         .star { 
             position: absolute; background: #FFD700; border-radius: 0; opacity: 0; 
-            box-shadow: 0 0 8px #FFD700; animation: shooting-star linear infinite; 
+            box-shadow: 0 0 8px #FFD700, -2px -2px 0px rgba(255, 215, 0, 0.4);
+            animation: shooting-star linear infinite; 
         }
-        @keyframes shooting-star { 0% { transform: translate(0, 0); opacity: 0; } 10% { opacity: 1; } 100% { transform: translate(250px, 250px); opacity: 0; } }
+        @keyframes shooting-star { 0% { transform: translate(0, 0); opacity: 0; } 15% { opacity: 1; } 85% { opacity: 1; } 100% { transform: translate(300px, 300px); opacity: 0; } }
 
-        /* UI 컴포넌트 */
-        input { background: rgba(0,0,0,0.8); border: 2px solid #00ff41; color: #00ff41; padding: 12px; font-family: 'DungGeunMo'; outline: none; }
+        /* [UI 스타일] */
+        input, select { background: rgba(0,0,0,0.8); border: 2px solid #00ff41; color: #00ff41; padding: 12px; width: 100%; font-family: 'DungGeunMo'; outline: none; font-size: 1.1rem; }
         input[type="date"] { -webkit-appearance: none; min-height: 45px; }
 
         button.cyber-btn {
@@ -131,18 +134,17 @@
         }
         button.cyber-btn:hover { background: #ff00ff; border-color: #aa00aa; color: #fff; box-shadow: 4px 4px 0 #550055; }
 
-        /* [복구] 지도 CSS */
+        /* [복구] 지도 스타일 지정 */
         #map { height: 160px; width: 100%; border: 3px solid #00ff41; margin-top: 5px; filter: invert(100%) hue-rotate(180deg); background-color: #000; }
 
-        /* 운세 결과 박스 (검정 베이스 유지) */
+        /* [수정] 결과 박스: 사진처럼 진한 검정 베이스 유지 */
         .result-box { 
             border: 3px solid #00ff41; padding: 15px; 
-            background: rgba(0,0,0,0.9);
-            margin-bottom: 12px; width: 100%; 
-            transition: border-color 0.4s;
+            background: rgba(0,0,0,0.9); /* 완전한 검정색에 가까운 베이스 */
+            margin-bottom: 12px; width: 100%; transition: border-color 0.4s;
         }
-        .result-box h2 { font-size: 1.1rem; color: inherit; border-bottom: 1px solid currentColor; margin-bottom: 8px; margin-top:0; }
-        .result-content { font-size: 0.95rem; line-height: 1.6; color: #00ff41; }
+        .result-box h2 { font-size: 1.1rem; color: inherit; border-bottom: 1px solid currentColor; margin-bottom: 10px; margin-top:0; font-weight: 900; }
+        .result-content { font-size: 0.95rem; line-height: 1.6; color: inherit; } /* 텍스트도 테마색을 따라가도록 설정 */
         
         .button-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; }
         .hidden-btn { display: none !important; }
@@ -160,16 +162,16 @@
                         <h1 class="shiny-title">ACCESS: PLUTO</h1>
                         <div style="margin-bottom:12px; width:100%; text-align:left;">
                             <label style="color:#ff00ff; font-weight:bold;">NAME</label>
-                            <input type="text" id="userName" placeholder="이름 입력" style="width:100%;">
+                            <input type="text" id="userName" placeholder="이름 입력">
                         </div>
-                        <div style="display: flex; gap: 10px; margin-bottom:12px; width:100%;">
+                        <div style="display: flex; gap: 10px; margin-bottom:12px;">
                             <div style="flex: 1; text-align:left;">
                                 <label style="color:#ff00ff; font-weight:bold;">DATE</label>
-                                <input type="date" id="birthDate" max="9999-12-31" style="width:100%;">
+                                <input type="date" id="birthDate" max="9999-12-31">
                             </div>
                             <div style="flex: 1; text-align:left;">
                                 <label style="color:#ff00ff; font-weight:bold;">TIME</label>
-                                <input type="time" id="birthTime" style="width:100%;">
+                                <input type="time" id="birthTime">
                             </div>
                         </div>
                         <div style="width:100%; margin-bottom:12px; text-align:left;">
@@ -181,7 +183,7 @@
                 </section>
 
                 <section id="screen-loading" class="screen">
-                    <div id="loading-text" style="font-size: 2rem; color: #FFD700; font-weight: 900;">별의 소리를 관측하는 중</div>
+                    <div id="loading-text" style="font-size: 2rem; color: #FFD700; font-weight: 900; text-align: center;">별의 소리를 관측하는 중</div>
                 </section>
 
                 <section id="screen-personality" class="screen">
@@ -192,7 +194,7 @@
                             <div id="res-personality" class="result-content"></div>
                         </div>
                         <div style="display: flex; gap: 10px;">
-                            <div class="result-box" style="flex:1; border-color: #0044ff; color: #0044ff;">
+                            <div class="result-box" style="flex:1; border-color: #00ffff; color: #00ffff;">
                                 <h2>[+] STRENGTHS</h2>
                                 <div id="res-pros" class="result-content" style="font-size:0.85rem;"></div>
                             </div>
@@ -214,7 +216,7 @@
                             <button id="btn-career" class="cyber-btn" style="border-color:#00ffff; color:#00ffff;" onclick="showFortune('career')">[!] CAREER</button>
                             <button id="btn-health" class="cyber-btn" style="border-color:#00ff41; color:#00ff41;" onclick="showFortune('health')">[+] HEALTH</button>
                         </div>
-                        <button id="btn-final-report" class="cyber-btn hidden-btn" style="background:#fff; color:#000;" onclick="showFinalReport()">[!] 2026_WHISPER</button>
+                        <button id="btn-final-report" class="cyber-btn hidden-btn" style="background:#fff; color:#000; border-color:#00ff41; margin-top:20px;" onclick="showFinalReport()">[!] 2026_WHISPER</button>
                     </div>
                 </section>
 
@@ -236,7 +238,7 @@
                             <h2>>> 2026_SUMMARY</h2>
                             <div id="res-summary" class="result-content"></div>
                         </div>
-                        <div class="result-box" style="border-color:#00ff41; color:#00ff41; background:rgba(0,255,65,0.15);">
+                        <div class="result-box" style="border-color:#00ff41; color:#00ff41; background:rgba(0,0,0,0.9);">
                             <h2>>> PLUTO'S_WHISPER</h2>
                             <div id="res-final-advice" class="result-content" style="font-style:italic; font-weight:bold;"></div>
                         </div>
@@ -254,6 +256,7 @@
                         <button class="cyber-btn" onclick="location.reload()" style="background:#ff0055; color:#fff;">SYSTEM_REBOOT</button>
                     </div>
                 </section>
+
             </div>
         </div>
     </div>
@@ -265,18 +268,20 @@
         let selectedLat = 37.5665; let selectedLon = 126.9780;
         let globalData = null;
         let viewedFortunes = { love: false, money: false, career: false, health: false };
-        let isSwitching = false; // 화면 전환 중복 클릭 방지
+        
+        // [수정] 화면 전환 중첩을 막기 위한 잠금 장치
+        let isSwitching = false; 
         let loadingInterval;
 
         const rootStyle = document.documentElement.style;
         
-        // 지도 초기화 (크기 계산 오류를 막기 위해 지연 로딩 처리 추가)
+        // 지도 초기화 (크기 계산 오류 방지)
         const map = L.map('map', { zoomControl: false }).setView([selectedLat, selectedLon], 6);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
         let marker = L.marker([selectedLat, selectedLon]).addTo(map);
         map.on('click', (e) => { selectedLat = e.latlng.lat; selectedLon = e.latlng.lng; marker.setLatLng(e.latlng); });
         
-        // 지도가 렌더링되지 않는 문제 방지
+        // 렌더링 지연 해결
         setTimeout(() => { map.invalidateSize(); }, 500);
 
         function setScreenColor(center, edge) {
@@ -284,14 +289,15 @@
             rootStyle.setProperty('--screen-bg-edge', edge);
         }
 
-        // 전환 로직 (잔상 방지)
+        // [수정] 스쳐지나가는 버그를 완벽히 차단하는 방어적 전환 로직
         function switchScreen(id) {
-            if (isSwitching) return;
+            if (isSwitching) return; // 이미 화면을 넘기고 있으면 무시
             isSwitching = true;
 
             const content = document.getElementById('content');
             content.classList.add('glitch-active');
 
+            // 새 화면을 준비한 뒤, 이전 화면을 지웁니다.
             setTimeout(() => {
                 const screens = document.querySelectorAll('.screen');
                 const target = document.getElementById(id);
@@ -302,13 +308,13 @@
                 }
             }, 150);
 
+            // 전환 완료 후 잠금 해제
             setTimeout(() => {
                 content.classList.remove('glitch-active');
                 isSwitching = false;
             }, 400);
         }
 
-        // 로딩 시퀀스
         function startLoadingAnimation() {
             switchScreen('screen-loading');
             setScreenColor('#1a0414', '#0a0208'); 
@@ -359,6 +365,7 @@
         }
 
         function showFortune(type) {
+            // [테마] 배경 중앙, 배경 테두리, 포인트(글자/테두리) 색상
             const themes = { 
                 'love': ['#3a0d2e', '#1a0515', '#ff00ff'], 
                 'money': ['#3a2e0d', '#1a1505', '#ffd700'], 
@@ -374,6 +381,7 @@
                 
                 const t = document.getElementById('fortune-title'), st = document.getElementById('fortune-sub-title'), c = document.getElementById('res-fortune-content'), box = document.getElementById('fortune-box');
                 
+                // [디자인 적용] 선택한 카테고리 색상으로 결과 창 테두리와 글씨 색 변경
                 box.style.borderColor = themes[type][2];
                 box.style.color = themes[type][2];
 
