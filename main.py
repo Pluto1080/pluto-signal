@@ -2,11 +2,12 @@ import os
 import json
 import re
 from datetime import datetime
-import pyswisseph as swe
+import swisseph as swe  # <--- pyswisseph에서 swisseph로 수정됨
 from flask import Flask, request, jsonify, render_template
 from google import genai
 import pytz
 from timezonefinder import TimezoneFinder
+# ... 이하 코드 동일
 
 app = Flask(__name__, template_folder='templates', static_folder='templates')
 tf = TimezoneFinder()
@@ -115,5 +116,6 @@ def analyze():
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 8080)))
+
 
 
