@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>📡 PLUTO SIGNAL</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        body { background: black; color: #33ff33; font-family: 'Courier New', monospace; margin: 0; }
+        .crt-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+                      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                                  linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+                      z-index: 2; pointer-events: none; background-size: 100% 2px, 3px 100%; }
+        #map { height: 300px; border: 1px solid #33ff33; margin: 20px 0; }
+        .container { padding: 40px; position: relative; z-index: 1; }
+        input { background: #111; border: 1px solid #33ff33; color: #33ff33; padding: 10px; margin-right: 10px; }
+        button { background: #33ff33; color: black; border: none; padding: 10px 20px; cursor: pointer; font-weight: bold; }
+        #output { margin-top: 30px; line-height: 1.6; white-space: pre-wrap; border-left: 2px solid #33ff33; padding-left: 15px; }
+    </style>
+</head>
+<body>
+    <div class="crt-overlay"></div>
+    <div class="container">
+        <h1>SIGNAL RECEIVED: GEM-875</h1>
+        <p>> 지구인, 네 위치와 시간을 입력해라. <br>> 그래야 주파수를 맞출 수 있어.</p>
+        
+        <input type="text" id="name" placeholder="이름">
+        <input type="text" id="birth" placeholder="YYYYMMDDHHMM (예: 199505201430)">
+        <div id="map"></div>
+        <button onclick="sendSignal()">교신 시작</button>
+        
+        <div id="output"></div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        let lat, lon;
+        const map = L.map('map').setView([37.5665, 126.9780], 5);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        
+        let marker;
+        map.on('click', (e) => {
+            lat = e.latlng.lat; lon = e.latlng.lng;
+            if (marker) map.removeLayer(marker);
+            marker = L.marker([lat, lon]).addTo(map);
+        });
+
+        async function sendSignal() {
+            if(!lat || !lon) { alert("지도에서 네 위치를 먼저 찍어줘!"); return; }
+            const out = document.getElementById('output');
+            out.innerText = "> 신호 증폭 중... 플루토에게 연결 중...";
+            
+            const res = await fetch('/analyze', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: document.getElementById('name').value,
+                    birth: document.getElementById('birth').value,
+                    lat: lat, lon: lon
+                })
+            });
+            const data = await res.json();
+            out.innerText = data.response;
+        }
+    </script>
+</body>
+</html>
