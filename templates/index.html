@@ -11,9 +11,12 @@
 
         * { box-sizing: border-box; }
         
-        /* 전체 배경: 방 안의 어두운 느낌 */
+        /* [요구사항] 스크롤바 숨기기 (기능은 유지) */
+        ::-webkit-scrollbar { display: none; }
+        * { -ms-overflow-style: none; scrollbar-width: none; }
+
         body {
-            background: #0a0a0a;
+            background: #050505;
             margin: 0; padding: 0;
             display: flex; align-items: center; justify-content: center;
             height: 100vh; width: 100vw;
@@ -21,119 +24,109 @@
             font-family: 'DungGeunMo', monospace;
         }
 
-        /* 아이맥/CRT 모니터 외관 프레임 */
+        /* [수정] 아이맥 G3 본디 블루 스타일 프레임 */
         .monitor-frame {
             width: 95vw; height: 90vh;
             max-width: 1000px; max-height: 800px;
-            background: #2a2a2a; /* 케이스 색상 */
-            border-radius: 40px;
-            padding: 30px;
+            background: radial-gradient(circle at 30% 30%, #00a8a8 0%, #006666 100%);
+            border-radius: 60px;
+            padding: 35px;
             box-shadow: 
-                inset 0 0 20px #000,
-                0 20px 50px rgba(0,0,0,0.8),
-                0 0 0 10px #1a1a1a;
+                inset 0 0 30px rgba(255,255,255,0.2),
+                0 30px 60px rgba(0,0,0,0.8), 
+                0 0 0 10px #004d4d;
             position: relative;
             display: flex; align-items: center; justify-content: center;
         }
 
-        /* 실제 화면 영역 */
         .screen-container {
             width: 100%; height: 100%;
             background: #000;
-            border-radius: 20px;
+            border-radius: 30px;
             position: relative;
             overflow: hidden;
-            border: 10px solid #111;
-            /* 화면이 살짝 튀어나온 듯한 효과 */
-            box-shadow: inset 0 0 100px rgba(0, 255, 65, 0.1);
+            border: 12px solid #111;
+            box-shadow: inset 0 0 80px rgba(0, 255, 65, 0.1);
         }
 
-        /* CRT 스캔라인 및 플리커 효과 overlay */
+        /* [요구사항] 고전 화면 밝기 깜빡임(Pulse) 효과 */
         .crt-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
-                        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-            background-size: 100% 4px, 3px 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            background-size: 100% 3px, 2px 100%;
             pointer-events: none;
             z-index: 100;
+            animation: ambient-light 4s ease-in-out infinite;
         }
 
-        /* 화면 미세 떨림 애니메이션 */
-        @keyframes flicker {
-            0% { opacity: 0.98; } 50% { opacity: 1; } 100% { opacity: 0.99; }
+        @keyframes ambient-light {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; } /* 미세하게 밝아졌다가 어두워짐 */
         }
+
         .screen-content {
             width: 100%; height: 100%;
-            position: relative;
-            animation: flicker 0.1s infinite;
             background: radial-gradient(circle at center, #1a0033 0%, #000000 100%);
-            overflow-y: auto;
+            position: relative;
+            /* 화면 전체의 밝기 변화를 위해 추가 */
+            animation: screen-burn 8s ease-in-out infinite;
+        }
+
+        @keyframes screen-burn {
+            0%, 100% { filter: brightness(0.9); }
+            50% { filter: brightness(1.1); }
         }
 
         .screen {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            padding: 20px;
-            transition: opacity 0.5s ease-in-out;
-            opacity: 0; pointer-events: none; z-index: 0;
+            padding: 25px; opacity: 0; pointer-events: none;
         }
         .screen.active { opacity: 1; pointer-events: auto; z-index: 10; }
 
-        /* 타이틀: 광택 효과 */
         h1.shiny-title { 
-            font-size: 2rem; letter-spacing: 2px; text-align: center; margin-bottom: 20px; 
+            font-size: 1.8rem; text-align: center; margin-bottom: 20px; 
             background: linear-gradient(90deg, #00ff41, #ffffff, #00ff41);
             background-size: 200% auto;
-            color: transparent;
-            -webkit-background-clip: text;
-            background-clip: text;
+            color: transparent; -webkit-background-clip: text; background-clip: text;
             animation: shine 3s linear infinite;
-            filter: drop-shadow(0 0 8px #00ff41);
         }
         @keyframes shine { to { background-position: 200% center; } }
 
-        .container {
-            width: 100%; max-width: 500px;
-            padding: 20px;
+        .star { 
+            position: absolute; width: 4px; height: 4px; background: #FFD700; border-radius: 0;
+            box-shadow: -4px -4px 0 #FFD700, -8px -8px 0 rgba(255, 215, 0, 0.4);
+            animation: shooting-star linear infinite; opacity: 0;
+        }
+        @keyframes shooting-star { 
+            0% { transform: translate(-10vw, -10vh); opacity: 0; } 
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translate(110vw, 110vh); opacity: 0; } 
         }
 
-        /* 인풋 및 버튼 도트 스타일 */
         input, select {
-            background: rgba(0, 0, 0, 0.5); border: 2px solid #00ff41; color: #00ff41; 
-            padding: 10px; width: 100%; font-family: 'DungGeunMo'; font-size: 1rem;
-            margin-top: 5px; outline: none;
+            background: rgba(0,0,0,0.7); border: 2px solid #00ff41; color: #00ff41; 
+            padding: 10px; width: 100%; font-family: 'DungGeunMo'; margin-top: 5px; outline: none;
         }
-        .input-group label { color: #ff00ff; font-size: 0.9rem; text-shadow: 0 0 5px #ff00ff; }
+        .input-group label { color: #ff00ff; font-size: 0.9rem; }
 
         button.cyber-btn {
             background: #00ff41; color: #000; border: 4px solid #008f11; padding: 15px; width: 100%;
             font-family: 'DungGeunMo'; font-weight: bold; font-size: 1.2rem; cursor: pointer; 
-            box-shadow: 4px 4px 0 #004411; margin-top: 20px;
+            box-shadow: 4px 4px 0 #004411; margin-top: 15px;
         }
         button.cyber-btn:hover { background: #ff00ff; border-color: #aa00aa; box-shadow: 4px 4px 0 #550055; color: #fff; }
 
-        #map { height: 150px; width: 100%; border: 3px solid #00ff41; margin-top: 10px; filter: invert(100%) hue-rotate(180deg); }
+        #map { height: 150px; width: 100%; border: 3px solid #00ff41; margin-top: 5px; filter: invert(100%) hue-rotate(180deg); }
 
-        #loading-text { 
-            font-size: 1.8rem; color: #FFD700; text-shadow: 0 0 10px #FFD700;
-            animation: blink 0.8s steps(2) infinite;
-        }
+        #loading-text { font-size: 1.5rem; color: #FFD700; text-shadow: 0 0 10px #FFD700; animation: blink 0.8s steps(2) infinite; }
         @keyframes blink { to { visibility: hidden; } }
 
-        /* 픽셀 별똥별 */
-        .star { 
-            position: absolute; width: 6px; height: 6px; background: #FFD700; 
-            box-shadow: -6px -6px 0 rgba(255, 215, 0, 0.6), -12px -12px 0 rgba(255, 215, 0, 0.3);
-            animation: shooting-star linear infinite; opacity: 0;
-        }
-        @keyframes shooting-star { 
-            0% { transform: translate(0, 0); opacity: 1; } 
-            100% { transform: translate(-70vw, 70vh); opacity: 0; } 
-        }
-
-        .result-box { border: 3px solid #00ff41; padding: 15px; background: rgba(0,0,0,0.7); margin-bottom: 15px; }
-        .result-box h2 { font-size: 1.1rem; color: #ff00ff; border-bottom: 1px solid #00ff41; margin: 0 0 10px 0; padding-bottom: 5px; }
-        .result-content { font-size: 1rem; line-height: 1.5; color: #00ff41; }
+        .result-box { border: 3px solid #00ff41; padding: 15px; background: rgba(0,0,0,0.8); margin-bottom: 15px; }
+        .result-box h2 { font-size: 1rem; color: #ff00ff; border-bottom: 1px solid #00ff41; margin-bottom: 10px; }
+        .result-content { font-size: 0.95rem; line-height: 1.6; color: #00ff41; }
     </style>
 </head>
 <body>
@@ -144,30 +137,21 @@
             <div class="screen-content">
                 
                 <section id="screen-input" class="screen active">
-                    <div class="container">
+                    <div style="width:100%; max-width:450px;">
                         <h1 class="shiny-title">ACCESS: PLUTO</h1>
                         <div class="input-group" style="margin-bottom:10px;">
                             <label>NAME</label>
                             <input type="text" id="userName" placeholder="이름 입력">
                         </div>
                         <div style="display: flex; gap: 10px; margin-bottom:10px;">
-                            <div style="flex: 1;">
-                                <label>DATE</label>
-                                <input type="date" id="birthDate" max="9999-12-31">
-                            </div>
-                            <div style="flex: 1;">
-                                <label>TIME (24H)</label>
-                                <input type="time" id="birthTime" lang="en-GB">
-                            </div>
+                            <div style="flex: 1;"><label>DATE</label><input type="date" id="birthDate" max="9999-12-31"></div>
+                            <div style="flex: 1;"><label>TIME</label><input type="time" id="birthTime" lang="en-GB"></div>
                         </div>
                         <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                            <input type="checkbox" id="timeUnknown" onchange="toggleTimeInput()" style="width: 20px; margin-right: 10px;">
-                            <label for="timeUnknown" style="color: #00ff41; font-size: 0.8rem;">시간 모름</label>
+                            <input type="checkbox" id="timeUnknown" onchange="toggleTimeInput()" style="width:18px; height:18px; margin-right:8px;">
+                            <label for="timeUnknown" style="color:#00ff41; font-size:0.8rem;">시간 모름</label>
                         </div>
-                        <div class="input-group">
-                            <label>LOCATION</label>
-                            <div id="map"></div>
-                        </div>
+                        <div class="input-group"><label>LOCATION</label><div id="map"></div></div>
                         <button class="cyber-btn" onclick="startAnalysis()">INITIATE_SEQUENCE</button>
                     </div>
                 </section>
@@ -177,19 +161,13 @@
                 </section>
 
                 <section id="screen-result" class="screen">
-                    <div class="container" style="max-height: 90%; overflow-y: auto;">
-                        <h1 class="shiny-title" style="font-size: 1.5rem;">ANALYSIS_COMPLETE</h1>
-                        <div class="result-box">
-                            <h2>>> CORE_PERSONALITY</h2>
-                            <div id="res-personality" class="result-content"></div>
-                        </div>
-                        <div class="result-box" style="border-color: #00ffff;">
-                            <h2 style="color: #00ffff;">[+] STRENGTHS</h2>
-                            <div id="res-pros" class="result-content"></div>
-                        </div>
-                        <div class="result-box" style="border-color: #ff0055;">
-                            <h2 style="color: #ff0055;">[-] WEAKNESSES</h2>
-                            <div id="res-cons" class="result-content"></div>
+                    <div style="width:100%; max-width:600px; max-height:90%; overflow-y:auto; padding:10px;">
+                        <h1 class="shiny-title" style="font-size:1.4rem;">ANALYSIS_COMPLETE</h1>
+                        <div id="result-container">
+                            <div class="result-box"><h2>>> CORE_PERSONALITY</h2><div id="res-personality" class="result-content"></div></div>
+                            <div class="result-box" style="border-color:#ff00ff;"><h2>[♥] LOVE_2026</h2><div id="res-love" class="result-content"></div></div>
+                            <div class="result-box" style="border-color:#ffd700;"><h2>[$] MONEY_2026</h2><div id="res-money" class="result-content"></div></div>
+                            <div class="result-box" style="border-color:#00ffff;"><h2>[!] CAREER_2026</h2><div id="res-career" class="result-content"></div></div>
                         </div>
                         <button class="cyber-btn" onclick="location.reload()">RESTART</button>
                     </div>
@@ -220,16 +198,15 @@
             document.getElementById(id).classList.add('active');
         }
 
-        let loadingInterval;
         function startLoadingAnimation() {
             switchScreen('screen-loading');
             const screen = document.querySelector('.screen-content');
-            for(let i=0; i<25; i++) {
+            for(let i=0; i<20; i++) {
                 let star = document.createElement('div');
                 star.className = 'star';
-                star.style.left = `${Math.random() * 120}vw`;
-                star.style.top = `-${Math.random() * 20}vh`;
-                star.style.animationDuration = `${Math.random() * 0.7 + 0.3}s`;
+                star.style.left = `${Math.random() * 80}vw`;
+                star.style.top = `${Math.random() * -20}vh`;
+                star.style.animationDuration = `${Math.random() * 1 + 0.5}s`;
                 star.style.animationDelay = `${Math.random() * 2}s`;
                 screen.appendChild(star);
             }
@@ -250,7 +227,7 @@
             const date = document.getElementById('birthDate').value;
             const unknown = document.getElementById('timeUnknown').checked;
             let time = document.getElementById('birthTime').value;
-            if(!name || !date || (!unknown && !time)) { alert("데이터를 입력하라."); return; }
+            if(!name || !date || (!unknown && !time)) { alert("데이터를 모두 입력하라."); return; }
             if(unknown) time = "12:00";
             
             startLoadingAnimation();
@@ -265,8 +242,9 @@
                 stopLoadingAnimation();
                 if(data.error) { alert(data.error); switchScreen('screen-input'); return; }
                 document.getElementById('res-personality').innerText = data.personality;
-                document.getElementById('res-pros').innerText = data.pros;
-                document.getElementById('res-cons').innerText = data.cons;
+                document.getElementById('res-love').innerText = data.fortune_2026?.love || "분석 불가";
+                document.getElementById('res-money').innerText = data.fortune_2026?.money || "분석 불가";
+                document.getElementById('res-career').innerText = data.fortune_2026?.career || "분석 불가";
                 switchScreen('screen-result');
             })
             .catch(err => { stopLoadingAnimation(); switchScreen('screen-input'); });
