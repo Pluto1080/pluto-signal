@@ -26,12 +26,21 @@
             opacity: 1; pointer-events: auto; z-index: 10;
         }
 
-        @keyframes glitch {
-            0% { transform: translate(0); } 20% { transform: translate(-2px, 2px); }
-            40% { transform: translate(-2px, -2px); } 60% { transform: translate(2px, 2px); }
-            80% { transform: translate(2px, -2px); } 100% { transform: translate(0); }
+        /* 광택이 흐르는 제목 효과 */
+        h1.shiny-title { 
+            font-size: 1.8rem; letter-spacing: 5px; text-align: center; margin-bottom: 30px; 
+            background: linear-gradient(90deg, #00ff41, #ffffff, #00ff41);
+            background-size: 200% auto;
+            color: transparent;
+            -webkit-background-clip: text;
+            background-clip: text;
+            animation: shine 3s linear infinite;
+            text-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
         }
-        h1.glitch-title { font-size: 1.8rem; letter-spacing: 5px; animation: glitch 0.3s infinite; text-shadow: 2px 0 #ff00ff, -2px 0 #00ffff; text-align: center; margin-bottom: 30px; }
+        @keyframes shine {
+            to { background-position: 200% center; }
+        }
+
         button.cyber-btn {
             background: #00ff41; color: #000; border: none; padding: 15px; width: 100%;
             font-weight: bold; font-size: 1.2rem; cursor: pointer; box-shadow: 0 0 15px #00ff41; margin-top: 20px;
@@ -50,12 +59,40 @@
             background: transparent; border: 1px solid #00ff41; color: #00ff41; padding: 10px; width: 100%;
             font-size: 1rem; outline: none; -webkit-appearance: none;
         }
+        input[type="date"]::-webkit-calendar-picker-indicator,
+        input[type="time"]::-webkit-calendar-picker-indicator {
+            filter: invert(1) sepia(1) saturate(5) hue-rotate(80deg);
+        }
+
         #map { height: 200px; width: 100%; border: 1px solid #00ff41; filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(80%); }
 
         #screen-loading { background: #000; overflow: hidden; }
-        #loading-text { font-size: 1.5rem; color: #00ff41; text-shadow: 0 0 10px #00ff41; z-index: 20; text-align: center; }
-        .star { position: absolute; width: 2px; height: 2px; background: #fff; box-shadow: 0 0 10px #fff, 0 0 20px #ff00ff, 0 0 30px #00ffff; animation: fall linear infinite; }
-        @keyframes fall { from { transform: translateY(-10vh); opacity: 1; } to { transform: translateY(110vh); opacity: 0; } }
+        
+        /* 신비로운 로딩 텍스트 스타일 */
+        #loading-text { 
+            font-size: 1.5rem; color: #FFD700; text-shadow: 0 0 10px #FFD700, 0 0 20px #ff8800; 
+            z-index: 20; text-align: center; letter-spacing: 2px;
+            animation: pulse 1.5s infinite alternate;
+        }
+        @keyframes pulse {
+            from { opacity: 0.7; filter: drop-shadow(0 0 5px #FFD700); }
+            to { opacity: 1; filter: drop-shadow(0 0 15px #FFD700); }
+        }
+
+        /* 사선으로 떨어지는 별똥별 효과 */
+        .star { 
+            position: absolute; 
+            background: linear-gradient(to bottom, rgba(255, 235, 59, 1) 0%, transparent 100%); 
+            border-radius: 50%;
+            filter: drop-shadow(0 0 8px #FFD700); 
+            animation: shooting-star linear infinite; 
+            opacity: 0;
+            transform-origin: top; 
+        }
+        @keyframes shooting-star { 
+            0% { transform: translate(0, 0) rotate(45deg); opacity: 1; } 
+            100% { transform: translate(-60vw, 100vh) rotate(45deg); opacity: 0; } 
+        }
 
         #screen-result { padding: 20px 10px; overflow-y: auto; display: block; }
         #screen-result .container { width: 100%; max-width: 700px; margin: 0 auto; }
@@ -71,7 +108,7 @@
 <body>
     <section id="screen-input" class="screen active">
         <div class="container">
-            <h1 class="glitch-title">ACCESS: PLUTO</h1>
+            <h1 class="shiny-title">ACCESS: PLUTO</h1>
             <p style="text-align: center; color: #8844ff; font-size: 0.8rem; margin-top:-15px;">>> ASTRO_DATA_REQUIRED...</p>
             
             <div class="input-group">
@@ -81,11 +118,11 @@
             <div class="input-group" style="display: flex; gap: 10px;">
                 <div style="flex: 2;">
                     <label>BIRTH_DATE</label>
-                    <input type="date" id="birthDate">
+                    <input type="date" id="birthDate" max="9999-12-31">
                 </div>
                 <div style="flex: 1.5;">
-                    <label>BIRTH_TIME</label>
-                    <input type="time" id="birthTime">
+                    <label>BIRTH_TIME (24H)</label>
+                    <input type="time" id="birthTime" lang="en-GB">
                 </div>
             </div>
             <div style="margin-bottom: 15px; display: flex; align-items: center;">
@@ -107,7 +144,7 @@
 
     <section id="screen-result" class="screen">
         <div class="container" style="padding-top: 30px;">
-             <h1 class="glitch-title" style="font-size: 1.5rem;">ANALYSIS_COMPLETE</h1>
+             <h1 class="shiny-title" style="font-size: 1.5rem;">ANALYSIS_COMPLETE</h1>
              <div class="result-box personality-box">
                  <h2>>> CORE_PERSONALITY (성격)</h2>
                  <div id="res-personality" class="result-content">데이터 로딩 중...</div>
@@ -151,14 +188,24 @@
         function startLoadingAnimation() {
             switchScreen('screen-loading');
             const loadingScreen = document.getElementById('screen-loading');
-            for(let i=0; i<30; i++) {
+            
+            // 별똥별 애니메이션 생성 (사선으로 떨어지도록 좌표 범위 확장)
+            for(let i=0; i<40; i++) {
                 let star = document.createElement('div');
                 star.className = 'star';
-                star.style.left = `${Math.random() * 100}vw`;
-                star.style.animationDuration = `${Math.random() * 2 + 1}s`;
-                star.style.animationDelay = `${Math.random()}s`;
+                star.style.left = `${Math.random() * 150}vw`; 
+                star.style.top = `-${Math.random() * 30}vh`;
+                
+                const scale = Math.random() * 2 + 0.5;
+                star.style.width = `${2 * scale}px`;
+                star.style.height = `${30 * scale}px`;
+                
+                star.style.animationDuration = `${Math.random() * 1 + 0.5}s`;
+                star.style.animationDelay = `${Math.random() * 2}s`;
+                
                 loadingScreen.appendChild(star);
             }
+            
             const textElement = document.getElementById('loading-text');
             let dots = 0;
             loadingInterval = setInterval(() => {
@@ -178,7 +225,6 @@
             const isUnknown = document.getElementById('timeUnknown').checked;
             let time = document.getElementById('birthTime').value;
 
-            // 추가: 사용자의 브라우저 언어 감지
             const userLang = navigator.language || 'ko-KR';
 
             if(!name || !date || (!isUnknown && !time)) { alert("필수 데이터를 모두 입력하라."); return; }
@@ -194,7 +240,7 @@
                     time_unknown: isUnknown, 
                     lat: selectedLat, 
                     lon: selectedLon,
-                    language: userLang // 서버로 전송
+                    language: userLang
                 })
             })
             .then(response => response.json())
