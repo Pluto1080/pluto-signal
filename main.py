@@ -105,12 +105,12 @@ def analyze():
         }}
         """
 
-  # 404 에러를 피하면서 가장 싸게 먹히는 검증된 모델
-        response = client.models.generate_content(
-            model='gemini-2.0-flash', # 3-flash 대신 이걸로 쓰면 바로 돼!
-            contents=prompt,
-            config={'response_mime_type': 'application/json'}
-        )
+    # 'gemini-3-flash' 대신 '-preview'를 붙이거나 'latest'를 써야 해
+    response = client.models.generate_content(
+    model='gemini-3-flash-preview', # 이게 2026년 현재 정답 이름이야!
+    contents=prompt,
+    config={'response_mime_type': 'application/json'}
+    )
 
         if not response or not response.text:
             return jsonify({"error": "별과의 통신이 일시적으로 끊겼어. 다시 시도해봐!"}), 200
@@ -123,5 +123,6 @@ def analyze():
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 8080)))
+
 
 
