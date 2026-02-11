@@ -6,19 +6,34 @@ from flask import Flask, request, jsonify, render_template
 from google import genai
 import re
 
+# --- 타임존 자동 계산을 위한 추가 도구들 ---
+import pytz
+from timezonefinder import TimezoneFinder
+
 app = Flask(__name__, template_folder='templates', static_folder='templates')
+
+# 타임존 파인더 초기화 (서버 실행 시 한 번만 로드)
+tf = TimezoneFinder()
 
 api_key = os.environ.get("GOOGLE_API_KEY") or os.environ.get("GEMINI_API_KEY")
 client = genai.Client(api_key=api_key) if api_key else None
 
-# 스위스 에페메리스 기본 경로 설정 (필요시 수정)
-# swe.set_ephe_path('/path/to/ephe') 
-
 def calculate_astrology(birth_date, birth_time, latitude, longitude):
-    timezone = 9  # KST 기준
+    # 1. 위도/경도로 타임존 이름 찾기 (예: 'Asia/Seoul')
+    tz_name = tf.timezone_at(lng=longitude, lat=latitude) or 'UTC'
+    timezone = pytz.timezone(tz_name)
+    
     dt = datetime.strptime(f"{birth_date} {birth_time}", "%Y-%m-%d %H:%M")
-    utc_hour = dt.hour - timezone + dt.minute / 60.0
+    
+    # 2. 해당 지역의 당시 시간 차이(Offset) 자동 계산 (서머타임 포함)
+    local_dt = timezone.localize(dt)
+    utc_offset = local_dt.utcoffset().total_seconds() / 3600.0
+    
+    # 3. 우주 시간(JD) 계산
+    utc_hour = dt.hour - utc_offset + dt.minute / 60.0
     jd = swe.julday(dt.year, dt.month, dt.day, utc_hour)
+
+    # --- 여기서부터는 기존의 zodiac_signs = [...] 코드와 동일합니다 ---
 
     zodiac_signs = [
         "양자리", "황소자리", "쌍둥이자리", "게자리", "사자자리", "처녀자리",
@@ -139,3 +154,4 @@ def analyze():
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 8080))
     app.run(host='0.0.0.0', port=port)
+
