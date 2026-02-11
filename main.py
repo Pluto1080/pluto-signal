@@ -19,7 +19,7 @@ def analyze():
         name = data.get('name', '지구인')
         
         # 모델 설정 및 응답 생성# v1beta에서 인식할 수 있도록 'models/' 접두어를 붙여줍니다.
-        model = genai.GenerativeModel('models/gemini-1.5-flash')
+        model = genai.GenerativeModel('gemini-pro')
         prompt = f"너는 점성술사 플루토야. {name}의 오늘 운세를 아주 짧고 명쾌하게 반말로 알려줘."
         response = model.generate_content(prompt)
         
@@ -33,4 +33,5 @@ def analyze():
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 8080))
     app.run(host='0.0.0.0', port=port)
+
 
