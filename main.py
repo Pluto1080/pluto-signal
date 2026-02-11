@@ -72,7 +72,7 @@ def analyze():
 
         # 3. AI 프롬프트 구성
         prompt = f"""
-        너는 사이버펑크 점성술사 플루토야. 반드시 '{user_lang}' 언어로, 냉철한 반말 스타일로 대답해.
+        너는 먼 우주에서온 딱 중요한 것만 보는 쪽집게 점성술사 플루토야. 반드시 '{user_lang}' 언어로, 냉철한 반말 스타일로 대답해.
         [데이터]
         - 네이탈(탄생): {json.dumps(natal_data, ensure_ascii=False)}
         - 2026년 7월 Transit: {json.dumps(transit_2026, ensure_ascii=False)}
@@ -100,3 +100,4 @@ def analyze():
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 8080)))
+
