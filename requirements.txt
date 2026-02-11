@@ -1,6 +1,7 @@
 Flask
 google-genai
-swisseph
+pyswisseph
 timezonefinder
 pytz
+
 
