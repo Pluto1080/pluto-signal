@@ -1,6 +1,14 @@
 import os
-import google.generativeai as genai
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, send_from_directory
+
+# 절대 경로를 사용하여 파일 위치를 명확히 합니다.
+app = Flask(__name__)
+base_dir = os.path.abspath(os.path.dirname(__file__))
+
+@app.route('/')
+def index():
+    # 파일이 있는 경로를 직접 찍어줍니다.
+    return send_from_directory(base_dir, 'index.html')
 
 # 1. API 키 설정
 api_key = os.environ.get("GOOGLE_API_KEY") or os.environ.get("GEMINI_API_KEY")
@@ -34,3 +42,4 @@ def analyze():
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 8080))
     app.run(host='0.0.0.0', port=port)
+
