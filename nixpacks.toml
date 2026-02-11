@@ -1,5 +1,7 @@
 [phases.setup]
-nixPkgs = ["python3", "sqlite", "libsqlite3", "gcc"]
+# 파이썬은 Nix로 설치하고, 시스템 부품(sqlite3)은 우분투 기본 방식(apt)으로 설치합니다.
+nixPkgs = ["python3", "gcc"]
+aptPkgs = ["libsqlite3-0"]
 
 [phases.build]
 cmds = ["pip install -r requirements.txt"]
