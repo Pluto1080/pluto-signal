@@ -149,8 +149,9 @@ def analyze():
     except Exception as e:
         return jsonify({"error": f"치명적 오류 발생: {str(e)}"}), 200
 
-if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 8080))
+if __name__ == "__main__":
+    # Railway가 정해준 포트를 읽어오고, 없으면 8080을 쓰라는 뜻입니다.
+    port = int(os.environ.get("PORT", 8080)) 
     app.run(host='0.0.0.0', port=port)
 
 
