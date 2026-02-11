@@ -4,14 +4,15 @@ from datetime import datetime
 import swisseph as swe
 from flask import Flask, request, jsonify, render_template
 from google import genai
+import re
 
 app = Flask(__name__, template_folder='templates', static_folder='templates')
 
 api_key = os.environ.get("GOOGLE_API_KEY") or os.environ.get("GEMINI_API_KEY")
 client = genai.Client(api_key=api_key) if api_key else None
 
-# 스위스 에페메리스 기본 경로 설정
-swe.set_ephe_path('')
+# 스위스 에페메리스 기본 경로 설정 (필요시 수정)
+# swe.set_ephe_path('/path/to/ephe') 
 
 def calculate_astrology(birth_date, birth_time, latitude, longitude):
     timezone = 9  # KST 기준
@@ -27,7 +28,7 @@ def calculate_astrology(birth_date, birth_time, latitude, longitude):
     def get_sign_and_degree(lon):
         sign_index = int(lon // 30)
         inner_degree = round(lon % 30, 2)
-        return f"{zodiac_signs[sign_index]} {inner_degree}도"
+        return f"{zodiac_signs[sign_index]} {inner_degree:.2f}도"
 
     planets = {
         'Sun': swe.SUN, 'Moon': swe.MOON, 'Mercury': swe.MERCURY,
@@ -42,20 +43,16 @@ def calculate_astrology(birth_date, birth_time, latitude, longitude):
         results[name] = {"degree": round(lon, 2), "sign": get_sign_and_degree(lon)}
 
     house_cusps, ascmc = swe.houses(jd, latitude, longitude)
-    asc = round(ascmc[0], 2)
-    mc = round(ascmc[1], 2)
-
-    results["ASC"] = {"degree": asc, "sign": get_sign_and_degree(asc)}
-    results["MC"] = {"degree": mc, "sign": get_sign_and_degree(mc)}
+    results["ASC"] = {"degree": round(ascmc[0], 2), "sign": get_sign_and_degree(ascmc[0])}
+    results["MC"] = {"degree": round(ascmc[1], 2), "sign": get_sign_and_degree(ascmc[1])}
 
     sun = swe.calc_ut(jd, swe.SUN)[0][0]
     moon = swe.calc_ut(jd, swe.MOON)[0][0]
-    pf = (asc + moon - sun) % 360
+    pf = (ascmc[0] + moon - sun) % 360
     results["Fortune"] = {"degree": round(pf, 2), "sign": get_sign_and_degree(pf)}
 
     for i in range(12):
-        cusp_degree = round(house_cusps[i], 2)
-        results[f"House_{i+1}_Cusp"] = {"degree": cusp_degree, "sign": get_sign_and_degree(cusp_degree)}
+        results[f"House_{i+1}_Cusp"] = {"degree": round(house_cusps[i], 2), "sign": get_sign_and_degree(house_cusps[i])}
 
     def get_house(degree, cusps):
         for i in range(12):
@@ -68,8 +65,7 @@ def calculate_astrology(birth_date, birth_time, latitude, longitude):
         return "Unknown"
 
     for name in planets:
-        planet_deg = results[name]["degree"]
-        results[name]["house"] = get_house(planet_deg, house_cusps)
+        results[name]["house"] = get_house(results[name]["degree"], house_cusps)
 
     return results
 
@@ -80,7 +76,8 @@ def index():
 @app.route('/analyze', methods=['POST'])
 def analyze():
     if not client:
-        return jsonify({"result": "플루토 비명 발생: 서버에 API 키가 없습니다."}), 200
+        # 프론트엔드에서 JSON 파싱 오류를 막기 위해 에러도 JSON 구조로 보냄
+        return jsonify({"error": "서버 API 키 설정 오류"}), 200
 
     try:
         data = request.json
@@ -91,28 +88,32 @@ def analyze():
         lat = float(data.get('lat', 37.5665))
         lon = float(data.get('lon', 126.9780))
 
-        # 별자리 데이터 계산
         astro_data = calculate_astrology(birth_date, birth_time, lat, lon)
         astro_json = json.dumps(astro_data, ensure_ascii=False)
 
-        # 시간을 모를 경우 경고 문구 주입
         warning_instruction = ""
         if time_unknown:
             warning_instruction = """
             [중요 지시사항] 사용자가 태어난 시간을 몰라서 12:00으로 임의 계산했습니다. 
-            답변을 시작할 때 반드시 다음 문구를 그대로 말하세요: "시간을 잘 모르는구나. 정확도는 조금 떨어지겠지만 재밌는 이야기 듣는다고 생각하고 들어줘."
+            'personality' 항목 분석을 시작할 때 반드시 다음 문장으로 시작하세요: "시간을 잘 모르는구나. 정확도는 조금 떨어지겠지만 재밌는 이야기 듣는다고 생각하고 들어줘."
             """
 
+        # [핵심 변경] JSON 포맷 강제 요청
         prompt = f"""
-        너는 점성술사 플루토야. 말투는 짧고 맵고 건방진 반말이야.
-        하지만 분석 자체는 아주 객관적이고 전문적이어야 해. 좋은 것은 좋다, 안 좋은 것은 안 좋다고 명확하게 팩트 기반으로 얘기해줘.
-        
-        다음은 {name}의 출생 차트 천체 데이터(JSON)야.
-        {astro_json}
+        너는 사이버펑크 점성술사 플루토야. 말투는 짧고 맵고 건방진 반말이야.
+        제공된 천체 데이터를 바탕으로 {name}을 분석해.
         
         {warning_instruction}
         
-        이 실제 데이터를 바탕으로 {name}의 성향, 잠재력, 피해야 할 것을 객관적이고 전문적으로 분석해서 맵게 팩트폭력 해줘.
+        **중요: 반드시 아래의 JSON 형식으로만 대답해. 다른 마크다운이나 설명은 절대 붙이지 마.**
+        {{
+            "personality": "여기에 전체적인 성격과 기질 분석 내용을 적어 (시간 모를 경우 경고문구 포함)",
+            "pros": "여기에 핵심 장점 3~4가지를 맵게 요약해서 적어",
+            "cons": "여기에 핵심 단점이나 주의할 점 3~4가지를 아주 맵게 팩트폭력으로 적어"
+        }}
+
+        [데이터]
+        {astro_json}
         """
 
         response = client.models.generate_content(
@@ -120,10 +121,20 @@ def analyze():
             contents=prompt
         )
         
-        return jsonify({"result": response.text})
+        # Gemini가 가끔 JSON 앞뒤에 ```json ... ``` 을 붙이는 경우가 있어서 제거
+        cleaned_text = re.sub(r"```json|```", "", response.text).strip()
+        
+        # 문자열을 실제 파이썬 딕셔너리(JSON 객체)로 변환
+        result_json = json.loads(cleaned_text)
+        
+        # 프론트엔드로 JSON 객체 전송
+        return jsonify(result_json)
 
+    except json.JSONDecodeError:
+         # Gemini가 JSON 형식을 지키지 않았을 때의 대비책
+         return jsonify({"error": "플루토가 신호를 잘못 보냈어. (JSON 파싱 실패)"}), 200
     except Exception as e:
-        return jsonify({"result": f"플루토 비명 발생: {str(e)}"}), 200
+        return jsonify({"error": f"치명적 오류 발생: {str(e)}"}), 200
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 8080))
