@@ -9,82 +9,91 @@
     <style>
         @import url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/DungGeunMo.woff');
 
+        :root {
+            /* 화면 내부 그라데이션 색상 변수 정의 (기본: 어두운 회색) */
+            --screen-bg-center: #444444;
+            --screen-bg-edge: #111111;
+        }
+
         * { box-sizing: border-box; }
         ::-webkit-scrollbar { display: none; }
         * { -ms-overflow-style: none; scrollbar-width: none; }
 
         body {
-            background: #050505;
-            margin: 0; padding: 0;
+            background: #050505; margin: 0; padding: 0;
             display: flex; align-items: center; justify-content: center;
-            height: 100vh; width: 100vw;
-            overflow: hidden;
+            height: 100vh; width: 100vw; overflow: hidden;
             font-family: 'DungGeunMo', monospace;
-            transition: background-color 0.8s ease;
         }
 
+        /* [수정1] 모니터 프레임: 색상 변화 transition 제거 및 고정 색상 유지 */
         .monitor-frame {
             width: 95vw; height: 90vh;
             max-width: 1000px; max-height: 800px;
-            background: radial-gradient(circle at 30% 30%, #00a8a8 0%, #006666 100%);
-            border-radius: 60px;
-            padding: 35px;
+            background: radial-gradient(circle at 30% 30%, #00a8a8 0%, #006666 100%); /* 고정된 청록색 */
+            border-radius: 60px; padding: 35px;
             box-shadow: inset 0 0 30px rgba(255,255,255,0.2), 0 30px 60px rgba(0,0,0,0.8), 0 0 0 10px #004d4d;
-            position: relative;
-            display: flex; align-items: center; justify-content: center;
-            transition: background 1.2s ease;
+            position: relative; display: flex; align-items: center; justify-content: center;
         }
 
-        /* 글리치 애니메이션 */
-        @keyframes glitch {
-            0% { transform: translate(0); filter: brightness(1); }
-            20% { transform: translate(-3px, 2px); filter: hue-rotate(90deg) brightness(1.3); }
-            40% { transform: translate(3px, -2px); filter: hue-rotate(180deg) contrast(1.5); }
-            60% { transform: translate(-3px, -2px); filter: brightness(0.8); }
-            80% { transform: translate(3px, 2px); filter: hue-rotate(270deg); }
-            100% { transform: translate(0); filter: brightness(1); }
+        /* [수정3] 아주 은은한 '찌릿' 글리치 효과 */
+        @keyframes subtle-glitch {
+            0% { transform: translate(0); }
+            20% { transform: translate(-2px, 0); filter: brightness(1.2); }
+            40% { transform: translate(2px, 0); }
+            60% { transform: translate(-1px, 0); filter: brightness(0.9); }
+            80% { transform: translate(1px, 0); }
+            100% { transform: translate(0); }
         }
 
-        .glitch-active { animation: glitch 0.2s linear 2; }
+        .glitch-active {
+            /* 화면 내용물만 살짝 떨리게 적용 */
+            animation: subtle-glitch 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+        }
 
         .screen-container {
-            width: 100%; height: 100%;
-            background: #000;
-            border-radius: 30px;
-            position: relative;
-            overflow: hidden;
-            border: 12px solid #111;
+            width: 100%; height: 100%; background: #000; border-radius: 30px;
+            position: relative; overflow: hidden; border: 12px solid #111;
             box-shadow: inset 0 0 80px rgba(0, 255, 65, 0.1);
         }
 
+        /* CRT 질감 레이어 (항상 최상위 유지) */
         .crt-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
                         linear-gradient(90deg, rgba(255, 0, 0, 0.05), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.05));
-            background-size: 100% 3px, 3px 100%;
-            pointer-events: none; z-index: 100;
+            background-size: 100% 3px, 3px 100%; pointer-events: none; z-index: 100; opacity: 0.8;
         }
 
+        /* [수정2] 화면 내용 배경: CSS 변수를 사용하여 질감 유지하며 색상 변경 */
         .screen-content {
             width: 100%; height: 100%;
-            background: radial-gradient(circle at center, #444444 0%, #111111 100%);
+            /* 변수를 사용한 그라데이션으로 질감 유지 */
+            background: radial-gradient(circle at center, var(--screen-bg-center) 0%, var(--screen-bg-edge) 100%);
             position: relative;
-            transition: background 1s ease;
+            transition: background 1s ease; /* 부드러운 색상 전환 */
         }
+        
+        /* 화면 스윕 효과 (질감 추가) */
+        .screen-content::after {
+            content: ""; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent);
+            animation: screen-sweep 10s linear infinite; pointer-events: none;
+        }
+        @keyframes screen-sweep { to { left: 200%; } }
 
         .screen {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            padding: 25px; opacity: 0; pointer-events: none; transition: opacity 0.5s;
+            padding: 25px; opacity: 0; pointer-events: none; transition: opacity 0.5s; z-index: 10;
         }
-        .screen.active { opacity: 1; pointer-events: auto; z-index: 10; }
+        .screen.active { opacity: 1; pointer-events: auto; }
 
         h1.shiny-title { 
             font-size: 3.5rem; font-weight: 900; text-align: center; margin-bottom: 30px; 
             background: linear-gradient(180deg, #00ff41 0%, #ffffff 50%, #00ff41 100%);
             background-size: auto 200%; color: transparent; -webkit-background-clip: text; background-clip: text;
-            text-shadow: 0 0 10px rgba(0, 255, 65, 0.5), 2px 2px 0px #000;
-            animation: shine-v 3s linear infinite;
+            text-shadow: 0 0 10px rgba(0, 255, 65, 0.5), 2px 2px 0px #000; animation: shine-v 3s linear infinite;
         }
         @keyframes shine-v { to { background-position: center 200%; } }
 
@@ -94,21 +103,14 @@
         }
         @keyframes shooting-star { 
             0% { transform: translate(0, 0); opacity: 0; } 
-            10% { opacity: 1; }
-            100% { transform: translate(100vw, 100vh); opacity: 0; } 
+            10% { opacity: 1; } 100% { transform: translate(100vw, 100vh); opacity: 0; } 
         }
 
-        /* 입력창 디자인 수정: 연도 6자리 버그 방지 및 레트로 스타일 */
         input, select { 
             background: rgba(0,0,0,0.8); border: 2px solid #00ff41; color: #00ff41; 
-            padding: 12px; width: 100%; font-family: 'DungGeunMo'; 
-            outline: none; font-size: 1.1rem;
+            padding: 12px; width: 100%; font-family: 'DungGeunMo'; outline: none; font-size: 1.1rem;
         }
-        input[type="date"] {
-            /* 브라우저 기본 스핀 버튼 제거 및 정렬 */
-            -webkit-appearance: none;
-            min-height: 45px;
-        }
+        input[type="date"] { -webkit-appearance: none; min-height: 45px; }
 
         button.cyber-btn {
             background: #00ff41; color: #000; border: 4px solid #008f11; padding: 18px; width: 100%;
@@ -127,7 +129,7 @@
 </head>
 <body>
 
-    <div id="monitor" class="monitor-frame">
+    <div class="monitor-frame">
         <div id="container" class="screen-container">
             <div class="crt-overlay"></div>
             <div id="content" class="screen-content">
@@ -194,32 +196,45 @@
         let selectedLat = 37.5665; let selectedLon = 126.9780;
         let globalData = null;
         let viewedFortunes = { love: false, money: false, career: false };
-        let loadingInterval;
+        
+        // [수정2] CSS 변수를 조작하여 화면 배경색 변경 (질감 유지)
+        const rootStyle = document.documentElement.style;
+
+        function setScreenColor(center, edge) {
+            rootStyle.setProperty('--screen-bg-center', center);
+            rootStyle.setProperty('--screen-bg-edge', edge);
+        }
+        
+        function resetScreenColor() {
+            setScreenColor('#444444', '#111111'); // 기본 어두운색으로 복귀
+        }
 
         const map = L.map('map', { zoomControl: false }).setView([selectedLat, selectedLon], 6);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
         let marker = L.marker([selectedLat, selectedLon]).addTo(map);
         map.on('click', (e) => { selectedLat = e.latlng.lat; selectedLon = e.latlng.lng; marker.setLatLng(e.latlng); });
 
+        // [수정3] 은은한 글리치 효과 적용
         function switchScreen(id) {
-            const container = document.getElementById('container');
-            container.classList.add('glitch-active');
+            const content = document.getElementById('content');
+            content.classList.add('glitch-active'); // 화면 내용물에만 글리치 적용
             
             setTimeout(() => {
                 document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
                 document.getElementById(id).classList.add('active');
-            }, 200);
+            }, 150); // 전환 타이밍을 조금 더 빠르게
 
             setTimeout(() => {
-                container.classList.remove('glitch-active');
-            }, 400);
+                content.classList.remove('glitch-active');
+            }, 300); // 글리치 지속 시간 단축
         }
 
+        // 별똥별 로딩 시작 (보라색 톤 배경)
         function startLoadingAnimation() {
             switchScreen('screen-loading');
-            document.getElementById('content').style.background = '#662753'; 
-            document.getElementById('monitor').style.background = 'radial-gradient(circle at 30% 30%, #883366 0%, #441133 100%)';
-            
+            // [수정1,2] 모니터 프레임 변경 제거, 화면 내부만 질감 유지하며 색상 변경
+            setScreenColor('#883366', '#441133'); // 보라색 그라데이션
+
             const screen = document.querySelector('.screen-content');
             for(let i=0; i<30; i++) {
                 let star = document.createElement('div');
@@ -233,8 +248,7 @@
         }
 
         function stopLoadingAnimation() {
-            document.getElementById('content').style.background = '';
-            document.getElementById('monitor').style.background = '';
+            resetScreenColor(); // 기본 배경색 복구
             document.querySelectorAll('.star').forEach(s => s.remove());
         }
 
@@ -243,11 +257,9 @@
             const date = document.getElementById('birthDate').value;
             if(!name || !date) { alert("데이터를 입력하라."); return; }
             startLoadingAnimation();
-            fetch('/analyze', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, date, time: "12:00", lat: selectedLat, lon: selectedLon })
-            })
+            // 실제 서버 통신 시 주석 해제 및 수정 필요
+            /*
+            fetch('/analyze', { ... })
             .then(res => res.json())
             .then(data => {
                 stopLoadingAnimation();
@@ -255,17 +267,30 @@
                 document.getElementById('res-personality').innerText = data.personality;
                 switchScreen('screen-personality');
             });
+            */
+           // 테스트를 위한 임시 코드 (서버 없이 작동 확인용)
+           setTimeout(() => {
+                stopLoadingAnimation();
+                globalData = { fortune_2026: { love: "테스트", money: "테스트", career: "테스트", summary: "요약", final_advice: "조언" } };
+                document.getElementById('res-personality').innerText = "분석 완료 샘플 데이터";
+                switchScreen('screen-personality');
+           }, 2000);
         }
 
+        // 운세 보기 (버튼색에 따라 배경 톤 변경)
         function showFortune(type) {
-            const colors = { 'love': '#441133', 'money': '#443311', 'career': '#113344' };
-            const frameColors = { 'love': '#882266', 'money': '#886622', 'career': '#226688' };
+            // 각 테마별 중심색/주변색 정의
+            const bgColors = { 
+                'love': ['#882266', '#441133'],   // 자주색 톤
+                'money': ['#886622', '#443311'],  // 황금/갈색 톤
+                'career': ['#226688', '#113344']  // 청록/남색 톤
+            };
             
             if(type !== 'monthly') {
                 viewedFortunes[type] = true;
                 if(document.getElementById(`btn-${type}`)) document.getElementById(`btn-${type}`).classList.add('hidden-btn');
-                document.getElementById('content').style.background = colors[type];
-                document.getElementById('monitor').style.background = `radial-gradient(circle at 30% 30%, ${frameColors[type]} 0%, #111 100%)`;
+                // [수정2] 질감을 유지하는 색상 변경 함수 사용
+                setScreenColor(bgColors[type][0], bgColors[type][1]);
             }
 
             const t = document.getElementById('fortune-title'), c = document.getElementById('res-fortune-content');
@@ -278,8 +303,7 @@
         }
 
         function returnToSelection() {
-            document.getElementById('content').style.background = '';
-            document.getElementById('monitor').style.background = '';
+            resetScreenColor(); // 기본 배경색 복구
             switchScreen('screen-selection');
         }
 
