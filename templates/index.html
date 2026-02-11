@@ -7,17 +7,16 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <style>
-        /* [폰트] 레트로 감성의 둥근모꼴 */
+        /* 레트로 감성의 둥근모꼴 폰트 */
         @import url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/DungGeunMo.woff');
 
-        /* [변수] 화면 중앙과 테두리 색상 (JS에서 동적으로 조절) */
         :root {
             --screen-bg-center: #444444;
             --screen-bg-edge: #111111;
         }
 
         * { box-sizing: border-box; }
-        ::-webkit-scrollbar { display: none; } /* 스크롤바 숨김 */
+        ::-webkit-scrollbar { display: none; }
         * { -ms-overflow-style: none; scrollbar-width: none; }
 
         body {
@@ -27,32 +26,36 @@
             font-family: 'DungGeunMo', monospace;
         }
 
-        /* [프레임] 아이맥 G3 본디 블루 스타일 모니터 본체 */
+        /* [수정] 모니터 본체 프레임 */
         .monitor-frame {
-            width: 95vw; height: 80vh;
+            width: 95vw; height: 75vh;
             max-width: 950px; max-height: 700px;
             background: radial-gradient(circle at 30% 30%, #00a8a8 0%, #006666 100%);
             border-radius: 50px; padding: 30px;
             box-shadow: inset 0 0 30px rgba(255,255,255,0.2), 0 30px 60px rgba(0,0,0,0.8), 0 0 0 8px #004d4d;
             position: relative; display: flex; align-items: center; justify-content: center;
+            z-index: 3;
+        }
+
+        /* [추가/수정] 모니터 받침대 (목 부분) */
+        .monitor-neck {
+            width: 140px; height: 35px;
+            background: linear-gradient(to bottom, #005555 0%, #002222 100%);
+            margin-top: -15px; /* 모니터 본체와 자연스럽게 겹치도록 설정 */
             z-index: 2;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
         }
 
-        /* [추가] 모니터 받침대(Stand) 디자인 */
-        .monitor-stand {
-            width: 250px; height: 60px;
-            background: linear-gradient(180deg, #004d4d 0%, #002222 100%);
-            margin-top: -15px; /* 모니터 하단과 연결 */
-            border-radius: 0 0 80px 80px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
-            position: relative; z-index: 1;
-        }
-        .monitor-stand::before { /* 받침대 연결 부위 */
-            content: ""; position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
-            width: 100px; height: 20px; background: #004d4d;
+        /* [추가/수정] 모니터 받침대 (바닥 부분) */
+        .monitor-base {
+            width: 350px; height: 25px;
+            background: linear-gradient(to bottom, #004d4d 0%, #001111 100%);
+            border-radius: 30px 30px 5px 5px;
+            z-index: 1;
+            box-shadow: 0 15px 25px rgba(0,0,0,0.9);
         }
 
-        /* [글리치] 화면 전환 시 찌릿한 효과 */
+        /* 화면 전환 글리치 애니메이션 */
         @keyframes glitch-short {
             0% { transform: translate(0); }
             20% { transform: translate(-3px, 0); filter: brightness(1.2); }
@@ -67,7 +70,7 @@
             box-shadow: inset 0 0 60px rgba(0, 255, 65, 0.1);
         }
 
-        /* [질감] CRT 스캔라인 오버레이 */
+        /* CRT 스캔라인 오버레이 */
         .crt-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
@@ -75,7 +78,7 @@
             background-size: 100% 3px, 3px 100%; pointer-events: none; z-index: 100; opacity: 0.7;
         }
 
-        /* [배경] 숨쉬는 밝기 효과 및 그라데이션 질감 */
+        /* 숨쉬는 화면 밝기 변화 및 그라데이션 */
         .screen-content {
             width: 100%; height: 100%;
             background: radial-gradient(circle at center, var(--screen-bg-center) 0%, var(--screen-bg-edge) 100%);
@@ -83,7 +86,7 @@
             animation: screen-pulse 8s ease-in-out infinite;
         }
 
-        /* [안개] 화면을 가로지르는 은은한 빛 */
+        /* 화면을 가로지르는 안개빛 효과 */
         .screen-content::after {
             content: ""; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
             background: linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent);
@@ -93,7 +96,7 @@
         @keyframes screen-sweep { to { left: 200%; } }
         @keyframes screen-pulse { 0%, 100% { filter: brightness(0.95); } 50% { filter: brightness(1.1); } }
 
-        /* [섹션] 각 화면의 기본 레이아웃 */
+        /* 화면 섹션 기본 레이아웃 (잔상 방지 포함) */
         .screen {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -102,7 +105,7 @@
         }
         .screen.active { opacity: 1; pointer-events: auto; }
 
-        /* [타이틀] 네온 광채 텍스트 */
+        /* 네온 텍스트 타이틀 */
         h1.shiny-title { 
             font-size: 3.2rem; font-weight: 900; text-align: center; margin-bottom: 20px; 
             background: linear-gradient(180deg, #00ff41 0%, #ffffff 50%, #00ff41 100%);
@@ -111,25 +114,30 @@
         }
         @keyframes shine-v { to { background-position: center 200%; } }
 
-        /* [별] 몽환적인 슈팅스타 효과 */
+        /* 별똥별 애니메이션 */
         .star { 
             position: absolute; background: #FFD700; border-radius: 0; opacity: 0; 
             box-shadow: 0 0 8px #FFD700; animation: shooting-star linear infinite; 
         }
         @keyframes shooting-star { 0% { transform: translate(0, 0); opacity: 0; } 10% { opacity: 1; } 100% { transform: translate(250px, 250px); opacity: 0; } }
 
-        /* [UI] 입력창 및 버튼 디자인 */
+        /* UI 컴포넌트 */
         input { background: rgba(0,0,0,0.8); border: 2px solid #00ff41; color: #00ff41; padding: 12px; font-family: 'DungGeunMo'; outline: none; }
+        input[type="date"] { -webkit-appearance: none; min-height: 45px; }
+
         button.cyber-btn {
             background: #00ff41; color: #000; border: 4px solid #008f11; padding: 16px; width: 100%;
             font-family: 'DungGeunMo'; font-weight: 900; font-size: 1.3rem; cursor: pointer; box-shadow: 4px 4px 0 #004411; margin-top: 15px;
         }
         button.cyber-btn:hover { background: #ff00ff; border-color: #aa00aa; color: #fff; box-shadow: 4px 4px 0 #550055; }
 
-        /* [수정] 운세 결과 창 디자인 (검정 베이스 + 컬러 테두리) */
+        /* [복구] 지도 CSS */
+        #map { height: 160px; width: 100%; border: 3px solid #00ff41; margin-top: 5px; filter: invert(100%) hue-rotate(180deg); background-color: #000; }
+
+        /* 운세 결과 박스 (검정 베이스 유지) */
         .result-box { 
             border: 3px solid #00ff41; padding: 15px; 
-            background: rgba(0,0,0,0.9); /* 이미지처럼 진한 검정 베이스 */
+            background: rgba(0,0,0,0.9);
             margin-bottom: 12px; width: 100%; 
             transition: border-color 0.4s;
         }
@@ -150,12 +158,24 @@
                 <section id="screen-input" class="screen active">
                     <div style="width:100%; max-width:450px;">
                         <h1 class="shiny-title">ACCESS: PLUTO</h1>
-                        <div style="margin-bottom:12px;"><label style="color:#ff00ff;">NAME</label><input type="text" id="userName" style="width:100%;"></div>
-                        <div style="display: flex; gap: 10px; margin-bottom:12px;">
-                            <div style="flex: 1;"><label style="color:#ff00ff;">DATE</label><input type="date" id="birthDate" max="9999-12-31" style="width:100%;"></div>
-                            <div style="flex: 1;"><label style="color:#ff00ff;">TIME</label><input type="time" id="birthTime" style="width:100%;"></div>
+                        <div style="margin-bottom:12px; width:100%; text-align:left;">
+                            <label style="color:#ff00ff; font-weight:bold;">NAME</label>
+                            <input type="text" id="userName" placeholder="이름 입력" style="width:100%;">
                         </div>
-                        <div id="map"></div>
+                        <div style="display: flex; gap: 10px; margin-bottom:12px; width:100%;">
+                            <div style="flex: 1; text-align:left;">
+                                <label style="color:#ff00ff; font-weight:bold;">DATE</label>
+                                <input type="date" id="birthDate" max="9999-12-31" style="width:100%;">
+                            </div>
+                            <div style="flex: 1; text-align:left;">
+                                <label style="color:#ff00ff; font-weight:bold;">TIME</label>
+                                <input type="time" id="birthTime" style="width:100%;">
+                            </div>
+                        </div>
+                        <div style="width:100%; margin-bottom:12px; text-align:left;">
+                            <label style="color:#ff00ff; font-weight:bold;">LOCATION</label>
+                            <div id="map"></div>
+                        </div>
                         <button class="cyber-btn" onclick="startAnalysis()">INITIATE_SEQUENCE</button>
                     </div>
                 </section>
@@ -238,37 +258,39 @@
         </div>
     </div>
 
-    <div class="monitor-stand"></div>
+    <div class="monitor-neck"></div>
+    <div class="monitor-base"></div>
 
     <script>
-        // 전역 상태 및 데이터 저장
         let selectedLat = 37.5665; let selectedLon = 126.9780;
         let globalData = null;
         let viewedFortunes = { love: false, money: false, career: false, health: false };
-        let isSwitching = false; // [수정] 전환 중 중복 클릭 방지 플래그
+        let isSwitching = false; // 화면 전환 중복 클릭 방지
         let loadingInterval;
 
         const rootStyle = document.documentElement.style;
         
-        // 지도 설정 (Leaflet)
+        // 지도 초기화 (크기 계산 오류를 막기 위해 지연 로딩 처리 추가)
         const map = L.map('map', { zoomControl: false }).setView([selectedLat, selectedLon], 6);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
         let marker = L.marker([selectedLat, selectedLon]).addTo(map);
         map.on('click', (e) => { selectedLat = e.latlng.lat; selectedLon = e.latlng.lng; marker.setLatLng(e.latlng); });
+        
+        // 지도가 렌더링되지 않는 문제 방지
+        setTimeout(() => { map.invalidateSize(); }, 500);
 
-        // 화면 색상 테마 변경 함수
         function setScreenColor(center, edge) {
             rootStyle.setProperty('--screen-bg-center', center);
             rootStyle.setProperty('--screen-bg-edge', edge);
         }
 
-        // [버그 수정] 부드러운 화면 전환 로직
+        // 전환 로직 (잔상 방지)
         function switchScreen(id) {
-            if (isSwitching) return; // 이미 전환 중이면 차단
+            if (isSwitching) return;
             isSwitching = true;
 
             const content = document.getElementById('content');
-            content.classList.add('glitch-active'); // 글리치 효과 시작
+            content.classList.add('glitch-active');
 
             setTimeout(() => {
                 const screens = document.querySelectorAll('.screen');
@@ -276,17 +298,17 @@
                 
                 if (target) {
                     screens.forEach(s => { if(s !== target) s.classList.remove('active'); });
-                    target.classList.add('active'); // 타겟 화면 활성화
+                    target.classList.add('active');
                 }
             }, 150);
 
             setTimeout(() => {
                 content.classList.remove('glitch-active');
-                isSwitching = false; // 잠금 해제
+                isSwitching = false;
             }, 400);
         }
 
-        // 로딩 시퀀스 (심연 보라색)
+        // 로딩 시퀀스
         function startLoadingAnimation() {
             switchScreen('screen-loading');
             setScreenColor('#1a0414', '#0a0208'); 
@@ -313,7 +335,6 @@
             document.querySelectorAll('.star').forEach(s => s.remove());
         }
 
-        // 서버 분석 호출
         function startAnalysis() {
             const name = document.getElementById('userName').value;
             const date = document.getElementById('birthDate').value;
@@ -337,7 +358,6 @@
             .catch(err => { stopLoadingAnimation(); switchScreen('screen-input'); });
         }
 
-        // 운세 상세 보기 및 테마색 설정
         function showFortune(type) {
             const themes = { 
                 'love': ['#3a0d2e', '#1a0515', '#ff00ff'], 
@@ -354,7 +374,6 @@
                 
                 const t = document.getElementById('fortune-title'), st = document.getElementById('fortune-sub-title'), c = document.getElementById('res-fortune-content'), box = document.getElementById('fortune-box');
                 
-                // 상세 박스 컬러 업데이트
                 box.style.borderColor = themes[type][2];
                 box.style.color = themes[type][2];
 
@@ -370,7 +389,6 @@
                 switchScreen('screen-monthly-final');
             }
 
-            // 4개 운세를 다 봤을 때만 최종 버튼 노출
             if(viewedFortunes.love && viewedFortunes.money && viewedFortunes.career && viewedFortunes.health) {
                 document.getElementById('btn-final-report').classList.remove('hidden-btn');
             }
