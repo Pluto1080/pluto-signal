@@ -60,7 +60,7 @@ def analyze():
     triggers = find_3deg_triggers(natal)
     
     model = genai.GenerativeModel(
-        model_name="gemini-1.5-flash",
+        model_name="gemini-1.5-flash-latest",
         system_instruction=f"너는 GEM-875 행성에서 온 요정 왕 '플루토'야. 말투는 말괄량이 같고 직설적인 반말을 써. {name}의 데이터를 보고 3도 이내 트리거를 기반으로 팩트 폭격을 해줘."
     )
     
@@ -70,4 +70,5 @@ def analyze():
     return jsonify({"response": response.text})
 
 if __name__ == "__main__":
+
     app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
