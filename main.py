@@ -22,10 +22,11 @@ def analyze():
         
         # 모델 이름을 'models/' 접두사 없이 아주 명확하게 전달합니다.
         # 만약 1.5-flash가 안 된다면, 가장 안정적인 'gemini-1.5-flash-latest'로 지칭합니다.
+        # main.py 수정 (가장 확실한 모델명 사용)
         response = client.models.generate_content(
-            model='gemini-1.5-flash', 
-            contents=f"너는 점성술사 플루토야. {name}의 오늘 운세를 아주 맵고 짧게 반말로 알려줘."
-        )
+        model='gemini-1.5-flash', # 'models/'를 붙이지 않는 것이 최신 SDK의 표준입니다.
+        contents=f"너는 점성술사 플루토야. {name}의 오늘 운세를 짧고 맵게 반말로 알려줘."
+)
         
         return jsonify({"result": response.text})
 
@@ -36,3 +37,4 @@ def analyze():
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 8080))
     app.run(host='0.0.0.0', port=port)
+
