@@ -49,7 +49,7 @@
             box-shadow: inset 0 0 80px rgba(0, 255, 65, 0.1);
         }
 
-        /* 화면 밝기 깜빡임(Pulse) 효과 */
+        /* 화면 밝기 깜빡임 효과 */
         .crt-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
@@ -65,9 +65,10 @@
             50% { opacity: 1; }
         }
 
+        /* [수정] 보라색을 빼고 회색톤으로 변경한 화면 내부 */
         .screen-content {
             width: 100%; height: 100%;
-            background: radial-gradient(circle at center, #1a0033 0%, #000000 100%);
+            background: radial-gradient(circle at center, #222222 0%, #000000 100%);
             position: relative;
             animation: screen-pulse 8s ease-in-out infinite;
         }
@@ -93,16 +94,19 @@
         }
         @keyframes shine { to { background-position: 200% center; } }
 
-        /* 픽셀 별 */
+        /* [수정] 픽셀 별 스타일 - 그림자 밀도 상향 */
         .star { 
-            position: absolute; width: 4px; height: 4px; background: #FFD700; border-radius: 0;
-            box-shadow: -4px -4px 0 #FFD700, -8px -8px 0 rgba(255, 215, 0, 0.4);
+            position: absolute; background: #FFD700; border-radius: 0;
             animation: shooting-star linear infinite; opacity: 0;
+            box-shadow: -2px -2px 0 #FFD700, -4px -4px 0 rgba(255, 215, 0, 0.3);
         }
+
+        /* [수정] 전체 화면을 느리게 가로지르는 궤적 */
         @keyframes shooting-star { 
-            0% { transform: translate(-10vw, -10vh); opacity: 0; } 
+            0% { transform: translate(-20vw, -20vh); opacity: 0; } 
             10% { opacity: 1; }
-            100% { transform: translate(110vw, 110vh); opacity: 0; } 
+            90% { opacity: 1; }
+            100% { transform: translate(120vw, 120vh); opacity: 0; } 
         }
 
         input, select {
@@ -123,24 +127,11 @@
         #loading-text { font-size: 1.5rem; color: #FFD700; text-shadow: 0 0 10px #FFD700; animation: blink 0.8s steps(2) infinite; }
         @keyframes blink { to { visibility: hidden; } }
 
-        /* 텍스트 박스 레이아웃 (이미지 기반 수정) */
-        .result-box { 
-            border: 3px solid #00ff41; 
-            padding: 15px; 
-            background: rgba(0,0,0,0.8); 
-            margin-bottom: 15px;
-            width: 100%;
-        }
+        .result-box { border: 3px solid #00ff41; padding: 15px; background: rgba(0,0,0,0.8); margin-bottom: 15px; width: 100%; }
         .result-box h2 { font-size: 1rem; color: #ff00ff; border-bottom: 1px solid #00ff41; margin-bottom: 10px; margin-top:0; }
         .result-content { font-size: 0.95rem; line-height: 1.6; color: #00ff41; }
 
-        /* 운세 버튼 그리드 */
-        .button-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            width: 100%;
-        }
+        .button-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; }
     </style>
 </head>
 <body>
@@ -182,8 +173,8 @@
                             <div id="res-personality" class="result-content"></div>
                         </div>
                         <div style="display: flex; gap: 10px;">
-                            <div class="result-box" style="flex:1;">
-                                <h2>[+] STRENGTHS</h2>
+                            <div class="result-box" style="flex:1; border-color: #0044ff;">
+                                <h2 style="color: #0044ff;">[+] STRENGTHS</h2>
                                 <div id="res-pros" class="result-content" style="font-size:0.85rem;"></div>
                             </div>
                             <div class="result-box" style="flex:1; border-color:#ff0055;">
@@ -246,16 +237,28 @@
             document.getElementById(id).classList.add('active');
         }
 
+        /* [수정] 별똥별 크기 다양화 및 속도 조절 로직 */
         function startLoadingAnimation() {
             switchScreen('screen-loading');
             const screen = document.querySelector('.screen-content');
-            for(let i=0; i<20; i++) {
+            for(let i=0; i<25; i++) {
                 let star = document.createElement('div');
                 star.className = 'star';
-                star.style.left = `${Math.random() * 80}vw`;
-                star.style.top = `${Math.random() * -20}vh`;
-                star.style.animationDuration = `${Math.random() * 1 + 0.5}s`;
-                star.style.animationDelay = `${Math.random() * 2}s`;
+                
+                // 크기 다양화 (2px ~ 8px)
+                const size = Math.floor(Math.random() * 7) + 2;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                
+                // 위치 다양화 (화면 전체 범위)
+                star.style.left = `${Math.random() * 120 - 20}vw`;
+                star.style.top = `${Math.random() * -30}vh`;
+                
+                // 속도 다양화 (4s ~ 10s 사이로 느리게 설정)
+                const duration = Math.random() * 6 + 4;
+                star.style.animationDuration = `${duration}s`;
+                star.style.animationDelay = `${Math.random() * 3}s`;
+                
                 screen.appendChild(star);
             }
             let dots = 0;
@@ -289,13 +292,10 @@
             .then(data => {
                 stopLoadingAnimation();
                 if(data.error) { alert(data.error); switchScreen('screen-input'); return; }
-                
-                globalData = data; // 전역 변수에 저장
-                
+                globalData = data;
                 document.getElementById('res-personality').innerText = data.personality;
                 document.getElementById('res-pros').innerText = data.pros;
                 document.getElementById('res-cons').innerText = data.cons;
-                
                 switchScreen('screen-personality');
             })
             .catch(err => { stopLoadingAnimation(); switchScreen('screen-input'); });
