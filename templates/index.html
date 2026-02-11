@@ -40,21 +40,32 @@
             transition: all 0.3s ease;
         }
 
+        /* [요구사항] 모바일 대응 미디어 쿼리 */
         @media (max-width: 768px) {
             .monitor-frame {
                 width: 98vw;
                 height: 95vh;
                 padding: 15px;
                 border-radius: 30px;
-                box-shadow: inset 0 0 15px rgba(255,255,255,0.2), 0 10px 30px rgba(0,0,0,0.8), 0 0 0 5px #004d4d;
             }
             .screen-container {
                 border-width: 6px !important;
                 border-radius: 15px !important;
             }
-            h1.shiny-title { font-size: 1.3rem !important; }
-            .result-content { font-size: 0.85rem !important; }
-            button.cyber-btn { padding: 10px !important; font-size: 0.9rem !important; }
+            h1.shiny-title { font-size: 1.2rem !important; }
+            
+            /* 장단점 칸을 한 줄로 길게 변경 */
+            .result-split-row {
+                flex-direction: column !important;
+            }
+            .result-box { margin-bottom: 10px !important; }
+
+            /* 로딩 텍스트 가운데 정렬 및 폰트 조정 */
+            #loading-text {
+                font-size: 1.2rem !important;
+                width: 90%;
+                margin: 0 auto;
+            }
         }
 
         .screen-container {
@@ -110,7 +121,7 @@
         }
         @keyframes shine { to { background-position: 200% center; } }
 
-        /* [수정] 별똥별 스타일 및 애니메이션 좌표 최적화 */
+        /* [수정] 별똥별 스타일 */
         .star { 
             position: absolute; 
             background: #FFD700; 
@@ -142,7 +153,11 @@
 
         #map { height: 150px; width: 100%; border: 3px solid #00ff41; margin-top: 5px; filter: invert(100%) hue-rotate(180deg); }
 
-        #loading-text { font-size: 1.5rem; color: #FFD700; text-shadow: 0 0 10px #FFD700; animation: blink 0.8s steps(2) infinite; }
+        #loading-text { 
+            font-size: 1.5rem; color: #FFD700; text-shadow: 0 0 10px #FFD700; 
+            text-align: center;
+            animation: blink 0.8s steps(2) infinite; 
+        }
         @keyframes blink { to { visibility: hidden; } }
 
         .result-box { border: 3px solid #00ff41; padding: 15px; background: rgba(0,0,0,0.8); margin-bottom: 15px; width: 100%; }
@@ -190,7 +205,7 @@
                             <h2>>> CORE_PERSONALITY</h2>
                             <div id="res-personality" class="result-content"></div>
                         </div>
-                        <div style="display: flex; gap: 10px;">
+                        <div class="result-split-row" style="display: flex; gap: 10px;">
                             <div class="result-box" style="flex:1; border-color: #0044ff;">
                                 <h2 style="color: #0044ff;">[+] STRENGTHS</h2>
                                 <div id="res-pros" class="result-content" style="font-size:0.85rem;"></div>
@@ -255,7 +270,6 @@
             document.getElementById(id).classList.add('active');
         }
 
-        /* [수정] 별똥별이 화면 전체에 골고루 나타나도록 생성 로직 개선 */
         function startLoadingAnimation() {
             switchScreen('screen-loading');
             const screen = document.querySelector('.screen-content');
@@ -263,22 +277,14 @@
             for(let i=0; i<30; i++) {
                 let star = document.createElement('div');
                 star.className = 'star';
-                
-                // 별의 크기를 2px에서 10px까지 다양하게 설정
                 const size = Math.floor(Math.random() * 9) + 2;
                 star.style.width = `${size}px`;
                 star.style.height = `${size}px`;
-                
-                // 화면 전체(상단 및 좌측)에서 무작위 시작점 설정
-                // 시작 좌표를 음수값으로 주어 화면 밖에서 날아들어오는 느낌을 줌
                 star.style.left = `${Math.random() * 120 - 40}vw`; 
                 star.style.top = `${Math.random() * 120 - 40}vh`;
-                
-                // 속도를 5s~12s 사이로 느리게 설정
                 const duration = Math.random() * 7 + 5;
                 star.style.animationDuration = `${duration}s`;
                 star.style.animationDelay = `${Math.random() * 5}s`;
-                
                 screen.appendChild(star);
             }
             
