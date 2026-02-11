@@ -1,8 +1,7 @@
 import os
 import json
-import re
 from datetime import datetime
-import swisseph as swe  # pyswisseph 설치 후 swisseph로 임포트하는 것이 정석입니다.
+import swisseph as swe
 from flask import Flask, request, jsonify, render_template
 from google import genai
 import pytz
@@ -11,6 +10,7 @@ from timezonefinder import TimezoneFinder
 app = Flask(__name__, template_folder='templates', static_folder='templates')
 tf = TimezoneFinder()
 
+# API 키 설정
 api_key = os.environ.get("GOOGLE_API_KEY") or os.environ.get("GEMINI_API_KEY")
 client = genai.Client(api_key=api_key) if api_key else None
 
@@ -54,18 +54,18 @@ def analyze():
         user_lang = data.get('language', 'ko-KR')
         lat, lon = float(data.get('lat')), float(data.get('lon'))
         
-        # 1. 태어난 시점 데이터 계산
+        # 1. 탄생 시점 데이터 계산
         natal_data = calculate_astrology(data.get('date'), data.get('time'), lat, lon)
 
-        # [수정] 현재 시점 타임존 및 JD 자동 계산
+        # 현재 시점 타임존 및 JD 계산
         tz_name = tf.timezone_at(lng=lon, lat=lat) or 'UTC'
         timezone = pytz.timezone(tz_name)
         
-        # 2. 2026년 전체 흐름 기준 (고정된 미래 시점)
+        # 2. 2026년 전체 흐름 기준 (미래 시점 고정)
         dt_year = timezone.localize(datetime(2026, 7, 1, 12, 0))
         jd_year = swe.julday(2026, 7, 1, 12.0 - (dt_year.utcoffset().total_seconds() / 3600.0))
         
-        # 3. [핵심] 이번 달 기준 - 실제 현재 서버 시간(now)을 사용
+        # 3. 현재 달 기준 (서버 시간 사용)
         now = datetime.now(timezone)
         jd_now = swe.julday(now.year, now.month, now.day, now.hour - (now.utcoffset().total_seconds() / 3600.0))
 
@@ -105,28 +105,22 @@ def analyze():
         }}
         """
 
-        # [할당량 초과 대응] 모델 폴백 로직
-        model_candidates = ['gemini-1.5-flash-8b', 'gemini-1.5-flash', 'gemini-2.0-flash-lite-preview-02-05']
-        response = None
-        error_msg = ""
+        # 5. 최신 가성비 모델 Gemini 3 Flash 사용
+        # config 설정을 통해 AI가 JSON 형태 외에 다른 말을 섞지 못하게 강제합니다.
+        response = client.models.generate_content(
+            model='gemini-3-flash', 
+            contents=prompt,
+            config={'response_mime_type': 'application/json'}
+        )
 
-        for model_name in model_candidates:
-            try:
-                response = client.models.generate_content(model=model_name, contents=prompt)
-                if response and response.text:
-                    break
-            except Exception as e:
-                error_msg = str(e)
-                continue
+        if not response or not response.text:
+            return jsonify({"error": "별과의 통신이 일시적으로 끊겼어. 다시 시도해봐!"}), 200
 
-        if not response:
-            return jsonify({"error": f"모든 별과의 통신이 일시적으로 차단됐어. 나중에 다시 시도해. (사유: {error_msg})"}), 200
-
-        cleaned_text = re.sub(r"```json|```", "", response.text).strip()
-        return jsonify(json.loads(cleaned_text))
+        # 불필요한 마크다운 제거 과정 없이 바로 JSON 변환
+        return jsonify(json.loads(response.text))
 
     except Exception as e:
-        return jsonify({"error": str(e)}), 200
+        return jsonify({"error": f"분석 중 오류 발생: {str(e)}"}), 200
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 8080)))
