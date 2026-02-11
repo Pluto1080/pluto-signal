@@ -11,7 +11,7 @@
 
         * { box-sizing: border-box; }
         
-        /* [요구사항] 스크롤바 숨기기 */
+        /* 스크롤바 숨기기 */
         ::-webkit-scrollbar { display: none; }
         * { -ms-overflow-style: none; scrollbar-width: none; }
 
@@ -24,7 +24,7 @@
             font-family: 'DungGeunMo', monospace;
         }
 
-        /* [요구사항] 아이맥 G3 본디 블루 스타일 프레임 */
+        /* 아이맥 G3 본디 블루 스타일 프레임 */
         .monitor-frame {
             width: 95vw; height: 90vh;
             max-width: 1000px; max-height: 800px;
@@ -40,7 +40,6 @@
             transition: all 0.3s ease;
         }
 
-        /* [요구사항] 모바일 대응: 테두리 축소 및 레이아웃 조정 */
         @media (max-width: 768px) {
             .monitor-frame {
                 width: 98vw;
@@ -52,21 +51,10 @@
                 border-width: 6px !important;
                 border-radius: 15px !important;
             }
-            h1.shiny-title { font-size: 1.2rem !important; }
-            
-            /* 장단점 칸 세로 한 줄 배치 */
-            .result-split-row {
-                flex-direction: column !important;
-            }
+            h1.shiny-title { font-size: 2rem !important; }
+            .result-split-row { flex-direction: column !important; }
             .result-box { margin-bottom: 10px !important; }
-
-            /* 로딩 텍스트 중앙 정렬 */
-            #loading-text {
-                font-size: 1.2rem !important;
-                width: 90%;
-                margin: 0 auto;
-                text-align: center;
-            }
+            #loading-text { font-size: 1.2rem !important; width: 90%; margin: 0 auto; text-align: center; }
         }
 
         .screen-container {
@@ -79,7 +67,6 @@
             box-shadow: inset 0 0 80px rgba(0, 255, 65, 0.1);
         }
 
-        /* [요구사항] 고전 화면 밝기 깜빡임(Pulse) 효과 */
         .crt-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
@@ -95,17 +82,31 @@
             50% { opacity: 1; }
         }
 
-        /* [요구사항] 보라색을 빼고 회색톤으로 변경한 화면 */
+        /* [수정] 밝은 회색 스크린 & 움직이는 광원(Sweep) */
         .screen-content {
             width: 100%; height: 100%;
-            background: radial-gradient(circle at center, #222222 0%, #000000 100%);
+            background: radial-gradient(circle at center, #444444 0%, #111111 100%);
             position: relative;
             animation: screen-pulse 8s ease-in-out infinite;
         }
 
+        /* 움직이는 광원 레이어 추가 */
+        .screen-content::after {
+            content: "";
+            position: absolute; top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            animation: screen-sweep 10s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes screen-sweep {
+            to { left: 200%; }
+        }
+
         @keyframes screen-pulse {
             0%, 100% { filter: brightness(0.9); }
-            50% { filter: brightness(1.1); }
+            50% { filter: brightness(1.2); }
         }
 
         .screen {
@@ -115,16 +116,27 @@
         }
         .screen.active { opacity: 1; pointer-events: auto; z-index: 10; }
 
+        /* [수정] 훨씬 굵고 거대한 타이틀 폰트 */
         h1.shiny-title { 
-            font-size: 1.8rem; text-align: center; margin-bottom: 20px; 
-            background: linear-gradient(90deg, #00ff41, #ffffff, #00ff41);
-            background-size: 200% auto;
-            color: transparent; -webkit-background-clip: text; background-clip: text;
-            animation: shine 3s linear infinite;
+            font-size: 3.5rem; /* 크기 대폭 상향 */
+            font-weight: 900; /* 최대 두께 */
+            text-align: center; 
+            margin-bottom: 30px; 
+            background: linear-gradient(180deg, #00ff41 0%, #ffffff 50%, #00ff41 100%);
+            background-size: auto 200%;
+            color: transparent; 
+            -webkit-background-clip: text; 
+            background-clip: text;
+            letter-spacing: -2px;
+            /* 굵어 보이게 하기 위한 텍스트 그림자 겹치기 */
+            text-shadow: 
+                0 0 10px rgba(0, 255, 65, 0.5),
+                2px 2px 0px #000,
+                -2px -2px 0px #000;
+            animation: shine-v 3s linear infinite;
         }
-        @keyframes shine { to { background-position: 200% center; } }
+        @keyframes shine-v { to { background-position: center 200%; } }
 
-        /* [요구사항] 픽셀 별똥별 - 화면 전체를 느리게 가로지름 */
         .star { 
             position: absolute; 
             background: #FFD700; 
@@ -142,30 +154,31 @@
         }
 
         input, select {
-            background: rgba(0,0,0,0.7); border: 2px solid #00ff41; color: #00ff41; 
-            padding: 10px; width: 100%; font-family: 'DungGeunMo'; margin-top: 5px; outline: none;
+            background: rgba(0,0,0,0.8); border: 2px solid #00ff41; color: #00ff41; 
+            padding: 12px; width: 100%; font-family: 'DungGeunMo'; margin-top: 5px; outline: none;
+            font-size: 1.1rem;
         }
-        .input-group label { color: #ff00ff; font-size: 0.9rem; }
+        .input-group label { color: #ff00ff; font-size: 1rem; font-weight: bold; }
 
         button.cyber-btn {
-            background: #00ff41; color: #000; border: 4px solid #008f11; padding: 15px; width: 100%;
-            font-family: 'DungGeunMo'; font-weight: bold; font-size: 1.1rem; cursor: pointer; 
-            box-shadow: 4px 4px 0 #004411; margin-top: 15px;
+            background: #00ff41; color: #000; border: 4px solid #008f11; padding: 18px; width: 100%;
+            font-family: 'DungGeunMo'; font-weight: 900; font-size: 1.4rem; cursor: pointer; 
+            box-shadow: 4px 4px 0 #004411; margin-top: 20px;
         }
         button.cyber-btn:hover { background: #ff00ff; border-color: #aa00aa; box-shadow: 4px 4px 0 #550055; color: #fff; }
 
-        #map { height: 150px; width: 100%; border: 3px solid #00ff41; margin-top: 5px; filter: invert(100%) hue-rotate(180deg); }
+        #map { height: 180px; width: 100%; border: 3px solid #00ff41; margin-top: 5px; filter: invert(100%) hue-rotate(180deg) brightness(1.2); }
 
         #loading-text { 
-            font-size: 1.5rem; color: #FFD700; text-shadow: 0 0 10px #FFD700; 
-            text-align: center;
+            font-size: 2rem; color: #FFD700; text-shadow: 0 0 15px #FFD700; 
+            text-align: center; font-weight: 900;
             animation: blink 0.8s steps(2) infinite; 
         }
         @keyframes blink { to { visibility: hidden; } }
 
-        .result-box { border: 3px solid #00ff41; padding: 15px; background: rgba(0,0,0,0.8); margin-bottom: 15px; width: 100%; }
-        .result-box h2 { font-size: 1rem; color: #ff00ff; border-bottom: 1px solid #00ff41; margin-bottom: 10px; margin-top:0; }
-        .result-content { font-size: 0.95rem; line-height: 1.6; color: #00ff41; }
+        .result-box { border: 3px solid #00ff41; padding: 15px; background: rgba(0,0,0,0.85); margin-bottom: 15px; width: 100%; }
+        .result-box h2 { font-size: 1.1rem; color: #ff00ff; border-bottom: 1px solid #00ff41; margin-bottom: 10px; margin-top:0; font-weight: 900; }
+        .result-content { font-size: 1rem; line-height: 1.7; color: #00ff41; }
 
         .button-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; }
         .hidden-btn { display: none !important; }
@@ -179,19 +192,19 @@
             <div class="screen-content">
                 
                 <section id="screen-input" class="screen active">
-                    <div style="width:100%; max-width:450px;">
+                    <div style="width:100%; max-width:480px;">
                         <h1 class="shiny-title">ACCESS: PLUTO</h1>
-                        <div class="input-group" style="margin-bottom:10px;">
+                        <div class="input-group" style="margin-bottom:12px;">
                             <label>NAME</label>
                             <input type="text" id="userName" placeholder="이름 입력">
                         </div>
-                        <div style="display: flex; gap: 10px; margin-bottom:10px;">
+                        <div style="display: flex; gap: 10px; margin-bottom:12px;">
                             <div style="flex: 1;"><label>DATE</label><input type="date" id="birthDate" max="9999-12-31"></div>
                             <div style="flex: 1;"><label>TIME</label><input type="time" id="birthTime" lang="en-GB"></div>
                         </div>
-                        <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                            <input type="checkbox" id="timeUnknown" onchange="toggleTimeInput()" style="width:18px; height:18px; margin-right:8px;">
-                            <label for="timeUnknown" style="color:#00ff41; font-size:0.8rem;">시간 모름</label>
+                        <div style="display: flex; align-items: center; margin-bottom: 12px;">
+                            <input type="checkbox" id="timeUnknown" onchange="toggleTimeInput()" style="width:20px; height:20px; margin-right:8px;">
+                            <label for="timeUnknown" style="color:#00ff41; font-size:0.9rem;">시간 모름</label>
                         </div>
                         <div class="input-group"><label>LOCATION</label><div id="map"></div></div>
                         <button class="cyber-btn" onclick="startAnalysis()">INITIATE_SEQUENCE</button>
@@ -203,20 +216,20 @@
                 </section>
 
                 <section id="screen-personality" class="screen">
-                    <div style="width:100%; max-width:600px; max-height:90%; overflow-y:auto; padding:10px;">
-                        <h1 class="shiny-title" style="font-size:1.4rem;">CORE_DATA_ANALYZED</h1>
+                    <div style="width:100%; max-width:650px; max-height:90%; overflow-y:auto; padding:15px;">
+                        <h1 class="shiny-title" style="font-size:2.2rem;">CORE_DATA_ANALYZED</h1>
                         <div class="result-box">
                             <h2>>> CORE_PERSONALITY</h2>
                             <div id="res-personality" class="result-content"></div>
                         </div>
-                        <div class="result-split-row" style="display: flex; gap: 10px;">
+                        <div class="result-split-row" style="display: flex; gap: 12px;">
                             <div class="result-box" style="flex:1; border-color: #0044ff;">
                                 <h2 style="color: #0044ff;">[+] STRENGTHS</h2>
-                                <div id="res-pros" class="result-content" style="font-size:0.85rem;"></div>
+                                <div id="res-pros" class="result-content" style="font-size:0.9rem;"></div>
                             </div>
                             <div class="result-box" style="flex:1; border-color:#ff0055;">
                                 <h2 style="color:#ff0055;">[-] WEAKNESSES</h2>
-                                <div id="res-cons" class="result-content" style="font-size:0.85rem;"></div>
+                                <div id="res-cons" class="result-content" style="font-size:0.9rem;"></div>
                             </div>
                         </div>
                         <button class="cyber-btn" onclick="switchScreen('screen-selection')">PROCEED_TO_2026_FORTUNE</button>
@@ -224,23 +237,23 @@
                 </section>
 
                 <section id="screen-selection" class="screen">
-                    <div style="width:100%; max-width:500px; text-align:center;">
+                    <div style="width:100%; max-width:550px; text-align:center;">
                         <h1 class="shiny-title">CHOOSE_YOUR_DESTINY</h1>
-                        <p style="color:#00ff41; margin-bottom:20px;">2026년 행성 궤도 분석 완료.</p>
+                        <p style="color:#00ff41; margin-bottom:25px; font-weight: bold;">2026년 행성 궤도 분석 완료.</p>
                         <div id="selection-buttons" class="button-grid">
                             <button id="btn-love" class="cyber-btn" style="border-color:#ff00ff; color:#ff00ff;" onclick="showFortune('love')">[♥] LOVE</button>
                             <button id="btn-money" class="cyber-btn" style="border-color:#ffd700; color:#ffd700;" onclick="showFortune('money')">[$] MONEY</button>
                             <button id="btn-career" class="cyber-btn" style="border-color:#00ffff; color:#00ffff;" onclick="showFortune('career')">[!] CAREER</button>
                             <button class="cyber-btn" onclick="location.reload()">RESTART</button>
                         </div>
-                        <button id="btn-final-report" class="cyber-btn hidden-btn" style="background:#fff; color:#000;" onclick="showFinalReport()">INITIATE_FINAL_REPORT</button>
+                        <button id="btn-final-report" class="cyber-btn hidden-btn" style="background:#fff; color:#000; border-color: #fff;" onclick="showFinalReport()">INITIATE_FINAL_REPORT</button>
                     </div>
                 </section>
 
                 <section id="screen-fortune-detail" class="screen">
-                    <div style="width:100%; max-width:500px;">
-                        <h1 id="fortune-title" class="shiny-title" style="font-size:1.4rem;"></h1>
-                        <div id="fortune-box" class="result-box" style="min-height:200px;">
+                    <div style="width:100%; max-width:550px;">
+                        <h1 id="fortune-title" class="shiny-title" style="font-size:2rem;"></h1>
+                        <div id="fortune-box" class="result-box" style="min-height:220px;">
                             <h2 id="fortune-sub-title"></h2>
                             <div id="res-fortune-content" class="result-content"></div>
                         </div>
@@ -249,13 +262,13 @@
                 </section>
 
                 <section id="screen-final-advice" class="screen">
-                    <div style="width:100%; max-width:500px;">
-                        <h1 class="shiny-title" style="font-size:1.4rem;">FINAL_ADVICE_FROM_PLUTO</h1>
+                    <div style="width:100%; max-width:550px;">
+                        <h1 class="shiny-title" style="font-size:2rem;">FINAL_ADVICE</h1>
                         <div class="result-box" style="border-color:#fff;">
                             <h2>>> 2026_SUMMARY</h2>
                             <div id="res-summary" class="result-content"></div>
                         </div>
-                        <div class="result-box" style="border-color:#00ff41; background:rgba(0,255,65,0.1);">
+                        <div class="result-box" style="border-color:#00ff41; background:rgba(0,255,65,0.15);">
                             <h2 style="color:#00ff41;">>> PLUTO'S_WHISPER</h2>
                             <div id="res-final-advice" class="result-content" style="font-style:italic;"></div>
                         </div>
@@ -291,7 +304,6 @@
             document.getElementById(id).classList.add('active');
         }
 
-        /* [요구사항] 별똥별 전체 화면 생성 로직 */
         function startLoadingAnimation() {
             switchScreen('screen-loading');
             const screen = document.querySelector('.screen-content');
@@ -299,12 +311,12 @@
             for(let i=0; i<30; i++) {
                 let star = document.createElement('div');
                 star.className = 'star';
-                const size = Math.floor(Math.random() * 9) + 2; // 다양한 크기
+                const size = Math.floor(Math.random() * 9) + 2;
                 star.style.width = `${size}px`;
                 star.style.height = `${size}px`;
                 star.style.left = `${Math.random() * 120 - 40}vw`; 
                 star.style.top = `${Math.random() * 120 - 40}vh`;
-                const duration = Math.random() * 7 + 5; // 천천히
+                const duration = Math.random() * 7 + 5;
                 star.style.animationDuration = `${duration}s`;
                 star.style.animationDelay = `${Math.random() * 5}s`;
                 screen.appendChild(star);
@@ -350,7 +362,6 @@
             .catch(err => { stopLoadingAnimation(); switchScreen('screen-input'); });
         }
 
-        /* [요구사항] 선택지 소진형 흐름 제어 */
         function showFortune(type) {
             if(type !== 'monthly') {
                 viewedFortunes[type] = true;
@@ -361,14 +372,14 @@
             const t = document.getElementById('fortune-title'), st = document.getElementById('fortune-sub-title'), c = document.getElementById('res-fortune-content'), b = document.getElementById('fortune-box');
             
             if (type === 'love') {
-                t.innerText = "2026_LOVE_FORTUNE"; st.innerText = "[♥] RELATIONSHIP_LOG"; c.innerText = globalData.fortune_2026.love; b.style.borderColor = "#ff00ff"; st.style.color = "#ff00ff";
+                t.innerText = "2026_LOVE"; st.innerText = "[♥] RELATIONSHIP_LOG"; c.innerText = globalData.fortune_2026.love; b.style.borderColor = "#ff00ff"; st.style.color = "#ff00ff";
             } else if (type === 'money') {
-                t.innerText = "2026_MONEY_FORTUNE"; st.innerText = "[$] WEALTH_STATUS"; c.innerText = globalData.fortune_2026.money; b.style.borderColor = "#ffd700"; st.style.color = "#ffd700";
+                t.innerText = "2026_MONEY"; st.innerText = "[$] WEALTH_STATUS"; c.innerText = globalData.fortune_2026.money; b.style.borderColor = "#ffd700"; st.style.color = "#ffd700";
             } else if (type === 'career') {
-                t.innerText = "2026_CAREER_FORTUNE"; st.innerText = "[!] CAREER_UPDATE"; c.innerText = globalData.fortune_2026.career; b.style.borderColor = "#00ffff"; st.style.color = "#00ffff";
+                t.innerText = "2026_CAREER"; st.innerText = "[!] CAREER_UPDATE"; c.innerText = globalData.fortune_2026.career; b.style.borderColor = "#00ffff"; st.style.color = "#00ffff";
             } else if(type === 'monthly') { 
                 const currentMonth = globalData.current_month || "CURRENT";
-                t.innerText = `${currentMonth}_LOG`; st.innerText = "[*] DYNAMIC_MONTHLY_FORTUNE"; c.innerText = globalData.fortune_2026.monthly; b.style.borderColor = "#fff"; st.style.color = "#fff"; 
+                t.innerText = `${currentMonth}_LOG`; st.innerText = "[*] MONTHLY_ORBIT"; c.innerText = globalData.fortune_2026.monthly; b.style.borderColor = "#fff"; st.style.color = "#fff"; 
             }
             switchScreen('screen-fortune-detail');
         }
