@@ -11,7 +11,7 @@
 
         * { box-sizing: border-box; }
         
-        /* [요구사항] 스크롤바 숨기기 (기능은 유지) */
+        /* 스크롤바 숨기기 */
         ::-webkit-scrollbar { display: none; }
         * { -ms-overflow-style: none; scrollbar-width: none; }
 
@@ -24,7 +24,7 @@
             font-family: 'DungGeunMo', monospace;
         }
 
-        /* [수정] 아이맥 G3 본디 블루 스타일 프레임 */
+        /* 아이맥 G3 본디 블루 스타일 프레임 */
         .monitor-frame {
             width: 95vw; height: 90vh;
             max-width: 1000px; max-height: 800px;
@@ -49,31 +49,30 @@
             box-shadow: inset 0 0 80px rgba(0, 255, 65, 0.1);
         }
 
-        /* [요구사항] 고전 화면 밝기 깜빡임(Pulse) 효과 */
+        /* 화면 밝기 깜빡임(Pulse) 효과 */
         .crt-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%), 
-                        linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
-            background-size: 100% 3px, 2px 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.05), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.05));
+            background-size: 100% 3px, 3px 100%;
             pointer-events: none;
             z-index: 100;
             animation: ambient-light 4s ease-in-out infinite;
         }
 
         @keyframes ambient-light {
-            0%, 100% { opacity: 0.8; }
-            50% { opacity: 1; } /* 미세하게 밝아졌다가 어두워짐 */
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
         }
 
         .screen-content {
             width: 100%; height: 100%;
             background: radial-gradient(circle at center, #1a0033 0%, #000000 100%);
             position: relative;
-            /* 화면 전체의 밝기 변화를 위해 추가 */
-            animation: screen-burn 8s ease-in-out infinite;
+            animation: screen-pulse 8s ease-in-out infinite;
         }
 
-        @keyframes screen-burn {
+        @keyframes screen-pulse {
             0%, 100% { filter: brightness(0.9); }
             50% { filter: brightness(1.1); }
         }
@@ -81,7 +80,7 @@
         .screen {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            padding: 25px; opacity: 0; pointer-events: none;
+            padding: 25px; opacity: 0; pointer-events: none; transition: opacity 0.5s;
         }
         .screen.active { opacity: 1; pointer-events: auto; z-index: 10; }
 
@@ -94,6 +93,7 @@
         }
         @keyframes shine { to { background-position: 200% center; } }
 
+        /* 픽셀 별 */
         .star { 
             position: absolute; width: 4px; height: 4px; background: #FFD700; border-radius: 0;
             box-shadow: -4px -4px 0 #FFD700, -8px -8px 0 rgba(255, 215, 0, 0.4);
@@ -102,7 +102,6 @@
         @keyframes shooting-star { 
             0% { transform: translate(-10vw, -10vh); opacity: 0; } 
             10% { opacity: 1; }
-            90% { opacity: 1; }
             100% { transform: translate(110vw, 110vh); opacity: 0; } 
         }
 
@@ -114,7 +113,7 @@
 
         button.cyber-btn {
             background: #00ff41; color: #000; border: 4px solid #008f11; padding: 15px; width: 100%;
-            font-family: 'DungGeunMo'; font-weight: bold; font-size: 1.2rem; cursor: pointer; 
+            font-family: 'DungGeunMo'; font-weight: bold; font-size: 1.1rem; cursor: pointer; 
             box-shadow: 4px 4px 0 #004411; margin-top: 15px;
         }
         button.cyber-btn:hover { background: #ff00ff; border-color: #aa00aa; box-shadow: 4px 4px 0 #550055; color: #fff; }
@@ -124,9 +123,24 @@
         #loading-text { font-size: 1.5rem; color: #FFD700; text-shadow: 0 0 10px #FFD700; animation: blink 0.8s steps(2) infinite; }
         @keyframes blink { to { visibility: hidden; } }
 
-        .result-box { border: 3px solid #00ff41; padding: 15px; background: rgba(0,0,0,0.8); margin-bottom: 15px; }
-        .result-box h2 { font-size: 1rem; color: #ff00ff; border-bottom: 1px solid #00ff41; margin-bottom: 10px; }
+        /* 텍스트 박스 레이아웃 (이미지 기반 수정) */
+        .result-box { 
+            border: 3px solid #00ff41; 
+            padding: 15px; 
+            background: rgba(0,0,0,0.8); 
+            margin-bottom: 15px;
+            width: 100%;
+        }
+        .result-box h2 { font-size: 1rem; color: #ff00ff; border-bottom: 1px solid #00ff41; margin-bottom: 10px; margin-top:0; }
         .result-content { font-size: 0.95rem; line-height: 1.6; color: #00ff41; }
+
+        /* 운세 버튼 그리드 */
+        .button-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            width: 100%;
+        }
     </style>
 </head>
 <body>
@@ -160,16 +174,48 @@
                     <div id="loading-text">별의 소리를 관측하는 중</div>
                 </section>
 
-                <section id="screen-result" class="screen">
+                <section id="screen-personality" class="screen">
                     <div style="width:100%; max-width:600px; max-height:90%; overflow-y:auto; padding:10px;">
-                        <h1 class="shiny-title" style="font-size:1.4rem;">ANALYSIS_COMPLETE</h1>
-                        <div id="result-container">
-                            <div class="result-box"><h2>>> CORE_PERSONALITY</h2><div id="res-personality" class="result-content"></div></div>
-                            <div class="result-box" style="border-color:#ff00ff;"><h2>[♥] LOVE_2026</h2><div id="res-love" class="result-content"></div></div>
-                            <div class="result-box" style="border-color:#ffd700;"><h2>[$] MONEY_2026</h2><div id="res-money" class="result-content"></div></div>
-                            <div class="result-box" style="border-color:#00ffff;"><h2>[!] CAREER_2026</h2><div id="res-career" class="result-content"></div></div>
+                        <h1 class="shiny-title" style="font-size:1.4rem;">CORE_DATA_ANALYZED</h1>
+                        <div class="result-box">
+                            <h2>>> CORE_PERSONALITY</h2>
+                            <div id="res-personality" class="result-content"></div>
                         </div>
-                        <button class="cyber-btn" onclick="location.reload()">RESTART</button>
+                        <div style="display: flex; gap: 10px;">
+                            <div class="result-box" style="flex:1;">
+                                <h2>[+] STRENGTHS</h2>
+                                <div id="res-pros" class="result-content" style="font-size:0.85rem;"></div>
+                            </div>
+                            <div class="result-box" style="flex:1; border-color:#ff0055;">
+                                <h2 style="color:#ff0055;">[-] WEAKNESSES</h2>
+                                <div id="res-cons" class="result-content" style="font-size:0.85rem;"></div>
+                            </div>
+                        </div>
+                        <button class="cyber-btn" onclick="switchScreen('screen-selection')">PROCEED_TO_2026_FORTUNE</button>
+                    </div>
+                </section>
+
+                <section id="screen-selection" class="screen">
+                    <div style="width:100%; max-width:500px; text-align:center;">
+                        <h1 class="shiny-title">CHOOSE_YOUR_DESTINY</h1>
+                        <p style="color:#00ff41; margin-bottom:20px;">2026년 행성 궤도 분석 완료. 무엇을 확인하겠는가?</p>
+                        <div class="button-grid">
+                            <button class="cyber-btn" style="border-color:#ff00ff; color:#ff00ff;" onclick="showFortune('love')">[♥] LOVE</button>
+                            <button class="cyber-btn" style="border-color:#ffd700; color:#ffd700;" onclick="showFortune('money')">[$] MONEY</button>
+                            <button class="cyber-btn" style="border-color:#00ffff; color:#00ffff;" onclick="showFortune('career')">[!] CAREER</button>
+                            <button class="cyber-btn" onclick="location.reload()">RESTART</button>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="screen-fortune-detail" class="screen">
+                    <div style="width:100%; max-width:500px;">
+                        <h1 id="fortune-title" class="shiny-title" style="font-size:1.4rem;"></h1>
+                        <div id="fortune-box" class="result-box" style="min-height:200px;">
+                            <h2 id="fortune-sub-title"></h2>
+                            <div id="res-fortune-content" class="result-content"></div>
+                        </div>
+                        <button class="cyber-btn" onclick="switchScreen('screen-selection')">GO_BACK</button>
                     </div>
                 </section>
 
@@ -179,6 +225,8 @@
 
     <script>
         let selectedLat = 37.5665; let selectedLon = 126.9780;
+        let globalData = null;
+
         const map = L.map('map', { zoomControl: false }).setView([selectedLat, selectedLon], 6);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
         let marker = L.marker([selectedLat, selectedLon]).addTo(map);
@@ -241,13 +289,44 @@
             .then(data => {
                 stopLoadingAnimation();
                 if(data.error) { alert(data.error); switchScreen('screen-input'); return; }
+                
+                globalData = data; // 전역 변수에 저장
+                
                 document.getElementById('res-personality').innerText = data.personality;
-                document.getElementById('res-love').innerText = data.fortune_2026?.love || "분석 불가";
-                document.getElementById('res-money').innerText = data.fortune_2026?.money || "분석 불가";
-                document.getElementById('res-career').innerText = data.fortune_2026?.career || "분석 불가";
-                switchScreen('screen-result');
+                document.getElementById('res-pros').innerText = data.pros;
+                document.getElementById('res-cons').innerText = data.cons;
+                
+                switchScreen('screen-personality');
             })
             .catch(err => { stopLoadingAnimation(); switchScreen('screen-input'); });
+        }
+
+        function showFortune(type) {
+            const title = document.getElementById('fortune-title');
+            const subTitle = document.getElementById('fortune-sub-title');
+            const content = document.getElementById('res-fortune-content');
+            const box = document.getElementById('fortune-box');
+
+            if (type === 'love') {
+                title.innerText = "2026_LOVE_FORTUNE";
+                subTitle.innerText = "[♥] RELATIONSHIP_LOG";
+                content.innerText = globalData.fortune_2026.love;
+                box.style.borderColor = "#ff00ff";
+                subTitle.style.color = "#ff00ff";
+            } else if (type === 'money') {
+                title.innerText = "2026_MONEY_FORTUNE";
+                subTitle.innerText = "[$] WEALTH_STATUS";
+                content.innerText = globalData.fortune_2026.money;
+                box.style.borderColor = "#ffd700";
+                subTitle.style.color = "#ffd700";
+            } else if (type === 'career') {
+                title.innerText = "2026_CAREER_FORTUNE";
+                subTitle.innerText = "[!] CAREER_UPDATE";
+                content.innerText = globalData.fortune_2026.career;
+                box.style.borderColor = "#00ffff";
+                subTitle.style.color = "#00ffff";
+            }
+            switchScreen('screen-fortune-detail');
         }
     </script>
 </body>
