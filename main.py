@@ -97,11 +97,11 @@ def analyze():
             "cons": "주의할 점",
             "current_month": "{now.year}.{now.month:02d}", 
             "fortune_2026": {{
-                "love": "2026년 애정운",
-                "money": "2026년 재물운",
-                "career": "2026년 직업운",
-                "health": "2026년 건강운",
-                "summary": "2026년 전체 요약",
+                "love": "올해 애정운",
+                "money": "올해 재물운",
+                "career": "올해 직업운",
+                "health": "올해 건강운",
+                "summary": "올해 전체 요약",
                 "final_advice": "플루토의 한마디",
                 "monthly": "{now.month}월 이번 달 운세"
             }}
@@ -139,3 +139,4 @@ def analyze():
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 8080)))
+
