@@ -11,7 +11,9 @@
 body {
     background: #050505; margin: 0; padding: 0;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
-    height: 100vh; width: 100vw; overflow: hidden;
+    min-height: 100vh;
+    width: 100%;
+    overflow-x: hidden;
     font-family: 'DungGeunMo', monospace;
 }
 /* [1] 기본 설정 및 변수 END */
