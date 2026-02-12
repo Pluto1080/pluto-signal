@@ -115,7 +115,7 @@ def analyze():
         for attempt in range(max_retries):
             try:
                 response = client.models.generate_content(
-                    model='gemini-2.0-flash-exp',
+                    model='gemini-flash-latest',
                     contents=prompt,
                     config={'response_mime_type': 'application/json'}
                 )
@@ -139,4 +139,5 @@ def analyze():
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 8080)))
+
 
