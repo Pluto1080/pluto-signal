@@ -1,32 +1,30 @@
-/* [1] 기본 설정 및 변수 START */
+/* [1] 기본 설정: 브라우저 정중앙 정렬 */
 :root {
     --screen-bg-center: #444444;
     --screen-bg-edge: #111111;
 }
 
-* { box-sizing: border-box; }
-::-webkit-scrollbar { display: none; }
-* { -ms-overflow-style: none; scrollbar-width: none; }
-
 body {
     background: #050505; margin: 0; padding: 0;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    min-height: 100vh;
-    width: 100%;
-    overflow-x: hidden;
+    display: flex; flex-direction: column; 
+    align-items: center; justify-content: center; /* 자식 요소들을 화면 정중앙으로 */
+    height: 100vh; width: 100vw; overflow: hidden;
     font-family: 'DungGeunMo', monospace;
 }
+
 /* [1] 기본 설정 및 변수 END */
 
-/* [2] 모니터 외관 및 받침대 START */
+/* [2] 모니터 프레임: 내부 화면의 기준점(Relative) */
 .monitor-frame {
     width: 95vw; height: 75vh;
     max-width: 950px; max-height: 700px;
     background: radial-gradient(circle at 30% 30%, #00a8a8 0%, #006666 100%);
     border-radius: 50px; padding: 30px;
     box-shadow: inset 0 0 30px rgba(255,255,255,0.2), 0 30px 60px rgba(0,0,0,0.8), 0 0 0 8px #004d4d;
-    position: relative; display: flex; align-items: center; justify-content: center;
+    position: relative; /* 자식(.screen)들의 기준점 */
+    display: flex; align-items: center; justify-content: center;
     z-index: 3;
+}
 }
 
 .monitor-neck {
@@ -63,8 +61,8 @@ body {
 .screen-content {
     width: 100%; height: 100%;
     background: radial-gradient(circle at center, var(--screen-bg-center) 0%, var(--screen-bg-edge) 100%);
-    position: relative; transition: background 0.8s ease;
-    animation: screen-pulse 8s ease-in-out infinite;
+    position: relative; /* .screen의 직접적인 기준점 */
+    border-radius: 25px; overflow: hidden;
 }
 
 .screen-content::after {
@@ -77,30 +75,19 @@ body {
 @keyframes screen-pulse { 0%, 100% { filter: brightness(0.95); } 50% { filter: brightness(1.1); } }
 /* [3] CRT 특수 효과 애니메이션 END */
 
-/* [4] 섹션 레이아웃 및 텍스트 START (수정됨) */
+/* [4] 섹션 레이아웃: 프레임 안에서 꽉 차게 겹치기(Absolute) */
 .screen {
-    position: absolute; /* 1. 부모(.screen-content) 기준으로 띄움 */
-    top: 0; 
-    left: 0; 
-    width: 100%; 
-    height: 100%;
-    
-    /* 2. 내부 콘텐츠(입력창 등)를 정중앙에 배치 */
-    display: flex; 
-    flex-direction: column; 
-    align-items: center; /* 가로 중앙 */
-    justify-content: center; /* 세로 중앙 */
-    
-    padding: 25px; 
-    opacity: 0; 
-    pointer-events: none; 
+    position: absolute; /* 부모(.screen-content) 기준으로 띄움 */
+    top: 0; left: 0; width: 100%; height: 100%;
+    display: flex; flex-direction: column; 
+    align-items: center; justify-content: center; /* 내부 콘텐츠 중앙 정렬 */
+    padding: 25px; opacity: 0; pointer-events: none; 
     transition: opacity 0.4s ease-in-out;
-    z-index: 10; 
-    backface-visibility: hidden;
-    
-    /* [중요] 혹시 모를 레이아웃 밀림 방지 */
+    z-index: 10; backface-visibility: hidden;
     box-sizing: border-box;
-    margin: 0;
+}
+
+.screen.active { opacity: 1; pointer-events: auto; }
 }
 
 /* 화면이 활성화되면 보이게 설정 */
