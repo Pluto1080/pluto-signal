@@ -9,14 +9,13 @@
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    
 </head>
-    
 <body>
 
     <div class="monitor-frame">
         <div id="container" class="screen-container">
             <div class="crt-overlay"></div>
+            
             <div id="content" class="screen-content">
                 
                 <section id="screen-input" class="screen active">
@@ -44,80 +43,12 @@
                     </div>
                 </section>
 
-                <section id="screen-loading" class="screen">
-                    <div id="loading-text" style="font-size: 2rem; color: #FFD700; font-weight: 900; text-align: center;">별의 소리를 관측하는 중</div>
-                </section>
-
-                <section id="screen-personality" class="screen">
-                    <div style="width:100%; max-width:650px; padding:10px;">
-                        <h1 class="shiny-title" style="font-size:2rem;">CORE_DATA</h1>
-                        <div class="result-box" style="border-color: #00ff41; color: #00ff41;">
-                            <h2>>> CORE_PERSONALITY</h2>
-                            <div id="res-personality" class="result-content"></div>
-                        </div>
-                        <div style="display: flex; gap: 10px;">
-                            <div class="result-box" style="flex:1; border-color: #00ffff; color: #00ffff;">
-                                <h2>[+] STRENGTHS</h2>
-                                <div id="res-pros" class="result-content" style="font-size:0.85rem;"></div>
-                            </div>
-                            <div class="result-box" style="flex:1; border-color:#ff0055; color: #ff0055;">
-                                <h2>[-] WEAKNESSES</h2>
-                                <div id="res-cons" class="result-content" style="font-size:0.85rem;"></div>
-                            </div>
-                        </div>
-                        <button class="cyber-btn" onclick="switchScreen('screen-selection')">PROCEED_TO_FORTUNE</button>
-                    </div>
-                </section>
-
-                <section id="screen-selection" class="screen">
-                    <div style="width:100%; max-width:550px; text-align:center;">
-                        <h1 class="shiny-title">DESTINY</h1>
-                        <div class="button-grid">
-                            <button id="btn-love" class="cyber-btn" style="border-color:#ff00ff; color:#ff00ff;" onclick="showFortune('love')">[♥] LOVE</button>
-                            <button id="btn-money" class="cyber-btn" style="border-color:#ffd700; color:#ffd700;" onclick="showFortune('money')">[$] MONEY</button>
-                            <button id="btn-career" class="cyber-btn" style="border-color:#00ffff; color:#00ffff;" onclick="showFortune('career')">[!] CAREER</button>
-                            <button id="btn-health" class="cyber-btn" style="border-color:#00ff41; color:#00ff41;" onclick="showFortune('health')">[+] HEALTH</button>
-                        </div>
-                        <button id="btn-final-report" class="cyber-btn hidden-btn" style="background:#fff; color:#000; border-color:#00ff41; margin-top:20px;" onclick="showFinalReport()">[!] 2026_WHISPER</button>
-                    </div>
-                </section>
-
-                <section id="screen-fortune-detail" class="screen">
-                    <div style="width:100%; max-width:550px;">
-                        <h1 id="fortune-title" class="shiny-title" style="font-size:2rem;"></h1>
-                        <div id="fortune-box" class="result-box">
-                            <h2 id="fortune-sub-title"></h2>
-                            <div id="res-fortune-content" class="result-content"></div>
-                        </div>
-                        <button class="cyber-btn" onclick="returnToSelection()">GO_BACK</button>
-                    </div>
-                </section>
-
-                <section id="screen-final-advice" class="screen">
-                    <div style="width:100%; max-width:600px;">
-                        <h1 class="shiny-title">FINAL_REPORT</h1>
-                        <div class="result-box" style="border-color:#fff; color:#fff;">
-                            <h2>>> 2026_SUMMARY</h2>
-                            <div id="res-summary" class="result-content"></div>
-                        </div>
-                        <div class="result-box" style="border-color:#00ff41; color:#00ff41; background:rgba(0,0,0,0.9);">
-                            <h2>>> PLUTO'S_WHISPER</h2>
-                            <div id="res-final-advice" class="result-content" style="font-style:italic; font-weight:bold;"></div>
-                        </div>
-                        <button class="cyber-btn" onclick="showFortune('monthly')">PROCEED_TO_MONTHLY_LOG</button>
-                    </div>
-                </section>
-
-                <section id="screen-monthly-final" class="screen">
-                    <div style="width:100%; max-width:550px;">
-                        <h1 class="shiny-title" style="font-size:2rem;">MONTHLY_LOG</h1>
-                        <div class="result-box" style="border-color:#fff; color:#fff;">
-                            <h2>[*] CURRENT_MONTHLY_STATUS</h2>
-                            <div id="res-monthly-content" class="result-content"></div>
-                        </div>
-                        <button class="cyber-btn" onclick="location.reload()" style="background:#ff0055; color:#fff;">SYSTEM_REBOOT</button>
-                    </div>
-                </section>
+                <section id="screen-loading" class="screen">...</section>
+                <section id="screen-personality" class="screen">...</section>
+                <section id="screen-selection" class="screen">...</section>
+                <section id="screen-fortune-detail" class="screen">...</section>
+                <section id="screen-final-advice" class="screen">...</section>
+                <section id="screen-monthly-final" class="screen">...</section>
             </div>
         </div>
     </div>
@@ -128,4 +59,3 @@
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
-
