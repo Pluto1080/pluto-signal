@@ -77,20 +77,52 @@ body {
 @keyframes screen-pulse { 0%, 100% { filter: brightness(0.95); } 50% { filter: brightness(1.1); } }
 /* [3] CRT 특수 효과 애니메이션 END */
 
-/* [4] 섹션 레이아웃 및 텍스트 START */
+/* [4] 섹션 레이아웃 및 텍스트 START (수정됨) */
 .screen {
-    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    padding: 25px; opacity: 0; pointer-events: none; transition: opacity 0.4s ease-in-out;
-    z-index: 10; backface-visibility: hidden;
+    position: absolute; /* 1. 부모(.screen-content) 기준으로 띄움 */
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%;
+    
+    /* 2. 내부 콘텐츠(입력창 등)를 정중앙에 배치 */
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; /* 가로 중앙 */
+    justify-content: center; /* 세로 중앙 */
+    
+    padding: 25px; 
+    opacity: 0; 
+    pointer-events: none; 
+    transition: opacity 0.4s ease-in-out;
+    z-index: 10; 
+    backface-visibility: hidden;
+    
+    /* [중요] 혹시 모를 레이아웃 밀림 방지 */
+    box-sizing: border-box;
+    margin: 0;
 }
-.screen.active { opacity: 1; pointer-events: auto; }
+
+/* 화면이 활성화되면 보이게 설정 */
+.screen.active { 
+    opacity: 1; 
+    pointer-events: auto; 
+}
 
 h1.shiny-title { 
-    font-size: 3.2rem; font-weight: 900; text-align: center; margin-bottom: 20px; 
+    font-size: 3.2rem; 
+    font-weight: 900; 
+    text-align: center; 
+    margin-bottom: 20px; 
+    width: 100%; /* 제목이 전체 너비를 쓰도록 강제 */
+    
     background: linear-gradient(180deg, #00ff41 0%, #ffffff 50%, #00ff41 100%);
-    background-size: auto 200%; color: transparent; -webkit-background-clip: text; background-clip: text;
-    text-shadow: 0 0 8px rgba(0, 255, 65, 0.6); animation: shine-v 3s linear infinite;
+    background-size: auto 200%; 
+    color: transparent; 
+    -webkit-background-clip: text; 
+    background-clip: text;
+    text-shadow: 0 0 8px rgba(0, 255, 65, 0.6); 
+    animation: shine-v 3s linear infinite;
 }
 @keyframes shine-v { to { background-position: center 200%; } }
 /* [4] 섹션 레이아웃 및 텍스트 END */
