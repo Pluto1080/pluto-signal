@@ -1,0 +1,124 @@
+/* [1] 기본 설정 및 변수 START */
+:root {
+    --screen-bg-center: #444444;
+    --screen-bg-edge: #111111;
+}
+
+* { box-sizing: border-box; }
+::-webkit-scrollbar { display: none; }
+* { -ms-overflow-style: none; scrollbar-width: none; }
+
+body {
+    background: #050505; margin: 0; padding: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    height: 100vh; width: 100vw; overflow: hidden;
+    font-family: 'DungGeunMo', monospace;
+}
+/* [1] 기본 설정 및 변수 END */
+
+/* [2] 모니터 외관 및 받침대 START */
+.monitor-frame {
+    width: 95vw; height: 75vh;
+    max-width: 950px; max-height: 700px;
+    background: radial-gradient(circle at 30% 30%, #00a8a8 0%, #006666 100%);
+    border-radius: 50px; padding: 30px;
+    box-shadow: inset 0 0 30px rgba(255,255,255,0.2), 0 30px 60px rgba(0,0,0,0.8), 0 0 0 8px #004d4d;
+    position: relative; display: flex; align-items: center; justify-content: center;
+    z-index: 3;
+}
+
+.monitor-neck {
+    width: 140px; height: 35px;
+    background: linear-gradient(to bottom, #005555 0%, #002222 100%);
+    margin-top: -15px; z-index: 2;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+}
+
+.monitor-base {
+    width: 350px; height: 25px;
+    background: linear-gradient(to bottom, #004d4d 0%, #001111 100%);
+    border-radius: 30px 30px 5px 5px;
+    z-index: 1; box-shadow: 0 15px 25px rgba(0,0,0,0.9);
+}
+/* [2] 모니터 외관 및 받침대 END */
+
+/* [3] CRT 특수 효과 애니메이션 START */
+@keyframes glitch-short {
+    0% { transform: translate(0); }
+    20% { transform: translate(-3px, 0); filter: brightness(1.2); }
+    40% { transform: translate(3px, 0); }
+    100% { transform: translate(0); }
+}
+.glitch-active { animation: glitch-short 0.25s ease-out; }
+
+.crt-overlay {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+    background-size: 100% 3px, 3px 100%; pointer-events: none; z-index: 100; opacity: 0.8;
+}
+
+.screen-content {
+    width: 100%; height: 100%;
+    background: radial-gradient(circle at center, var(--screen-bg-center) 0%, var(--screen-bg-edge) 100%);
+    position: relative; transition: background 0.8s ease;
+    animation: screen-pulse 8s ease-in-out infinite;
+}
+
+.screen-content::after {
+    content: ""; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+    animation: screen-sweep 10s linear infinite; pointer-events: none;
+}
+
+@keyframes screen-sweep { to { left: 200%; } }
+@keyframes screen-pulse { 0%, 100% { filter: brightness(0.95); } 50% { filter: brightness(1.1); } }
+/* [3] CRT 특수 효과 애니메이션 END */
+
+/* [4] 섹션 레이아웃 및 텍스트 START */
+.screen {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 25px; opacity: 0; pointer-events: none; transition: opacity 0.4s ease-in-out;
+    z-index: 10; backface-visibility: hidden;
+}
+.screen.active { opacity: 1; pointer-events: auto; }
+
+h1.shiny-title { 
+    font-size: 3.2rem; font-weight: 900; text-align: center; margin-bottom: 20px; 
+    background: linear-gradient(180deg, #00ff41 0%, #ffffff 50%, #00ff41 100%);
+    background-size: auto 200%; color: transparent; -webkit-background-clip: text; background-clip: text;
+    text-shadow: 0 0 8px rgba(0, 255, 65, 0.6); animation: shine-v 3s linear infinite;
+}
+@keyframes shine-v { to { background-position: center 200%; } }
+/* [4] 섹션 레이아웃 및 텍스트 END */
+
+/* [5] UI 요소 및 결과 박스 START */
+input, select { background: rgba(0,0,0,0.8); border: 2px solid #00ff41; color: #00ff41; padding: 12px; font-family: 'DungGeunMo'; outline: none; font-size: 1.1rem; }
+
+button.cyber-btn {
+    background: #00ff41; color: #000; border: 4px solid #008f11; padding: 16px; width: 100%;
+    font-family: 'DungGeunMo'; font-weight: 900; font-size: 1.3rem; cursor: pointer; box-shadow: 4px 4px 0 #004411; margin-top: 15px;
+}
+button.cyber-btn:hover { background: #ff00ff; border-color: #aa00aa; color: #fff; box-shadow: 4px 4px 0 #550055; }
+
+#map { height: 160px; width: 100%; border: 3px solid #00ff41; margin-top: 5px; filter: invert(100%) hue-rotate(180deg); background-color: #000; }
+
+.result-box { 
+    border: 3px solid #00ff41; padding: 15px; 
+    background: rgba(0,0,0,0.9); /* 이미지처럼 진한 검정 베이스 */
+    margin-bottom: 12px; width: 100%; transition: border-color 0.4s;
+}
+.result-box h2 { font-size: 1.1rem; color: inherit; border-bottom: 1px solid currentColor; margin-bottom: 10px; margin-top:0; font-weight: 900; }
+.result-content { font-size: 0.95rem; line-height: 1.6; color: inherit; }
+
+.button-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; }
+.hidden-btn { display: none !important; }
+
+.star { 
+    position: absolute; background: #FFD700; border-radius: 0; opacity: 0; 
+    box-shadow: 0 0 8px #FFD700, -2px -2px 0px rgba(255, 215, 0, 0.4);
+    animation: shooting-star linear infinite; 
+}
+@keyframes shooting-star { 0% { transform: translate(0, 0); opacity: 0; } 15% { opacity: 1; } 85% { opacity: 1; } 100% { transform: translate(300px, 300px); opacity: 0; } }
+/* [5] UI 요소 및 결과 박스 END */
