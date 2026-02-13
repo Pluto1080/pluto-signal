@@ -57,6 +57,7 @@ body {
     z-index: 1; box-shadow: 0 15px 25px rgba(0,0,0,0.9);
 }
 /* [수정] 화면 컨테이너: CRT 굴곡 + 고정된 배경 장식(HUD) 역할 */
+/* [수정] 화면 컨테이너: CRT 굴곡 + 배경 장식(HUD) */
 .screen-container {
     width: 100%;
     height: 100%;
@@ -69,7 +70,7 @@ body {
     border-radius: 60px / 40px; 
     overflow: hidden; 
     
-    /* 안쪽 그림자 (깊이감) */
+    /* 안쪽 그림자 */
     box-shadow: 
         inset 0 0 80px rgba(0,0,0,0.9),
         inset 0 0 20px rgba(0,255,65,0.2);
@@ -78,16 +79,15 @@ body {
     background: #000;
 }
 
-/* [추가] 상단 고정 라인 (HUD) - 스크롤 안 됨 */
+/* [수정] 상단 라인: 순서를 5로 낮춤 (내용물보다 뒤로 가기 위함) */
 .screen-container::before {
     content: "";
     position: absolute;
-    top: 12%; /* 화면 상단에 고정 */
+    top: 12%; 
     left: 0;
     width: 100%;
     height: 100px;
     
-    /* 가로줄 패턴 */
     background: repeating-linear-gradient(
         to bottom,
         rgba(0, 255, 255, 0.15) 0px,
@@ -95,20 +95,19 @@ body {
         transparent 1px,
         transparent 40px
     );
-    z-index: 60; /* 내용물(90)보다 낮아서 글자 뒤에 깔림 */
+    z-index: 5; /* [중요] 60 -> 5로 변경 */
     pointer-events: none;
 }
 
-/* [추가] 하단 고정 라인 (HUD) - 스크롤 안 됨 */
+/* [수정] 하단 라인: 순서를 5로 낮춤 */
 .screen-container::after {
     content: "";
     position: absolute;
-    bottom: 12%; /* 화면 하단에 고정 */
+    bottom: 12%;
     left: 0;
     width: 100%;
     height: 100px;
     
-    /* 가로줄 패턴 */
     background: repeating-linear-gradient(
         to top,
         rgba(0, 255, 255, 0.15) 0px,
@@ -116,7 +115,7 @@ body {
         transparent 1px,
         transparent 40px
     );
-    z-index: 60; /* 내용물 뒤 */
+    z-index: 5; /* [중요] 60 -> 5로 변경 */
     pointer-events: none;
 }
 /* [2] 모니터 외관 및 받침대 END */
@@ -156,56 +155,35 @@ body {
 }
 
 /* 4. 내부 콘텐츠: 텍스트 RGB 번짐 효과 (두꺼운 유리 느낌) */
+/* [수정] 내부 콘텐츠: 배경 격자 제거 & 순서(Z-Index) 정리 */
 .screen-content {
     /* 1. 레이아웃 및 스크롤 설정 */
     position: relative;
-    z-index: 90;
-    height: 100%;
-    width: 100%; /* 부모 컨테이너에 맞춰 꽉 채움 */
-    padding: 30px;
-    overflow-y: auto; /* 내용이 넘치면 스크롤 */
+    /* [핵심] 격자(5)보다 훨씬 높은 20을 줘서 버튼이 무조건 위로 오게 함 */
+    z-index: 20; 
     
-    /* 2. 텍스트 스타일 (레트로 그린) */
+    height: 100%;
+    width: 100%;
+    padding: 30px;
+    overflow-y: auto; /* 스크롤 유지 */
+    
+    /* 2. 텍스트 스타일 */
     color: #00ff41;
     
-    /* 3. [유지] 텍스트 그림자를 이용한 RGB 색수차(번짐) 효과 */
+    /* 3. 텍스트 RGB 번짐 효과 (이건 남겨야 함!) */
     text-shadow: 
-        2px 0 1px rgba(255, 0, 0, 0.3),  /* 빨간색 번짐 */
-        -2px 0 1px rgba(0, 0, 255, 0.3), /* 파란색 번짐 */
-        0 0 5px #00ff41;                 /* 기본 녹색 발광 */
+        2px 0 1px rgba(255, 0, 0, 0.3),
+        -2px 0 1px rgba(0, 0, 255, 0.3),
+        0 0 5px #00ff41;
 
-    /* 4. [유지] 배경색을 투명하게 (부모의 CRT 굴곡 그림자가 비치도록 함) */
-    background-color: transparent; 
+    /* 4. 배경 설정 (투명하게) */
+    background-color: transparent;
     
-    /* 5. [핵심 변경] 배경 패턴: 전체 격자 삭제 -> 상/하단 가로줄 장식으로 변경 */
-    background-image: 
-        /* (1) 상단 라인 패턴 (위에서 아래로 그려짐) */
-        repeating-linear-gradient(
-            to bottom,
-            rgba(0, 255, 255, 0.3) 0px,  /* 선 색상 (밝은 청록색) */
-            rgba(0, 255, 255, 0.3) 1px,  /* 선 두께 (1px) */
-            transparent 1px,             /* 투명 구간 시작 */
-            transparent 30px             /* 반복 간격 (30px) */
-        ),
-        /* (2) 하단 라인 패턴 (아래에서 위로 그려짐) */
-        repeating-linear-gradient(
-            to top,
-            rgba(0, 255, 255, 0.3) 0px,
-            rgba(0, 255, 255, 0.3) 1px,
-            transparent 1px,
-            transparent 30px
-        );
-        
-    /* 6. [핵심 변경] 패턴 크기 및 위치 제어 */
-    /* 높이를 90px로 제한 -> 30px 간격 패턴이 정확히 3번만 반복됨 (3줄) */
-    background-size: 100% 90px;
+    /* [핵심] 아까 그 길었던 코드를 'none' 한 줄로 삭제! */
+    /* 격자는 이제 screen-container가 담당하니까 여기선 필요 없음 */
+    background-image: none; 
     
-    /* 전체 반복(repeat)을 끄고, 위치를 위/아래 끝으로 고정 */
-    background-repeat: no-repeat;
-    background-position: top center, bottom center;
-    
-    /* 7. 블렌딩 및 스크롤바 숨김 */
-    background-blend-mode: screen;
+    /* 5. 스크롤바 숨김 */
     scrollbar-width: none; 
     -ms-overflow-style: none;
 }
