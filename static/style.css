@@ -111,8 +111,8 @@ body {
     position: relative; z-index: 20; 
     height: 100%; width: 100%;
     
-    /* [수정] 패딩 제거: 내부 .screen에서 중앙 정렬을 담당하므로 여기선 꽉 채움 */
-    padding: 0; 
+    /* [수정] 패딩을 0으로 만들어야 내부 .screen의 중앙 정렬이 정확히 작동합니다 */
+    padding: 0 !important; 
     
     overflow-y: auto; 
     color: #00ff41;
@@ -195,48 +195,45 @@ h1.shiny-title:hover {
     display: flex; 
     flex-direction: column;
 }
-
 /* 1. 입력창 & 결과 박스 공통 */
-/* [수정] 입력창 & 선택창: 밑줄만 있는 해킹 터미널 스타일 */
-input, select {
-    background: rgba(0, 20, 20, 0.6) !important; /* 배경을 더 어둡고 매트하게 */
+/* [수정] 타입을 명시하여 브라우저 기본 하얀 배경을 차단하고 너비를 고정합니다 */
+input[type="text"],
+input[type="date"],
+input[type="time"],
+select {
+    background: rgba(0, 20, 20, 0.6) !important;
     border: none !important;
-    border-bottom: 2px solid #008080 !important; /* 평소엔 어두운 청록색 밑줄 */
-    border-radius: 0 !important; /* 둥근 모서리 제거 (각지게) */
-    
-    color: #00ffff !important; /* 글자색 형광 청록 */
-    text-shadow: 0 0 5px rgba(0, 255, 255, 0.5) !important;
-    font-family: 'DungGeunMo'; 
-    font-size: 1.1rem; /* 글자 크기 살짝 키움 */
-    padding: 10px 5px; /* 좌우 여백 조정 */
-    width: 100%; 
-    margin-bottom: 15px;
-    outline: none;
-    transition: all 0.3s ease; /* 부드러운 전환 효과 */
-}
-
-/* [추가] 입력창을 클릭했을 때 (포커스): 강렬하게 빛남 */
-input:focus, select:focus {
-    background: rgba(0, 255, 255, 0.1) !important; /* 배경 살짝 밝아짐 */
-    border-bottom: 2px solid #00ffff !important; /* 밑줄이 밝은 형광색으로 변함 */
-    box-shadow: 0 10px 20px -10px rgba(0, 255, 255, 0.5); /* 바닥으로 퍼지는 빛 */
-}
-
-/* [수정] 결과 박스: 내용은 담아야 하므로 테두리 유지하되 각지게 변경 */
-.result-box {
-    background: rgba(10, 15, 30, 0.85) !important;
-    border: 2px solid #00ffff !important; /* 결과창은 네모 테두리 유지 */
-    border-radius: 0 !important; /* 각지게 변경 */
+    border-bottom: 2px solid #008080 !important;
+    border-radius: 0 !important;
     
     color: #00ffff !important;
     text-shadow: 0 0 5px rgba(0, 255, 255, 0.5) !important;
-    box-shadow: inset 0 0 20px rgba(0, 255, 255, 0.2) !important;
-    
-    padding: 15px; 
     font-family: 'DungGeunMo'; 
+    font-size: 1.1rem;
+    padding: 10px 5px;
     width: 100%; 
     margin-bottom: 15px;
-    box-sizing: border-box;
+    outline: none;
+    transition: all 0.3s ease;
+    
+    /* [추가] 너비 계산 오류 방지 */
+    box-sizing: border-box; 
+    color-scheme: dark; /* 브라우저 기본 아이콘을 어둡게 설정 */
+}
+
+/* [추가] 쏠림 방지를 위한 너비 제한 적용 대상 정리 */
+.content-wrapper, 
+.input-wrapper, 
+.date-time-container, 
+#map, 
+button.cyber-btn, 
+.result-box {
+    width: 100%;
+    max-width: 480px; /* 이 너비를 기준으로 정중앙에 모입니다 */
+    display: flex; 
+    flex-direction: column;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 /* 2. 결과 박스 내부 제목 */
@@ -279,19 +276,24 @@ label {
 }
 
 /* 6. '시간 모름' 체크박스 스타일 */
+.unknown-check {
+    display: flex;
+    align-items: center; /* 수직 중앙 정렬 */
+    cursor: pointer;
+}
+
 .unknown-check input[type="checkbox"] {
-    appearance: none; /* 기본 스타일 제거 */
+    appearance: none;
     -webkit-appearance: none;
     width: 16px; height: 16px;
     background: transparent;
-    border: 2px solid #ffff00; /* 노란색 테두리 */
-    border-radius: 0; /* 각지게 */
-    margin-right: 8px;
+    border: 2px solid #ffff00;
+    border-radius: 0;
+    margin: 0 8px 0 0; /* 우측 여백만 부여 */
     cursor: pointer;
     position: relative;
-    display: inline-block;
-    vertical-align: middle;
-    box-shadow: 0 0 5px #ffff00; /* 노란색 발광 */
+    box-shadow: 0 0 5px #ffff00;
+    flex-shrink: 0; /* 크기 고정 */
 }
 
 /* 체크되었을 때 모습 */
