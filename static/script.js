@@ -45,21 +45,23 @@ function switchScreen(id) {
     isSwitching = true;
 
     const content = document.getElementById('content');
-    content.classList.add('glitch-active'); /* 지지직거리는 애니메이션 시작 */
+    
+    // 1. 글리치 효과 즉시 시작
+    content.classList.add('glitch-active');
 
-    // [수정] 화면 교체 타이밍을 더 빠르게 (150ms -> 50ms)
+    // 2. 현재 활성화된 화면들을 즉시 비활성화 (버튼 잔상 제거의 핵심)
+    const screens = document.querySelectorAll('.screen');
+    screens.forEach(s => s.classList.remove('active'));
+
+    // 3. 아주 짧은 찰나(50ms) 뒤에 다음 화면 표시
     setTimeout(() => {
-        const screens = document.querySelectorAll('.screen');
         const target = document.getElementById(id);
         if (target) {
-            screens.forEach(s => { 
-                if(s !== target) s.classList.remove('active'); 
-            });
             target.classList.add('active');
         }
     }, 50);
 
-    // [수정] 글리치 효과 제거 타이밍 단축 (400ms -> 250ms)
+    // 4. 글리치 제거 및 전환 프로세스 종료
     setTimeout(() => {
         content.classList.remove('glitch-active');
         isSwitching = false;
