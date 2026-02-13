@@ -33,6 +33,10 @@
                             <div style="flex: 1; text-align:left;">
                                 <label style="color:#ff00ff; font-weight:bold;">TIME</label>
                                 <input type="time" id="birthTime">
+                                <div style="margin-top: 5px; font-size: 0.8rem; color: #00ff41;">
+                                    <input type="checkbox" id="noTime" style="width:auto; vertical-align:middle;"> 
+                                    <label for="noTime">시간 모름</label>
+                                </div>
                             </div>
                         </div>
                         <div style="width:100%; margin-bottom:12px; text-align:left;">
@@ -43,7 +47,10 @@
                     </div>
                 </section>
 
-                <section id="screen-loading" class="screen">...</section>
+                <section id="screen-loading" class="screen">
+                    <h2 id="loading-text" class="shiny-title" style="font-size: 1.5rem;">별의 소리를 관측하는 중...</h2>
+                </section>
+
                 <section id="screen-personality" class="screen">...</section>
                 <section id="screen-selection" class="screen">...</section>
                 <section id="screen-fortune-detail" class="screen">...</section>
