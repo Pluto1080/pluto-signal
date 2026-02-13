@@ -51,11 +51,90 @@
                     <h2 id="loading-text" class="shiny-title" style="font-size: 1.5rem;">별의 소리를 관측하는 중...</h2>
                 </section>
 
-                <section id="screen-personality" class="screen">...</section>
-                <section id="screen-selection" class="screen">...</section>
-                <section id="screen-fortune-detail" class="screen">...</section>
-                <section id="screen-final-advice" class="screen">...</section>
-                <section id="screen-monthly-final" class="screen">...</section>
+                <section id="screen-personality" class="screen">
+                    <div style="width:100%; max-width:500px;">
+                        <h2 class="shiny-title" style="font-size:2rem; margin-bottom:10px;">ANALYSIS_COMPLETE</h2>
+                        
+                        <div class="result-box">
+                            <h2>[DATA] PERSONALITY_CORE</h2>
+                            <div id="res-personality" class="result-content"></div>
+                        </div>
+
+                        <div class="button-grid">
+                            <div class="result-box">
+                                <h2 style="color:#00ffff;">[+] PROS</h2>
+                                <div id="res-pros" class="result-content"></div>
+                            </div>
+                            <div class="result-box">
+                                <h2 style="color:#ff0055;">[-] CONS</h2>
+                                <div id="res-cons" class="result-content"></div>
+                            </div>
+                        </div>
+
+                        <button class="cyber-btn" onclick="switchScreen('screen-selection')">NEXT_SEQUENCE >></button>
+                    </div>
+                </section>
+
+                <section id="screen-selection" class="screen">
+                    <div style="width:100%; max-width:450px;">
+                        <h1 class="shiny-title" style="font-size:2rem;">SELECT_TARGET</h1>
+                        <p style="color:#00ff41; margin-bottom:20px; text-align:center;">관측할 미래 데이터를 선택하라.</p>
+                        
+                        <div class="button-grid">
+                            <button id="btn-love" class="cyber-btn" onclick="showFortune('love')" style="border-color:#ff00ff; color:#ff00ff;">LOVE_SIGNAL</button>
+                            <button id="btn-money" class="cyber-btn" onclick="showFortune('money')" style="border-color:#ffd700; color:#ffd700;">WEALTH_FLOW</button>
+                            <button id="btn-career" class="cyber-btn" onclick="showFortune('career')" style="border-color:#00ffff; color:#00ffff;">CAREER_PATH</button>
+                            <button id="btn-health" class="cyber-btn" onclick="showFortune('health')" style="border-color:#00ff41; color:#00ff41;">VITALITY_LOG</button>
+                        </div>
+
+                        <button id="btn-final-report" class="cyber-btn hidden-btn" onclick="showFinalReport()" style="margin-top:20px; background:#fff; color:#000; border-color:#fff;">FINAL_REPORT >></button>
+                    </div>
+                </section>
+
+                <section id="screen-fortune-detail" class="screen">
+                    <div style="width:100%; max-width:500px;">
+                        <h1 id="fortune-title" class="shiny-title" style="font-size:2rem; margin-bottom:10px;">TITLE</h1>
+                        
+                        <div id="fortune-box" class="result-box">
+                            <h2 id="fortune-sub-title">SUB_TITLE</h2>
+                            <div id="res-fortune-content" class="result-content"></div>
+                        </div>
+
+                        <button class="cyber-btn" onclick="returnToSelection()">(( RETURN</button>
+                    </div>
+                </section>
+
+                <section id="screen-final-advice" class="screen">
+                    <div style="width:100%; max-width:500px;">
+                        <h1 class="shiny-title" style="font-size:2rem;">SUMMARY_LOG</h1>
+                        
+                        <div class="result-box" style="border-color:#ffffff; color:#ffffff;">
+                            <h2>TOTAL_SUMMARY</h2>
+                            <div id="res-summary" class="result-content"></div>
+                        </div>
+
+                        <div class="result-box" style="border-color:#ff00ff; color:#ff00ff;">
+                            <h2>PLUTO'S_WHISPER</h2>
+                            <div id="res-final-advice" class="result-content" style="font-weight:bold;"></div>
+                        </div>
+
+                        <button class="cyber-btn" onclick="showFortune('monthly')">CHECK_THIS_MONTH >></button>
+                    </div>
+                </section>
+
+                <section id="screen-monthly-final" class="screen">
+                    <div style="width:100%; max-width:500px;">
+                        <h1 class="shiny-title" style="font-size:2rem;">THIS_MONTH</h1>
+                        
+                        <div class="result-box" style="border-color:#fff; color:#fff;">
+                            <h2>MONTHLY_SIGNAL</h2>
+                            <div id="res-monthly-content" class="result-content"></div>
+                        </div>
+
+                        <button class="cyber-btn" onclick="location.reload()">SYSTEM_REBOOT</button>
+                    </div>
+                </section>
+
             </div>
         </div>
     </div>
