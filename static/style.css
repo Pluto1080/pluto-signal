@@ -232,69 +232,126 @@ h1.shiny-title:hover {
 
 /* [5] UI 요소 및 결과 박스 START */
 
-/* 1. 공통 래퍼: 모든 요소를 480px 너비 내에서 중앙 정렬 */
-.content-wrapper, .date-time-container, #map, button.cyber-btn, .result-box {
+/* 1. 공통 너비 제한 및 중앙 정렬 (가장 중요) */
+/* 모든 주요 요소들이 이 480px 박스 안에서 한 줄로 정렬됩니다. */
+.content-wrapper, 
+.input-wrapper, 
+.date-time-container, 
+#map, 
+button.cyber-btn, 
+.result-box,
+.content-wrapper > div {
     width: 100%;
     max-width: 480px; 
-    margin: 0 auto 15px auto !important; /* 가로 중앙 정렬 및 하단 간격 */
+    margin-left: auto !important;
+    margin-right: auto !important;
     display: flex; 
     flex-direction: column;
 }
 
-/* 2. 입력창 & 결과 박스 (청록색 네모 스타일 복구) */
-input[type="text"], input[type="date"], input[type="time"], select, .result-box {
+/* 2. 입력창 & 결과 박스 공통 (네모 박스 스타일) */
+input[type="text"],
+input[type="date"],
+input[type="time"],
+select,
+.result-box {
     background: rgba(10, 15, 30, 0.9) !important;
     border: 2px solid #00ffff !important; 
     border-radius: 4px !important; 
     color: #00ffff !important;
     text-shadow: 0 0 5px rgba(0, 255, 255, 0.5) !important;
     box-shadow: inset 0 0 20px rgba(0, 255, 255, 0.2) !important;
-    padding: 10px;
-    font-family: 'DungGeunMo'; font-size: 1.0rem;
-    box-sizing: border-box; 
-    color-scheme: dark; /* 브라우저 기본 아이콘 최적화 */
+    padding: 12px;
+    font-family: 'DungGeunMo'; 
+    font-size: 1.0rem;
+    margin-bottom: 15px; /* 요소 간 세로 간격 */
+    outline: none;
+    box-sizing: border-box; /* 패딩이 너비를 침범하지 않게 고정 */
+    color-scheme: dark; 
 }
 
-/* 3. 날짜/시간 반응형 컨테이너 */
+/* 3. 라벨 스타일 (정렬의 기준) */
+label {
+    color: #ff00ff !important; 
+    text-shadow: 0 0 8px #ff00ff;
+    display: block; 
+    margin-bottom: 5px; 
+    font-weight: bold; 
+    font-size: 0.9rem;
+    text-align: left; /* 480px 박스 내에서 왼쪽 정렬 */
+}
+
+/* 4. 날짜/시간 영역 (반응형 가로 배치) */
 .date-time-container {
-    flex-direction: row; 
+    flex-direction: row !important; /* 가로로 배치 */
     justify-content: space-between;
-    gap: 15px; flex-wrap: wrap;
+    gap: 15px; 
+    flex-wrap: wrap;
+    margin-bottom: 0px !important; /* 내부 input-group의 margin-bottom 활용 */
 }
-.input-group { flex: 1; min-width: 180px; display: flex; flex-direction: column; }
 
-/* 4. TIME 헤더 및 '시간 모름' 체크박스 */
-.time-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px; }
-.unknown-check { display: flex; align-items: center; gap: 8px; color: #ffff00; text-shadow: 0 0 5px #ffff00; font-size: 0.85rem; cursor: pointer; }
+.input-group {
+    flex: 1; 
+    min-width: 180px; 
+    display: flex; 
+    flex-direction: column;
+    margin-bottom: 15px;
+}
+
+/* 5. TIME 헤더 (라벨과 시간모름 체크박스 정렬) */
+.time-header {
+    display: flex;
+    justify-content: space-between; 
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+/* 6. '시간 모름' 체크박스 커스텀 디자인 */
+.unknown-check {
+    display: flex; 
+    align-items: center; 
+    gap: 5px;
+    color: #ffff00 !important; 
+    text-shadow: 0 0 5px #ffff00;
+    font-size: 0.8rem;
+    cursor: pointer;
+}
 
 .unknown-check input[type="checkbox"] {
     appearance: none; -webkit-appearance: none;
-    width: 16px; height: 16px; border: 2px solid #ffff00;
-    box-shadow: 0 0 5px #ffff00; cursor: pointer; position: relative;
-}
-.unknown-check input[type="checkbox"]:checked { background: #ffff00; }
-.unknown-check input[type="checkbox"]:checked::after {
-    content: '✔'; color: black; font-size: 12px; position: absolute; left: 2px; top: -1px;
+    width: 16px; height: 16px;
+    border: 2px solid #ffff00;
+    box-shadow: 0 0 5px #ffff00;
+    cursor: pointer;
+    position: relative;
+    margin: 0;
+    background: transparent !important;
 }
 
-/* 5. 버튼 및 지도 스타일 */
+.unknown-check input[type="checkbox"]:checked { background: #ffff00 !important; }
+.unknown-check input[type="checkbox"]:checked::after {
+    content: '✔'; color: black; font-size: 12px;
+    position: absolute; left: 2px; top: -2px;
+}
+
+/* 7. 버튼 스타일 */
 button.cyber-btn {
-    background: rgba(0, 255, 255, 0.1); border: 2px solid #00ff41; color: #00ff41;
-    padding: 14px; font-family: 'DungGeunMo'; font-weight: 900; font-size: 1.2rem; 
-    cursor: pointer; box-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
-    text-transform: uppercase; transition: all 0.3s ease;
+    background: rgba(0, 255, 255, 0.1);
+    border: 2px solid #00ff41;
+    color: #00ff41;
+    padding: 16px; 
+    font-family: 'DungGeunMo'; font-weight: 900; font-size: 1.3rem; 
+    cursor: pointer; 
+    box-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
+    text-transform: uppercase;
+    transition: all 0.3s ease;
 }
 button.cyber-btn:hover { background: #00ff41; color: #000; box-shadow: 0 0 30px #00ff41; }
 
-#map { height: 130px; border: 3px solid #00ffff; filter: invert(100%) hue-rotate(180deg); }
-
-/* 6. 결과창 내부 및 유틸리티 */
-.result-box h2 {
-    font-size: 1.1rem; color: #ff00ff !important; text-shadow: 0 0 10px #ff00ff;
-    border-bottom: 1px dashed #ff00ff; padding-bottom: 10px; margin-bottom: 15px;
-}
-.result-content { font-size: 0.95rem; line-height: 1.6; }
-.button-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; max-width: 480px; margin: 0 auto; }
+/* 8. 지도 및 기타 유틸리티 */
+#map { height: 140px; border: 3px solid #00ffff; filter: invert(100%) hue-rotate(180deg); margin-bottom: 15px; }
+.button-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
+.result-box h2 { font-size: 1.1rem; color: #ff00ff !important; border-bottom: 1px dashed #ff00ff; padding-bottom: 10px; margin-bottom: 15px; }
 .hidden-btn { display: none !important; }
 
 /* [5] UI 요소 및 결과 박스 END */
