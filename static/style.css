@@ -32,18 +32,24 @@ body {
     border: 8px solid #008080; 
     
     /* 4. [모양 변경] 전체적으로 둥글게 */
-    border-radius: 60px; /* 기본 둥글기 */
+    border-radius: 120px; /* 기본 둥글기 */
 
     /* 5. CRT 특유의 굴곡 (유지하되 조금 더 부드럽게) */
     border-top-left-radius: 80px 80px;
     border-top-right-radius: 80px 80px;
-    border-bottom-left-radius: 60px 60px;
-    border-bottom-right-radius: 60px 60px;
+    border-bottom-left-radius: 80px 80px;
+    border-bottom-right-radius: 80px 80px;
 
     /* 6. LED 후광 효과 (유지) */
     box-shadow: 
-        inset 0 0 20px rgba(0,0,0,0.8),
-        0 0 0 8px #004d4d,
+        /* (1) 테두리 안쪽으로 부드럽고 깊게 퍼지는 그림자 (여기가 핵심!) */
+        /* 범위(blur)를 20px -> 50px로 늘리고, 색상을 조금 더 진하게 하여 깊이감을 줍니다. */
+        inset 0 0 50px rgba(0,0,0,0.9),
+        
+        /* (2) 테두리 바깥쪽 바로 아래에 부드러운 그림자 추가 (입체감) */
+        0 10px 30px rgba(0,0,0,0.5),
+
+        /* (3) 기존 LED 후광 효과 (유지) */
         0 0 60px rgba(0, 255, 255, 0.4),
         0 0 120px rgba(255, 0, 255, 0.3);
 }
