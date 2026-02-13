@@ -39,33 +39,33 @@ function setScreenColor(center, edge) {
 }
 /* [3] 화면 색상 제어 함수 END */
 
-/* [4] 화면 전환 기능 수정 */
+/* [4] 화면 전환 기능 수정 (강화 버전) */
 function switchScreen(id) {
     if (isSwitching) return;
     isSwitching = true;
 
     const content = document.getElementById('content');
     
-    // 1. 글리치 효과 즉시 시작
+    // 1. 글리치 효과 시작
     content.classList.add('glitch-active');
 
-    // 2. 현재 활성화된 화면들을 즉시 비활성화 (버튼 잔상 제거의 핵심)
-    const screens = document.querySelectorAll('.screen');
-    screens.forEach(s => s.classList.remove('active'));
-
-    // 3. 아주 짧은 찰나(50ms) 뒤에 다음 화면 표시
+    // 2. 현재 활성화된 화면들을 비활성화하고 잠시 대기 (글리치만 보이는 상태)
     setTimeout(() => {
+        const screens = document.querySelectorAll('.screen');
+        screens.forEach(s => s.classList.remove('active'));
+
+        // 3. 글리치가 한창 진행 중일 때 다음 화면 활성화 (100ms 지점)
         const target = document.getElementById(id);
         if (target) {
             target.classList.add('active');
         }
-    }, 50);
+    }, 100); 
 
-    // 4. 글리치 제거 및 전환 프로세스 종료
+    // 4. 충분히 글리치를 보여준 후 효과 제거 및 전환 완료 (350ms)
     setTimeout(() => {
         content.classList.remove('glitch-active');
         isSwitching = false;
-    }, 250);
+    }, 350);
 }
 /* [4] 화면 전환 기능 END */
 
