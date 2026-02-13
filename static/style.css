@@ -16,15 +16,25 @@ body {
 
 /* [2] 모니터 프레임: 내부 화면의 기준점(Relative) */
 .monitor-frame {
-    width: 95vw; height: 75vh;
-    max-width: 950px; max-height: 700px;
-    background: radial-gradient(circle at 30% 30%, #00a8a8 0%, #006666 100%);
-    border-radius: 50px; padding: 30px;
-    box-shadow: inset 0 0 30px rgba(255,255,255,0.2), 0 30px 60px rgba(0,0,0,0.8), 0 0 0 8px #004d4d;
-    position: relative; /* 자식(.screen)들의 기준점 */
-    display: flex; align-items: center; justify-content: center;
-    z-index: 3;
+    width: 90vw; max-width: 1200px; height: 75vh; min-height: 600px;
+    background: #222; 
+    border: 20px solid #333; /* 프레임을 좀 더 어둡게 */
+    border-radius: 20px;
+    /* [핵심 변경] 안쪽 그림자 + 바깥쪽 멀티 컬러 LED 후광 효과 */
+    box-shadow: 
+        inset 0 0 80px rgba(0,0,0,0.8), /* 내부 깊이감 */
+        0 0 50px rgba(0, 255, 255, 0.4), /* 청록색 빛 번짐 (중간) */
+        0 0 150px rgba(255, 0, 255, 0.3); /* 자홍색 빛 번짐 (넓게) */
+    
+    position: relative; z-index: 10;
+    overflow: hidden;
+    /* CRT 굴곡 효과 */
+    border-top-left-radius: 80px 80px;
+    border-top-right-radius: 80px 80px;
+    border-bottom-left-radius: 40px 40px;
+    border-bottom-right-radius: 40px 40px;
 }
+
 }
 
 .monitor-neck {
@@ -68,10 +78,24 @@ body {
 }
 
 .screen-content {
-    width: 100%; height: 100%;
-    background: radial-gradient(circle at center, var(--screen-bg-center) 0%, var(--screen-bg-edge) 100%);
-    position: relative; /* .screen의 직접적인 기준점 */
-    border-radius: 25px; overflow: hidden;
+    position: relative;
+    z-index: 90; /* 오버레이보다 아래 */
+    height: 100%;
+    padding: 30px;
+    overflow-y: auto;
+    color: #00ff41;
+    text-shadow: 0 0 5px #00ff41;
+
+    /* [핵심 변경] 배경에 희미한 사이버 그리드 라인 추가 */
+    background-color: #000;
+    background-image: 
+        linear-gradient(rgba(0, 255, 255, 0.1) 1px, transparent 1px), /* 가로선 */
+        linear-gradient(90deg, rgba(0, 255, 255, 0.1) 1px, transparent 1px); /* 세로선 */
+    background-size: 40px 40px; /* 격자 크기 */
+    background-blend-mode: screen; /* 기존 CRT 효과와 자연스럽게 섞임 */
+    
+    /* 스크롤바 숨김 (선택사항) */
+    scrollbar-width: none; -ms-overflow-style: none;
 }
 
 .screen-content::after {
@@ -125,37 +149,78 @@ h1.shiny-title {
 
 /* [5] UI 요소 및 결과 박스 START */
 
-/* [5] UI 요소 및 결과 박스 START */
-input, select { 
-    background: rgba(0,0,0,0.8); 
-    border: 2px solid #00ff41; 
-    color: #00ff41; 
-    padding: 12px; 
-    font-family: 'DungGeunMo'; 
-    outline: none; 
-    font-size: 1.1rem;
+/* 1. 입력창 & 결과 박스 공통 (사이버펑크 스타일 적용) */
+input, select, .result-box {
+    background: rgba(10, 15, 30, 0.85) !important; /* 푸른빛 도는 투명 배경 */
+    border: 2px solid #00ffff !important;         /* 밝은 청록색 테두리 */
+    color: #00ffff !important;                    /* 텍스트 색상 */
+    text-shadow: 0 0 5px rgba(0, 255, 255, 0.5) !important;
+    box-shadow: inset 0 0 20px rgba(0, 255, 255, 0.2) !important; /* 내부 발광 */
     
-    /* [추가됨] 박스 크기 통일 */
-    width: 100%; 
-    box-sizing: border-box; 
+    padding: 15px;
+    font-family: 'DungGeunMo';
+    outline: none;
+    font-size: 1.1rem;
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 12px;
+    border-radius: 4px;
 }
 
-button.cyber-btn {
-    background: #00ff41; color: #000; border: 4px solid #008f11; padding: 16px; width: 100%;
-    font-family: 'DungGeunMo'; font-weight: 900; font-size: 1.3rem; cursor: pointer; box-shadow: 4px 4px 0 #004411; margin-top: 15px;
+/* 2. 결과 박스 내부 제목 스타일 */
+.result-box h2 {
+    font-size: 1.1rem;
+    font-weight: 900;
+    margin-top: 0;
+    color: #ff00ff !important;       /* 제목은 자홍색 포인트 */
+    text-shadow: 0 0 10px #ff00ff !important;
+    border-bottom: 1px dashed #ff00ff;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
 }
-button.cyber-btn:hover { background: #ff00ff; border-color: #aa00aa; color: #fff; box-shadow: 4px 4px 0 #550055; }
-
-#map { height: 160px; width: 100%; border: 3px solid #00ff41; margin-top: 5px; filter: invert(100%) hue-rotate(180deg); background-color: #000; }
-
-.result-box { 
-    border: 3px solid #00ff41; padding: 15px; 
-    background: rgba(0,0,0,0.9); /* 이미지처럼 진한 검정 베이스 */
-    margin-bottom: 12px; width: 100%; transition: border-color 0.4s;
-}
-.result-box h2 { font-size: 1.1rem; color: inherit; border-bottom: 1px solid currentColor; margin-bottom: 10px; margin-top:0; font-weight: 900; }
 .result-content { font-size: 0.95rem; line-height: 1.6; color: inherit; }
 
+/* 3. 라벨 (추가됨) */
+label {
+    color: #ff00ff !important;
+    text-shadow: 0 0 8px #ff00ff;
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+/* 4. 버튼 스타일 (네온 효과 강화) */
+button.cyber-btn {
+    background: rgba(0, 255, 255, 0.1);
+    border: 2px solid #00ff41;
+    color: #00ff41;
+    padding: 16px; 
+    width: 100%;
+    font-family: 'DungGeunMo'; font-weight: 900; font-size: 1.3rem; 
+    cursor: pointer; 
+    box-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
+    margin-top: 15px;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+}
+button.cyber-btn:hover { 
+    background: #00ff41; 
+    color: #000; 
+    box-shadow: 0 0 30px #00ff41; 
+    border-color: #00ff41;
+}
+
+/* 5. 지도 (테두리 색상만 테마에 맞게 변경) */
+#map { 
+    height: 160px; 
+    width: 100%; 
+    border: 3px solid #00ffff; /* 청록색으로 깔맞춤 */
+    margin-top: 5px; 
+    filter: invert(100%) hue-rotate(180deg); 
+    background-color: #000; 
+}
+
+/* 6. 기타 유틸리티 및 애니메이션 (기존 유지) */
 .button-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; }
 .hidden-btn { display: none !important; }
 
@@ -165,4 +230,5 @@ button.cyber-btn:hover { background: #ff00ff; border-color: #aa00aa; color: #fff
     animation: shooting-star linear infinite; 
 }
 @keyframes shooting-star { 0% { transform: translate(0, 0); opacity: 0; } 15% { opacity: 1; } 85% { opacity: 1; } 100% { transform: translate(300px, 300px); opacity: 0; } }
+
 /* [5] UI 요소 및 결과 박스 END */
