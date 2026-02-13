@@ -149,49 +149,44 @@ body {
 
 /* [4] 섹션 레이아웃: 완전 자동 정중앙 정렬 (최종 보정본) */
 .screen {
-    /* 부모 컨테이너(.screen-content)를 오차 없이 꽉 채움 */
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
-    height: 100%; /* 세로 중앙 정렬 기준을 위해 height 고정 */
+    height: 100%;
     
-    /* [핵심] Flexbox를 통한 가로/세로 무조건 정중앙 정렬 */
     display: flex;
     flex-direction: column;
-    align-items: center;     /* 가로축 중앙 정렬 */
-    justify-content: center; /* 세로축 중앙 정렬 */
+    align-items: center;
+    justify-content: center;
     
-    /* 좌우 패딩을 동일하게 설정하여 쏠림 현상 방지 */
     padding: 20px;
     box-sizing: border-box;
     
-    /* 투명도 및 레이어 설정 */
+    /* [보강] 투명도 0일 때 시각적으로 완전히 차단 */
     opacity: 0;
+    visibility: hidden; /* 추가: 화면 전환 시 뒤에 남는 잔상을 물리적으로 차단 */
     pointer-events: none;
     
-    /* [수정] 여기서 transition을 삭제하거나 none으로 변경합니다. 
-       이전 화면이 비활성화될 때 잔상 없이 즉시 사라지게 하기 위함입니다. */
+    /* 사라질 때는 트랜지션 없이 즉시 사라짐 */
     transition: none; 
     
     z-index: 10;
     backface-visibility: hidden;
     
-    /* 내용이 많아질 경우 내부 스크롤 허용 (가로 스크롤은 차단) */
     overflow-y: auto;
     overflow-x: hidden;
-    
-    /* 텍스트 기본 정렬을 중앙으로 고정 */
     text-align: center;
 }
 
-/* 활성화 상태: 화면을 부드럽게 나타내고 클릭 가능하게 변경 */
+/* 활성화 상태 */
 .screen.active {
     opacity: 1;
+    visibility: visible; /* 추가: 나타날 때만 보이게 설정 */
     pointer-events: auto;
+    z-index: 50; /* 추가: 활성화된 화면이 무조건 가장 위로 오게 함 */
     
-    /* [수정] 활성화될 때(나타날 때)만 트랜지션을 적용합니다. 
-       0.2초 정도로 짧게 설정하면 훨씬 깔끔하게 전환됩니다. */
+    /* 나타날 때만 0.2초 동안 부드럽게 표시 */
     transition: opacity 0.2s ease-in-out;
 }
 
