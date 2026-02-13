@@ -16,23 +16,29 @@ body {
 
 /* [2] 모니터 프레임: 내부 화면의 기준점(Relative) */
 .monitor-frame {
-    width: 90vw; max-width: 1200px; height: 75vh; min-height: 600px;
-    background: #222; 
-    border: 20px solid #333; /* 프레임을 좀 더 어둡게 */
-    border-radius: 20px;
-    /* [핵심 변경] 안쪽 그림자 + 바깥쪽 멀티 컬러 LED 후광 효과 */
-    box-shadow: 
-        inset 0 0 80px rgba(0,0,0,0.8), /* 내부 깊이감 */
-        0 0 50px rgba(0, 255, 255, 0.4), /* 청록색 빛 번짐 (중간) */
-        0 0 150px rgba(255, 0, 255, 0.3); /* 자홍색 빛 번짐 (넓게) */
+    /* 1. 크기 및 정렬 */
+    width: 95vw; height: 75vh;
+    max-width: 950px; max-height: 700px;
+    display: flex; align-items: center; justify-content: center;
+    position: relative; z-index: 3;
     
-    position: relative; z-index: 10;
-    overflow: hidden;
-    /* CRT 굴곡 효과 */
+    /* 2. [핵심] 모니터 틀(베젤) 만들기 */
+    background: #222; /* 플라스틱 틀 색상 */
+    padding: 40px;    /* 이 여백이 있어야 틀이 보입니다! */
+    border: 5px solid #333; /* 테두리 입체감 */
+
+    /* 3. [복구됨] CRT 특유의 비대칭 굴곡 효과 유지 */
     border-top-left-radius: 80px 80px;
     border-top-right-radius: 80px 80px;
     border-bottom-left-radius: 40px 40px;
     border-bottom-right-radius: 40px 40px;
+
+    /* 4. LED 후광 효과 (Ambilight) */
+    box-shadow: 
+        inset 0 0 20px rgba(0,0,0,0.8), /* 틀 안쪽 그림자 */
+        0 0 0 8px #1a1a1a,              /* 외부 얇은 라인 */
+        0 0 60px rgba(0, 255, 255, 0.4), /* 청록색 후광 */
+        0 0 120px rgba(255, 0, 255, 0.3); /* 자홍색 후광 */
 }
 
 }
@@ -75,6 +81,8 @@ body {
 /* [2] 모니터 외관 및 받침대 END */
 
 /* [3] CRT 특수 효과 애니메이션 START */
+
+/* 1. 글리치 효과 (화면 찢어짐) */
 @keyframes glitch-short {
     0% { transform: translate(0); }
     20% { transform: translate(-3px, 0); filter: brightness(1.2); }
@@ -83,36 +91,89 @@ body {
 }
 .glitch-active { animation: glitch-short 0.25s ease-out; }
 
+/* 2. 화면 깜빡임 (오래된 모니터 느낌) */
+@keyframes flicker {
+    0% { opacity: 0.85; }
+    50% { opacity: 0.9; }
+    100% { opacity: 0.85; }
+}
+
+/* 3. CRT 오버레이: 스캔라인 + 비네팅(볼록 렌즈 그림자) */
 .crt-overlay {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
-                linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
-    background-size: 100% 3px, 3px 100%; pointer-events: none; z-index: 100; opacity: 0.8;
+    
+    /* [핵심] 두 가지 배경 결합 
+       1. linear-gradient: 가로 스캔라인 (TV 줄무늬)
+       2. radial-gradient: 비네팅 (중앙은 투명, 모서리는 진한 검정 그림자) -> 이게 볼록해 보이게 만드는 핵심 착시
+    */
+    background: 
+        linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+        radial-gradient(circle at center, rgba(0,0,0,0) 55%, rgba(0,0,0,0.6) 100%);
+        
+    background-size: 100% 4px, 100% 100%; /* 스캔라인 간격 조절 */
+    pointer-events: none; /* 클릭 통과 */
+    z-index: 100; 
+    opacity: 0.9; 
+    
+    /* 화면이 미세하게 깜빡이는 애니메이션 적용 */
+    animation: flicker 0.15s infinite;
 }
-/* [수정] 내부 콘텐츠: 배경색을 빼고 그리드 패턴만 유지 */
+
+/* 4. 내부 콘텐츠: 텍스트 RGB 번짐 효과 (두꺼운 유리 느낌) */
 .screen-content {
+    /* 1. 레이아웃 및 스크롤 설정 */
     position: relative;
     z-index: 90;
     height: 100%;
-    width: 100%; /* 너비를 꽉 채움 */
+    width: 100%; /* 부모 컨테이너에 맞춰 꽉 채움 */
     padding: 30px;
-    overflow-y: auto; /* 내용 많으면 스크롤 */
+    overflow-y: auto; /* 내용이 넘치면 스크롤 */
+    
+    /* 2. 텍스트 스타일 (레트로 그린) */
     color: #00ff41;
-    text-shadow: 0 0 5px #00ff41;
+    
+    /* 3. [유지] 텍스트 그림자를 이용한 RGB 색수차(번짐) 효과 */
+    text-shadow: 
+        2px 0 1px rgba(255, 0, 0, 0.3),  /* 빨간색 번짐 */
+        -2px 0 1px rgba(0, 0, 255, 0.3), /* 파란색 번짐 */
+        0 0 5px #00ff41;                 /* 기본 녹색 발광 */
 
-    /* [중요] 배경색을 투명하게 해야 부모의 곡면 그림자가 보임 */
+    /* 4. [유지] 배경색을 투명하게 (부모의 CRT 굴곡 그림자가 비치도록 함) */
     background-color: transparent; 
     
-    /* 사이버 그리드 라인 유지 */
+    /* 5. [핵심 변경] 배경 패턴: 전체 격자 삭제 -> 상/하단 가로줄 장식으로 변경 */
     background-image: 
-        linear-gradient(rgba(0, 255, 255, 0.1) 1px, transparent 1px), 
-        linear-gradient(90deg, rgba(0, 255, 255, 0.1) 1px, transparent 1px);
-    background-size: 40px 40px;
-    background-blend-mode: screen;
+        /* (1) 상단 라인 패턴 (위에서 아래로 그려짐) */
+        repeating-linear-gradient(
+            to bottom,
+            rgba(0, 255, 255, 0.3) 0px,  /* 선 색상 (밝은 청록색) */
+            rgba(0, 255, 255, 0.3) 1px,  /* 선 두께 (1px) */
+            transparent 1px,             /* 투명 구간 시작 */
+            transparent 30px             /* 반복 간격 (30px) */
+        ),
+        /* (2) 하단 라인 패턴 (아래에서 위로 그려짐) */
+        repeating-linear-gradient(
+            to top,
+            rgba(0, 255, 255, 0.3) 0px,
+            rgba(0, 255, 255, 0.3) 1px,
+            transparent 1px,
+            transparent 30px
+        );
+        
+    /* 6. [핵심 변경] 패턴 크기 및 위치 제어 */
+    /* 높이를 90px로 제한 -> 30px 간격 패턴이 정확히 3번만 반복됨 (3줄) */
+    background-size: 100% 90px;
     
-    scrollbar-width: none; -ms-overflow-style: none;
+    /* 전체 반복(repeat)을 끄고, 위치를 위/아래 끝으로 고정 */
+    background-repeat: no-repeat;
+    background-position: top center, bottom center;
+    
+    /* 7. 블렌딩 및 스크롤바 숨김 */
+    background-blend-mode: screen;
+    scrollbar-width: none; 
+    -ms-overflow-style: none;
 }
-
+/* 5. 화면 스캔 광선 (좌우로 지나가는 빛) */
 .screen-content::after {
     content: ""; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
     background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
@@ -121,6 +182,7 @@ body {
 
 @keyframes screen-sweep { to { left: 200%; } }
 @keyframes screen-pulse { 0%, 100% { filter: brightness(0.95); } 50% { filter: brightness(1.1); } }
+
 /* [3] CRT 특수 효과 애니메이션 END */
 
 /* [4] 섹션 레이아웃: 프레임 안에서 꽉 차게 겹치기(Absolute) */
