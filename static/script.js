@@ -45,9 +45,9 @@ function switchScreen(id) {
     isSwitching = true;
 
     const content = document.getElementById('content');
-    content.classList.add('glitch-active');
+    content.classList.add('glitch-active'); /* 지지직거리는 애니메이션 시작 */
 
-    // [수정] 화면 교체 타이밍을 100ms -> 50ms로 더 빠르게
+    // [수정] 화면 교체 타이밍을 더 빠르게 (150ms -> 50ms)
     setTimeout(() => {
         const screens = document.querySelectorAll('.screen');
         const target = document.getElementById(id);
@@ -59,7 +59,7 @@ function switchScreen(id) {
         }
     }, 50);
 
-    // [수정] 전체 전환 완료 시간도 300ms -> 250ms로 단축
+    // [수정] 글리치 효과 제거 타이밍 단축 (400ms -> 250ms)
     setTimeout(() => {
         content.classList.remove('glitch-active');
         isSwitching = false;
