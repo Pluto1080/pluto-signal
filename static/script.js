@@ -39,7 +39,7 @@ function setScreenColor(center, edge) {
 }
 /* [3] 화면 색상 제어 함수 END */
 
-/* [4] 화면 전환 기능 (버그 수정 버전) START */
+/* [4] 화면 전환 기능 수정 */
 function switchScreen(id) {
     if (isSwitching) return;
     isSwitching = true;
@@ -47,7 +47,7 @@ function switchScreen(id) {
     const content = document.getElementById('content');
     content.classList.add('glitch-active');
 
-    // 화면 교체 타이밍을 150ms에서 100ms로 단축
+    // [수정] 화면 교체 타이밍을 100ms -> 50ms로 더 빠르게
     setTimeout(() => {
         const screens = document.querySelectorAll('.screen');
         const target = document.getElementById(id);
@@ -57,13 +57,13 @@ function switchScreen(id) {
             });
             target.classList.add('active');
         }
-    }, 100);
+    }, 50);
 
-    // 전체 전환 프로세스 완료 시간을 400ms에서 300ms로 단축
+    // [수정] 전체 전환 완료 시간도 300ms -> 250ms로 단축
     setTimeout(() => {
         content.classList.remove('glitch-active');
         isSwitching = false;
-    }, 300);
+    }, 250);
 }
 /* [4] 화면 전환 기능 END */
 
