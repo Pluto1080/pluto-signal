@@ -22,21 +22,22 @@ body {
     display: flex; align-items: center; justify-content: center;
     position: relative; z-index: 3;
     
-    /* 2. [핵심] 모니터 틀(베젤) 만들기 */
-    background: #222; /* 플라스틱 틀 색상 */
-    padding: 40px;    /* 이 여백이 있어야 틀이 보입니다! */
-    border: 5px solid #333; /* 테두리 입체감 */
+    /* 2. [핵심 변경] 모니터 틀(베젤) 색상 및 형태 변경 */
+    background: #005f5f; /* 프레임 색상: 어두운 청록색으로 변경 (회색 -> 청록색) */
+    padding: 40px;    
+    border: 8px solid #008080; /* 테두리 색상: 조금 더 밝은 청록색으로 입체감 */
+    border-radius: 50px; /* 모서리를 둥글게 (20px -> 50px) */
 
     /* 3. [복구됨] CRT 특유의 비대칭 굴곡 효과 유지 */
     border-top-left-radius: 80px 80px;
     border-top-right-radius: 80px 80px;
-    border-bottom-left-radius: 40px 40px;
-    border-bottom-right-radius: 40px 40px;
+    border-bottom-left-radius: 60px 60px; /* 하단도 둥글게 조정 */
+    border-bottom-right-radius: 60px 60px; /* 하단도 둥글게 조정 */
 
-    /* 4. LED 후광 효과 (Ambilight) */
+    /* 4. LED 후광 효과 (Ambilight) - 유지 */
     box-shadow: 
         inset 0 0 20px rgba(0,0,0,0.8), /* 틀 안쪽 그림자 */
-        0 0 0 8px #1a1a1a,              /* 외부 얇은 라인 */
+        0 0 0 8px #004d4d,              /* 외부 얇은 청록색 라인 */
         0 0 60px rgba(0, 255, 255, 0.4), /* 청록색 후광 */
         0 0 120px rgba(255, 0, 255, 0.3); /* 자홍색 후광 */
 }
@@ -57,8 +58,7 @@ body {
     z-index: 1; box-shadow: 0 15px 25px rgba(0,0,0,0.9);
 }
 /* [수정] 화면 컨테이너: CRT 굴곡 + 고정된 배경 장식(HUD) 역할 */
-/* [수정] 화면 컨테이너: CRT 굴곡 + 배경 장식(HUD) */
-.screen-container {
+/.screen-container {
     width: 100%;
     height: 100%;
     position: relative;
@@ -66,17 +66,16 @@ body {
     align-items: center;
     justify-content: center;
     
-    /* CRT 굴곡 */
     border-radius: 60px / 40px; 
     overflow: hidden; 
     
-    /* 안쪽 그림자 */
     box-shadow: 
         inset 0 0 80px rgba(0,0,0,0.9),
         inset 0 0 20px rgba(0,255,65,0.2);
         
     z-index: 50;
-    background: #000;
+    /* [핵심 변경] 화면 배경색: 완전 검은색에서 회색빛으로 변경 */
+    background: #222; /* 회색빛이 도는 짙은 배경색 */
 }
 
 /* [수정] 상단 라인: 순서를 5로 낮춤 (내용물보다 뒤로 가기 위함) */
@@ -201,31 +200,40 @@ body {
 
 /* [4] 섹션 레이아웃: 프레임 안에서 꽉 차게 겹치기(Absolute) */
 .screen {
-    position: absolute; /* 부모(.screen-content) 기준으로 띄움 */
+    position: absolute; /* 부모(.screen-content) 기준으로 고정 */
     top: 0; left: 0; width: 100%; height: 100%;
     display: flex; flex-direction: column; 
-    align-items: center; justify-content: center; /* 내부 콘텐츠 중앙 정렬 */
-    padding: 25px; opacity: 0; pointer-events: none; 
+    align-items: center; 
+    
+    /* [수정] 중앙 정렬 대신 상단 정렬을 사용하여 요소들이 아래로 쏠리지 않게 함 */
+    justify-content: flex-start; 
+    
+    /* [수정] 상단에 40px 여백을 주어 제목이 프레임 위쪽에 안정적으로 걸리게 함 */
+    padding: 40px 25px 25px 25px; 
+    
+    opacity: 0; pointer-events: none; 
     transition: opacity 0.4s ease-in-out;
     z-index: 10; backface-visibility: hidden;
     box-sizing: border-box;
+    
+    /* 내용이 화면 높이를 넘길 경우를 대비한 최소한의 스크롤 허용 */
+    overflow-y: auto;
 }
 
-.screen.active { opacity: 1; pointer-events: auto; }
-}
-
-/* 화면이 활성화되면 보이게 설정 */
+/* 화면 활성화 상태 (중복 코드 정리) */
 .screen.active { 
     opacity: 1; 
     pointer-events: auto; 
 }
 
 h1.shiny-title { 
-    font-size: 3.2rem; 
+    /* [수정] 화면 크기에 비해 너무 큰 제목 크기 축소 (3.2rem -> 2.5rem) */
+    font-size: 2.5rem; 
     font-weight: 900; 
     text-align: center; 
-    margin-bottom: 20px; 
-    width: 100%; /* 제목이 전체 너비를 쓰도록 강제 */
+    margin-top: 0;      /* 상단 여백 제거 */
+    margin-bottom: 15px; /* 다음 요소와의 간격 최적화 */
+    width: 100%; 
     
     background: linear-gradient(180deg, #00ff41 0%, #ffffff 50%, #00ff41 100%);
     background-size: auto 200%; 
@@ -235,26 +243,32 @@ h1.shiny-title {
     text-shadow: 0 0 8px rgba(0, 255, 65, 0.6); 
     animation: shine-v 3s linear infinite;
 }
-@keyframes shine-v { to { background-position: center 200%; } }
+
+@keyframes shine-v { 
+    to { background-position: center 200%; } 
+}
 /* [4] 섹션 레이아웃 및 텍스트 END */
 
 /* [5] UI 요소 및 결과 박스 START */
 
-/* 1. 입력창 & 결과 박스 공통 (사이버펑크 스타일 적용) */
+/* 1. 입력창 & 결과 박스 공통 (사이버펑크 스타일 최적화) */
 input, select, .result-box {
-    background: rgba(10, 15, 30, 0.85) !important; /* 푸른빛 도는 투명 배경 */
-    border: 2px solid #00ffff !important;         /* 밝은 청록색 테두리 */
-    color: #00ffff !important;                    /* 텍스트 색상 */
+    background: rgba(10, 15, 30, 0.85) !important;
+    border: 2px solid #00ffff !important;
+    color: #00ffff !important;
     text-shadow: 0 0 5px rgba(0, 255, 255, 0.5) !important;
-    box-shadow: inset 0 0 20px rgba(0, 255, 255, 0.2) !important; /* 내부 발광 */
+    box-shadow: inset 0 0 20px rgba(0, 255, 255, 0.2) !important;
     
-    padding: 15px;
+    /* [수정] 패딩을 10px로 줄여 세로 공간 확보 */
+    padding: 10px;
     font-family: 'DungGeunMo';
     outline: none;
-    font-size: 1.1rem;
+    /* [수정] 폰트 크기를 살짝 조절 */
+    font-size: 1.0rem;
     width: 100%;
     box-sizing: border-box;
-    margin-bottom: 12px;
+    /* [수정] 요소 간 간격을 10px로 최적화 */
+    margin-bottom: 10px;
     border-radius: 4px;
 }
 
@@ -263,7 +277,7 @@ input, select, .result-box {
     font-size: 1.1rem;
     font-weight: 900;
     margin-top: 0;
-    color: #ff00ff !important;       /* 제목은 자홍색 포인트 */
+    color: #ff00ff !important;
     text-shadow: 0 0 10px #ff00ff !important;
     border-bottom: 1px dashed #ff00ff;
     padding-bottom: 10px;
@@ -271,26 +285,30 @@ input, select, .result-box {
 }
 .result-content { font-size: 0.95rem; line-height: 1.6; color: inherit; }
 
-/* 3. 라벨 (추가됨) */
+/* 3. 라벨 (위치 보정) */
 label {
     color: #ff00ff !important;
     text-shadow: 0 0 8px #ff00ff;
     display: block;
-    margin-bottom: 5px;
+    /* [수정] 라벨과 입력창 사이 간격 최소화 */
+    margin-bottom: 3px;
     font-weight: bold;
+    font-size: 0.9rem;
 }
 
-/* 4. 버튼 스타일 (네온 효과 강화) */
+/* 4. 버튼 스타일 (크기 최적화) */
 button.cyber-btn {
     background: rgba(0, 255, 255, 0.1);
     border: 2px solid #00ff41;
     color: #00ff41;
-    padding: 16px; 
+    /* [수정] 패딩 조절 */
+    padding: 14px; 
     width: 100%;
-    font-family: 'DungGeunMo'; font-weight: 900; font-size: 1.3rem; 
+    font-family: 'DungGeunMo'; font-weight: 900; font-size: 1.2rem; 
     cursor: pointer; 
     box-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
-    margin-top: 15px;
+    /* [수정] 상단 마진 최적화 */
+    margin-top: 5px;
     transition: all 0.3s ease;
     text-transform: uppercase;
 }
@@ -301,11 +319,12 @@ button.cyber-btn:hover {
     border-color: #00ff41;
 }
 
-/* 5. 지도 (테두리 색상만 테마에 맞게 변경) */
+/* 5. 지도 (높이 축소로 전체 레이아웃 확보) */
 #map { 
-    height: 160px; 
+    /* [핵심 수정] 높이를 130px로 줄여 버튼이 화면 밖으로 나가지 않게 함 */
+    height: 130px; 
     width: 100%; 
-    border: 3px solid #00ffff; /* 청록색으로 깔맞춤 */
+    border: 3px solid #00ffff;
     margin-top: 5px; 
     filter: invert(100%) hue-rotate(180deg); 
     background-color: #000; 
