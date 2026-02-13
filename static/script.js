@@ -47,19 +47,23 @@ function switchScreen(id) {
     const content = document.getElementById('content');
     content.classList.add('glitch-active');
 
+    // 화면 교체 타이밍을 150ms에서 100ms로 단축
     setTimeout(() => {
         const screens = document.querySelectorAll('.screen');
         const target = document.getElementById(id);
         if (target) {
-            screens.forEach(s => { if(s !== target) s.classList.remove('active'); });
+            screens.forEach(s => { 
+                if(s !== target) s.classList.remove('active'); 
+            });
             target.classList.add('active');
         }
-    }, 150);
+    }, 100);
 
+    // 전체 전환 프로세스 완료 시간을 400ms에서 300ms로 단축
     setTimeout(() => {
         content.classList.remove('glitch-active');
         isSwitching = false;
-    }, 400);
+    }, 300);
 }
 /* [4] 화면 전환 기능 END */
 
