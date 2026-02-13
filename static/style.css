@@ -169,7 +169,11 @@ body {
     /* 투명도 및 레이어 설정 */
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.4s ease-in-out;
+    
+    /* [수정] 여기서 transition을 삭제하거나 none으로 변경합니다. 
+       이전 화면이 비활성화될 때 잔상 없이 즉시 사라지게 하기 위함입니다. */
+    transition: none; 
+    
     z-index: 10;
     backface-visibility: hidden;
     
@@ -185,6 +189,10 @@ body {
 .screen.active {
     opacity: 1;
     pointer-events: auto;
+    
+    /* [수정] 활성화될 때(나타날 때)만 트랜지션을 적용합니다. 
+       0.2초 정도로 짧게 설정하면 훨씬 깔끔하게 전환됩니다. */
+    transition: opacity 0.2s ease-in-out;
 }
 
 /* 제목 스타일: 반짝이는 사이버펑크 그라데이션 및 글리치 효과 */
