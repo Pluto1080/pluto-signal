@@ -88,21 +88,23 @@ body {
 
 /* [3] CRT 특수 효과 애니메이션 (최종 최적화본) */
 
-/* 1. 글리치 효과 */
+/* [3] CRT 특수 효과 애니메이션 (잔상 및 스크롤 완전 차단) */
+
+/* 1. 글리치 효과: 전환 시 지지직거리는 느낌 복구 */
 @keyframes glitch-short {
     0% { transform: translate(0); }
     20% { transform: translate(-3px, 0); filter: brightness(1.2); }
     40% { transform: translate(3px, 0); }
     100% { transform: translate(0); }
 }
-.glitch-active { animation: glitch-short 0.25s ease-out; }
+.glitch-active { animation: glitch-short 0.2s ease-out; }
 
-/* 2. 화면 깜빡임 */
+/* 2. 화면 깜빡임 효과 */
 @keyframes flicker {
     0% { opacity: 0.85; } 50% { opacity: 0.9; } 100% { opacity: 0.85; }
 }
 
-/* 3. CRT 오버레이 */
+/* 3. CRT 오버레이: 화면 위를 덮는 주사선 효과 */
 .crt-overlay {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%;
     background: 
@@ -112,28 +114,23 @@ body {
     pointer-events: none; z-index: 100; opacity: 0.9; animation: flicker 0.15s infinite;
 }
 
-/* 4. 내부 콘텐츠 영역 (정렬 뒤틀림 해결의 핵심) */
+/* 4. 내부 콘텐츠 영역: 스크롤바 원천 차단 */
 .screen-content {
     position: relative; 
     z-index: 20; 
     height: 100%; 
     width: 100%;
     
-    /* [수정] 패딩을 0으로 강제 고정해야 내부 .screen의 정중앙 정렬이 정확히 작동합니다. */
+    /* 패딩 0 유지 및 스크롤바 완전 제거 */
     padding: 0 !important; 
+    overflow: hidden !important; /* [핵심] 모든 스크롤바 발생 차단 */
     
-    overflow-y: auto; 
     color: #00ff41;
     text-shadow: 2px 0 1px rgba(255, 0, 0, 0.3), -2px 0 1px rgba(0, 0, 255, 0.3), 0 0 5px #00ff41;
     
     background-color: transparent;
     background-image: none; 
-    scrollbar-width: none; /* 파이어폭스용 */
-    -ms-overflow-style: none; /* IE용 */
 }
-
-/* 크롬, 사파리 등 브라우저용 스크롤바 완전 숨김 */
-.screen-content::-webkit-scrollbar { display: none; }
 
 /* 5. 화면 스캔 광선 효과 */
 .screen-content::after {
@@ -143,46 +140,43 @@ body {
 }
 
 @keyframes screen-sweep { to { left: 200%; } }
-@keyframes screen-pulse { 0%, 100% { filter: brightness(0.95); } 50% { filter: brightness(1.1); } }
 /* [3] CRT 특수 효과 애니메이션 END */
-
 
 /* [4] 섹션 레이아웃: 완전 자동 정중앙 정렬 (최종 보정본) */
 .screen {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
+    position: absolute; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
     height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: center; 
+    padding: 20px; 
     box-sizing: border-box;
 
-    /* [수정] 비활성화 시 즉시 숨김 처리하여 잔상 방지 */
+    /* [핵심] 비활성화 상태: 즉시 숨김 처리 */
     opacity: 0;
-    visibility: hidden; /* 시각적으로 완전히 차단 */
+    visibility: hidden; /* 렌더링에서 제외하여 잔상 방지 */
     pointer-events: none;
-    transition: none; /* 사라질 때는 애니메이션 제거 */
+    transition: none; /* 사라질 때는 즉각적으로 사라짐 */
 
-    z-index: 10;
+    z-index: 1;
     backface-visibility: hidden;
-    overflow-y: auto;
-    overflow-x: hidden;
+    overflow: hidden !important; /* 내부 스크롤바 제거 */
     text-align: center;
 }
 
 /* 활성화 상태 */
 .screen.active {
     opacity: 1;
-    visibility: visible; /* 나타날 때만 활성화 */
+    visibility: visible;
     pointer-events: auto;
-    z-index: 50; /* [추가] 새 화면을 무조건 가장 위로 배치 */
-
-    /* [수정] 나타날 때만 짧고 부드럽게 (0.2초) */
-    transition: opacity 0.2s ease-in-out;
+    z-index: 10; /* 활성 화면을 위로 */
+    
+    /* [핵심] 나타날 때만 짧고 부드럽게 (0.15초) */
+    transition: opacity 0.15s ease-in-out;
 }
 
 /* 제목 스타일: 반짝이는 사이버펑크 그라데이션 및 글리치 효과 */
