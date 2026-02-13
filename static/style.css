@@ -172,22 +172,33 @@ body {
     pointer-events: none; z-index: 100; opacity: 0.9; animation: flicker 0.15s infinite;
 }
 
-/* 4. 내부 콘텐츠 영역: 스크롤바 원천 차단 */
+/* 4. 내부 콘텐츠 영역: 스크롤은 되지만 바는 보이지 않게 수정 */
 .screen-content {
     position: relative; 
     z-index: 20; 
     height: 100%; 
     width: 100%;
     
-    /* 패딩 0 유지 및 스크롤바 완전 제거 */
     padding: 0 !important; 
-    overflow: hidden !important; /* [핵심] 모든 스크롤바 발생 차단 */
+    
+    /* [수정] hidden을 auto로 바꿔서 스크롤을 허용함 */
+    overflow-y: auto !important; 
+    overflow-x: hidden !important;
+
+    /* [추가] 브라우저별 스크롤바 숨김 처리 */
+    -ms-overflow-style: none; /* IE, Edge */
+    scrollbar-width: none; /* Firefox */
     
     color: #00ff41;
     text-shadow: 2px 0 1px rgba(255, 0, 0, 0.3), -2px 0 1px rgba(0, 0, 255, 0.3), 0 0 5px #00ff41;
     
     background-color: transparent;
     background-image: none; 
+}
+
+/* [추가] Chrome, Safari, Opera에서 스크롤바를 완전히 숨김 */
+.screen-content::-webkit-scrollbar {
+    display: none;
 }
 
 /* 5. 화면 스캔 광선 효과 */
