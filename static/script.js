@@ -45,27 +45,34 @@ function switchScreen(id) {
     isSwitching = true;
 
     const content = document.getElementById('content');
+    const container = document.getElementById('container'); // 배경 애니메이션용
     
-    // 1. 글리치 효과 시작
+    // 1. 효과 시작: 글리치 + 워프(빨려들어가는 느낌) 클래스 추가
     content.classList.add('glitch-active');
+    // container가 있다면 배경 워프 효과를 위해 추가 (CSS에 warping-bg 정의 필요)
+    if (container) container.classList.add('warping-bg');
+    content.classList.add('warping-content');
 
-    // 2. 현재 활성화된 화면들을 비활성화하고 잠시 대기 (글리치만 보이는 상태)
+    // 2. 중요: 새 화면으로 넘어가기 전 스크롤 위치를 맨 위로 리셋
+    content.scrollTo({ top: 0, behavior: 'instant' });
+
     setTimeout(() => {
+        // 3. 화면 교체
         const screens = document.querySelectorAll('.screen');
         screens.forEach(s => s.classList.remove('active'));
 
-        // 3. 글리치가 한창 진행 중일 때 다음 화면 활성화 (100ms 지점)
         const target = document.getElementById(id);
         if (target) {
             target.classList.add('active');
         }
-    }, 100); 
+    }, 150); // 전환 타이밍을 150ms로 약간 늘려 효과를 인지하게 함
 
-    // 4. 충분히 글리치를 보여준 후 효과 제거 및 전환 완료 (350ms)
     setTimeout(() => {
-        content.classList.remove('glitch-active');
+        // 4. 효과 제거 및 상태 해제
+        content.classList.remove('glitch-active', 'warping-content');
+        if (container) container.classList.remove('warping-bg');
         isSwitching = false;
-    }, 350);
+    }, 450);
 }
 /* [4] 화면 전환 기능 END */
 
