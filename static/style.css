@@ -232,8 +232,7 @@ h1.shiny-title:hover {
 
 /* [5] UI 요소 및 결과 박스 START */
 
-/* 1. 공통 너비 제한 및 중앙 정렬 (가장 중요) */
-/* 모든 주요 요소들이 이 480px 박스 안에서 한 줄로 정렬됩니다. */
+/* 1. 공통 너비 제한 및 중앙 정렬 */
 .content-wrapper, 
 .input-wrapper, 
 .date-time-container, 
@@ -249,7 +248,7 @@ button.cyber-btn,
     flex-direction: column;
 }
 
-/* 2. 입력창 & 결과 박스 공통 (네모 박스 스타일) */
+/* 2. 입력창 & 결과 박스 공통 스타일 (높이 고정 포함) */
 input[type="text"],
 input[type="date"],
 input[type="time"],
@@ -261,33 +260,46 @@ select,
     color: #00ffff !important;
     text-shadow: 0 0 5px rgba(0, 255, 255, 0.5) !important;
     box-shadow: inset 0 0 20px rgba(0, 255, 255, 0.2) !important;
-    padding: 12px;
+    
+    /* [핵심 수정] 높이를 45px로 고정하고 상하 패딩을 조절하여 정렬을 맞춤 */
+    height: 45px !important;
+    padding: 0 12px !important; 
+    
     font-family: 'DungGeunMo'; 
     font-size: 1.0rem;
-    margin-bottom: 15px; /* 요소 간 세로 간격 */
+    margin-bottom: 15px;
     outline: none;
-    box-sizing: border-box; /* 패딩이 너비를 침범하지 않게 고정 */
+    box-sizing: border-box; 
     color-scheme: dark; 
 }
 
-/* 3. 라벨 스타일 (정렬의 기준) */
-label {
+/* 결과 박스는 내용에 따라 높이가 늘어나야 하므로 height 속성 제외 */
+.result-box {
+    height: auto !important;
+    padding: 12px !important;
+}
+
+/* 3. 라벨 스타일 및 높이 고정 (정렬 뒤틀림 해결의 핵심) */
+/* DATE 라벨과 TIME 헤더의 높이를 25px로 통일하여 아래 입력창 위치를 맞춥니다. */
+.input-group > label, 
+.time-header {
+    height: 25px !important; 
+    display: flex !important;
+    align-items: center !important; 
+    margin-bottom: 5px !important;
     color: #ff00ff !important; 
     text-shadow: 0 0 8px #ff00ff;
-    display: block; 
-    margin-bottom: 5px; 
     font-weight: bold; 
     font-size: 0.9rem;
-    text-align: left; /* 480px 박스 내에서 왼쪽 정렬 */
 }
 
 /* 4. 날짜/시간 영역 (반응형 가로 배치) */
 .date-time-container {
-    flex-direction: row !important; /* 가로로 배치 */
+    flex-direction: row !important; 
     justify-content: space-between;
     gap: 15px; 
     flex-wrap: wrap;
-    margin-bottom: 0px !important; /* 내부 input-group의 margin-bottom 활용 */
+    margin-bottom: 0px !important;
 }
 
 .input-group {
@@ -296,17 +308,16 @@ label {
     display: flex; 
     flex-direction: column;
     margin-bottom: 15px;
+    vertical-align: top;
 }
 
 /* 5. TIME 헤더 (라벨과 시간모름 체크박스 정렬) */
 .time-header {
-    display: flex;
     justify-content: space-between; 
-    align-items: center;
-    margin-bottom: 5px;
+    width: 100%;
 }
 
-/* 6. '시간 모름' 체크박스 커스텀 디자인 */
+/* 6. '시간 모름' 체크박스 스타일 */
 .unknown-check {
     display: flex; 
     align-items: center; 
@@ -315,6 +326,7 @@ label {
     text-shadow: 0 0 5px #ffff00;
     font-size: 0.8rem;
     cursor: pointer;
+    white-space: nowrap;
 }
 
 .unknown-check input[type="checkbox"] {
@@ -345,6 +357,7 @@ button.cyber-btn {
     box-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
     text-transform: uppercase;
     transition: all 0.3s ease;
+    height: auto !important; /* 버튼은 내용에 맞게 */
 }
 button.cyber-btn:hover { background: #00ff41; color: #000; box-shadow: 0 0 30px #00ff41; }
 
