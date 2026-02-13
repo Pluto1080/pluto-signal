@@ -19,48 +19,52 @@
             <div id="content" class="screen-content">
                 
                 <section id="screen-input" class="screen active">
-                    <h1 class="shiny-title">ACCESS: PLUTO</h1>
+                    <div class="content-wrapper">
+                        <h1 class="shiny-title">ACCESS: PLUTO</h1>
 
-                    <div class="input-wrapper">
-                        <label for="userName">NAME</label>
-                        <input type="text" id="userName" placeholder="이름 입력">
-                    </div>
-
-                    <div class="date-time-container">
-                        <div class="input-group">
-                            <label for="birthDate">DATE</label>
-                            <input type="date" id="birthDate" max="9999-12-31">
+                        <div>
+                            <label for="userName">NAME</label>
+                            <input type="text" id="userName" placeholder="이름 입력">
                         </div>
 
-                        <div class="input-group">
-                            <div class="time-header">
-                                <label for="birthTime">TIME</label>
-                                <label class="unknown-check">
-                                    <input type="checkbox" id="noTime">
-                                    <span>시간 모름</span>
-                                </label>
+                        <div class="date-time-container">
+                            <div class="input-group">
+                                <label for="birthDate">DATE</label>
+                                <input type="date" id="birthDate" max="9999-12-31">
                             </div>
-                            <input type="time" id="birthTime">
+
+                            <div class="input-group">
+                                <div class="time-header">
+                                    <label for="birthTime">TIME</label>
+                                    <label class="unknown-check">
+                                        <input type="checkbox" id="noTime">
+                                        <span>시간 모름</span>
+                                    </label>
+                                </div>
+                                <input type="time" id="birthTime">
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="input-wrapper">
-                        <label>LOCATION</label>
-                        <div id="map"></div>
-                    </div>
+                        <div>
+                            <label>LOCATION</label>
+                            <div id="map"></div>
+                        </div>
 
-                    <button class="cyber-btn" onclick="startAnalysis()">INITIATE_SEQUENCE</button>
+                        <button class="cyber-btn" onclick="startAnalysis()">INITIATE_SEQUENCE</button>
+                    </div>
                 </section>
 
 
                 <section id="screen-loading" class="screen">
-                    <h2 id="loading-text" class="shiny-title" style="font-size: 1.5rem;">별의 소리를 관측하는 중...</h2>
+                    <div class="content-wrapper">
+                        <h2 id="loading-text" class="shiny-title" style="font-size: 1.5rem;">별의 소리를 관측하는 중...</h2>
+                    </div>
                 </section>
 
 
                 <section id="screen-personality" class="screen">
-                    <div style="width:100%; max-width:480px;">
-                        <h2 class="shiny-title" style="font-size:2rem; margin-bottom:10px;">ANALYSIS_COMPLETE</h2>
+                    <div class="content-wrapper">
+                        <h2 class="shiny-title" style="font-size:2rem;">ANALYSIS_COMPLETE</h2>
                         
                         <div class="result-box">
                             <h2>[DATA] PERSONALITY_CORE</h2>
@@ -84,7 +88,7 @@
 
 
                 <section id="screen-selection" class="screen">
-                    <div style="width:100%; max-width:450px;">
+                    <div class="content-wrapper">
                         <h1 class="shiny-title" style="font-size:2rem;">SELECT_TARGET</h1>
                         <p style="color:#00ff41; margin-bottom:20px; text-align:center;">관측할 미래 데이터를 선택하라.</p>
                         
@@ -101,7 +105,7 @@
 
 
                 <section id="screen-fortune-detail" class="screen">
-                    <div style="width:100%; max-width:500px;">
+                    <div class="content-wrapper">
                         <h1 id="fortune-title" class="shiny-title" style="font-size:2rem; margin-bottom:10px;">TITLE</h1>
                         
                         <div id="fortune-box" class="result-box">
@@ -115,7 +119,7 @@
 
 
                 <section id="screen-final-advice" class="screen">
-                    <div style="width:100%; max-width:500px;">
+                    <div class="content-wrapper">
                         <h1 class="shiny-title" style="font-size:2rem;">SUMMARY_LOG</h1>
                         
                         <div class="result-box" style="border-color:#ffffff; color:#ffffff;">
@@ -134,7 +138,7 @@
 
 
                 <section id="screen-monthly-final" class="screen">
-                    <div style="width:100%; max-width:500px;">
+                    <div class="content-wrapper">
                         <h1 class="shiny-title" style="font-size:2rem;">THIS_MONTH</h1>
                         
                         <div class="result-box" style="border-color:#fff; color:#fff;">
@@ -146,7 +150,11 @@
                     </div>
                 </section>
 
-            </div> </div> </div> <div class="monitor-neck"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="monitor-neck"></div>
     <div class="monitor-base"></div>
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
