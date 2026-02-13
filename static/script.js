@@ -7,6 +7,23 @@ let loadingInterval;
 const rootStyle = document.documentElement.style;
 /* [1] 전역 변수 설정 END */
 
+// [추가] 시간 모름 체크박스 로직
+document.addEventListener('DOMContentLoaded', () => {
+    const noTimeBox = document.getElementById('noTime');
+    const timeInput = document.getElementById('birthTime');
+    
+    if(noTimeBox && timeInput) {
+        noTimeBox.addEventListener('change', (e) => {
+            if(e.target.checked) {
+                timeInput.value = "";     // 값 초기화
+                timeInput.disabled = true; // 입력 막기
+            } else {
+                timeInput.disabled = false; // 입력 풀기
+            }
+        });
+    }
+});
+
 /* [2] 지도 초기화 START */
 const map = L.map('map', { zoomControl: false }).setView([selectedLat, selectedLon], 6);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
