@@ -74,6 +74,7 @@ function switchScreen(id) {
         isSwitching = false;
     }, 450);
 }
+
 /* [4] 화면 전환 기능 END */
 
 /* [5] 데이터 분석 및 통신 START */
@@ -146,10 +147,21 @@ function showFortune(type) {
     
     if(type !== 'monthly') {
         viewedFortunes[type] = true;
-        if(document.getElementById(`btn-${type}`)) document.getElementById(`btn-${type}`).classList.add('hidden-btn');
+
+        // [수정] 클릭한 버튼 외의 모든 버튼을 즉시 숨겨서 빨려 들어갈 때 지저분함 방지
+        const allButtons = document.querySelectorAll('#screen-selection .cyber-btn');
+        allButtons.forEach(btn => {
+            if (btn.id !== `btn-${type}`) {
+                btn.classList.add('hidden-btn'); 
+            }
+        });
+
         setScreenColor(bgColors[type][0], bgColors[type][1]);
         
-        const t = document.getElementById('fortune-title'), st = document.getElementById('fortune-sub-title'), c = document.getElementById('res-fortune-content'), box = document.getElementById('fortune-box');
+        const t = document.getElementById('fortune-title'), 
+              st = document.getElementById('fortune-sub-title'), 
+              c = document.getElementById('res-fortune-content'), 
+              box = document.getElementById('fortune-box');
         
         box.style.borderColor = bgColors[type][2];
         box.style.color = bgColors[type][2];
@@ -173,6 +185,20 @@ function showFortune(type) {
 
 function returnToSelection() {
     setScreenColor('#444444', '#111111');
+
+    // [추가] 돌아왔을 때, 아직 관측하지 않은(안 본) 버튼들만 다시 표시
+    const fortuneTypes = ['love', 'money', 'career', 'health'];
+    fortuneTypes.forEach(type => {
+        const btn = document.getElementById(`btn-${type}`);
+        if (btn) {
+            if (viewedFortunes[type]) {
+                btn.classList.add('hidden-btn'); // 이미 본 건 숨김 유지
+            } else {
+                btn.classList.remove('hidden-btn'); // 안 본 건 다시 보여줌
+            }
+        }
+    });
+
     switchScreen('screen-selection');
 }
 
