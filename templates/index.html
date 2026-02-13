@@ -19,40 +19,47 @@
             <div id="content" class="screen-content">
                 
                 <section id="screen-input" class="screen active">
-                    <div style="width:100%; max-width:450px;">
-                        <h1 class="shiny-title">ACCESS: PLUTO</h1>
-                        <div style="margin-bottom:12px; width:100%; text-align:left;">
-                            <label style="color:#ff00ff; font-weight:bold;">NAME</label>
-                            <input type="text" id="userName" placeholder="이름 입력">
-                        </div>
-                        <div style="display: flex; gap: 10px; margin-bottom:12px;">
-                            <div style="flex: 1; text-align:left;">
-                                <label style="color:#ff00ff; font-weight:bold;">DATE</label>
-                                <input type="date" id="birthDate" max="9999-12-31">
-                            </div>
-                            <div style="flex: 1; text-align:left;">
-                                <label style="color:#ff00ff; font-weight:bold;">TIME</label>
-                                <input type="time" id="birthTime">
-                                <div style="margin-top: 5px; font-size: 0.8rem; color: #00ff41;">
-                                    <input type="checkbox" id="noTime" style="width:auto; vertical-align:middle;"> 
-                                    <label for="noTime">시간 모름</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div style="width:100%; margin-bottom:12px; text-align:left;">
-                            <label style="color:#ff00ff; font-weight:bold;">LOCATION</label>
-                            <div id="map"></div>
-                        </div>
-                        <button class="cyber-btn" onclick="startAnalysis()">INITIATE_SEQUENCE</button>
+                    <h1 class="shiny-title">ACCESS: PLUTO</h1>
+
+                    <div class="input-wrapper">
+                        <label for="userName">NAME</label>
+                        <input type="text" id="userName" placeholder="이름 입력">
                     </div>
+
+                    <div class="date-time-container">
+                        <div class="input-group">
+                            <label for="birthDate">DATE</label>
+                            <input type="date" id="birthDate" max="9999-12-31">
+                        </div>
+
+                        <div class="input-group">
+                            <div class="time-header">
+                                <label for="birthTime">TIME</label>
+                                <label class="unknown-check">
+                                    <input type="checkbox" id="noTime">
+                                    <span>시간 모름</span>
+                                </label>
+                            </div>
+                            <input type="time" id="birthTime">
+                        </div>
+                    </div>
+
+                    <div class="input-wrapper">
+                        <label>LOCATION</label>
+                        <div id="map"></div>
+                    </div>
+
+                    <button class="cyber-btn" onclick="startAnalysis()">INITIATE_SEQUENCE</button>
                 </section>
+
 
                 <section id="screen-loading" class="screen">
                     <h2 id="loading-text" class="shiny-title" style="font-size: 1.5rem;">별의 소리를 관측하는 중...</h2>
                 </section>
 
+
                 <section id="screen-personality" class="screen">
-                    <div style="width:100%; max-width:500px;">
+                    <div style="width:100%; max-width:480px;">
                         <h2 class="shiny-title" style="font-size:2rem; margin-bottom:10px;">ANALYSIS_COMPLETE</h2>
                         
                         <div class="result-box">
@@ -75,6 +82,7 @@
                     </div>
                 </section>
 
+
                 <section id="screen-selection" class="screen">
                     <div style="width:100%; max-width:450px;">
                         <h1 class="shiny-title" style="font-size:2rem;">SELECT_TARGET</h1>
@@ -91,6 +99,7 @@
                     </div>
                 </section>
 
+
                 <section id="screen-fortune-detail" class="screen">
                     <div style="width:100%; max-width:500px;">
                         <h1 id="fortune-title" class="shiny-title" style="font-size:2rem; margin-bottom:10px;">TITLE</h1>
@@ -103,6 +112,7 @@
                         <button class="cyber-btn" onclick="returnToSelection()">(( RETURN</button>
                     </div>
                 </section>
+
 
                 <section id="screen-final-advice" class="screen">
                     <div style="width:100%; max-width:500px;">
@@ -122,6 +132,7 @@
                     </div>
                 </section>
 
+
                 <section id="screen-monthly-final" class="screen">
                     <div style="width:100%; max-width:500px;">
                         <h1 class="shiny-title" style="font-size:2rem;">THIS_MONTH</h1>
@@ -135,11 +146,7 @@
                     </div>
                 </section>
 
-            </div>
-        </div>
-    </div>
-
-    <div class="monitor-neck"></div>
+            </div> </div> </div> <div class="monitor-neck"></div>
     <div class="monitor-base"></div>
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
