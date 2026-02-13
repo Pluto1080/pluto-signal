@@ -211,24 +211,26 @@ body {
 
 /* [4] 섹션 레이아웃: 완전 자동 정중앙 정렬 (최종 보정본) */
 /* [4] 섹션 레이아웃 수정 */
+/* [4] 섹션 레이아웃 수정: 중앙 정렬 복구 */
 .screen {
     position: absolute; 
     top: 0; 
     left: 0; 
     width: 100%; 
     
-    /* [수정] 고정 높이 대신 최소 높이 사용 */
+    /* [수정] 최소 높이를 100%로 유지하여 중앙 정렬의 기준을 잡음 */
     min-height: 100%; 
-    /* [수정] height: 100%; 제거 또는 auto로 변경 */
     height: auto; 
 
     display: flex; 
     flex-direction: column; 
     align-items: center; 
     
-    /* [수정] 내용이 길 때 위쪽이 잘리지 않도록 flex-start 권장 */
-    justify-content: flex-start; 
-    padding: 60px 20px; /* 상하 여백 확보 */
+    /* [수정] 다시 중앙 정렬(center)로 변경 */
+    justify-content: center; 
+    
+    /* [수정] 상단 패딩을 줄여서 중앙에 더 가깝게 배치 */
+    padding: 20px; 
     
     box-sizing: border-box;
     opacity: 0;
@@ -236,9 +238,19 @@ body {
     pointer-events: none;
     z-index: 1;
 
-    /* [수정] 내부에서 내용을 자르지 않도록 설정 */
+    /* [중요] 부모인 .screen-content에서 스크롤을 제어하므로 여기선 보임 설정 */
     overflow: visible !important; 
     text-align: center;
+}
+
+/* [추가] 내용이 너무 길어질 경우를 대비한 보정 */
+.content-wrapper {
+    width: 100%;
+    max-width: 480px;
+    margin: auto 0; /* 내용이 적을 땐 중앙, 많을 땐 위아래 여백 확보 */
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* 요소들 사이의 간격 일정하게 유지 */
 }
 
 /* 활성화 상태 */
