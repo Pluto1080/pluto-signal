@@ -86,7 +86,9 @@ body {
 /* [2] 모니터 외관 및 받침대 END */
 
 
-/* [3] CRT 특수 효과 애니메이션 (유지) */
+/* [3] CRT 특수 효과 애니메이션 (최종 최적화본) */
+
+/* 1. 글리치 효과 */
 @keyframes glitch-short {
     0% { transform: translate(0); }
     20% { transform: translate(-3px, 0); filter: brightness(1.2); }
@@ -95,84 +97,115 @@ body {
 }
 .glitch-active { animation: glitch-short 0.25s ease-out; }
 
+/* 2. 화면 깜빡임 */
 @keyframes flicker {
     0% { opacity: 0.85; } 50% { opacity: 0.9; } 100% { opacity: 0.85; }
 }
 
+/* 3. CRT 오버레이 */
 .crt-overlay {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
-                radial-gradient(circle at center, rgba(0,0,0,0) 60%, rgba(0,0,0,0.6) 100%);
+    background: 
+        linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+        radial-gradient(circle at center, rgba(0,0,0,0) 60%, rgba(0,0,0,0.6) 100%);
     background-size: 100% 4px, 100% 100%;
     pointer-events: none; z-index: 100; opacity: 0.9; animation: flicker 0.15s infinite;
 }
 
+/* 4. 내부 콘텐츠 영역 (정렬 뒤틀림 해결의 핵심) */
 .screen-content {
-    /* 1. 레이어 및 크기 설정 */
     position: relative; 
     z-index: 20; 
     height: 100%; 
     width: 100%;
     
-    /* 2. [핵심] 패딩을 0으로 고정해야 내부 .screen의 flex 중앙 정렬이 정확히 작동합니다 */
+    /* [수정] 패딩을 0으로 강제 고정해야 내부 .screen의 정중앙 정렬이 정확히 작동합니다. */
     padding: 0 !important; 
     
-    /* 3. 스크롤 및 텍스트 효과 */
     overflow-y: auto; 
     color: #00ff41;
     text-shadow: 2px 0 1px rgba(255, 0, 0, 0.3), -2px 0 1px rgba(0, 0, 255, 0.3), 0 0 5px #00ff41;
     
-    /* 4. 배경 및 스크롤바 숨김 */
     background-color: transparent;
     background-image: none; 
-    scrollbar-width: none; /* 파이어폭스 */
-    -ms-overflow-style: none; /* 인터넷 익스플로러/엣지 */
+    scrollbar-width: none; /* 파이어폭스용 */
+    -ms-overflow-style: none; /* IE용 */
 }
 
-/* 크롬, 사파리 등 브라우저용 스크롤바 숨김 */
-.screen-content::-webkit-scrollbar {
-    display: none;
-}
+/* 크롬, 사파리 등 브라우저용 스크롤바 완전 숨김 */
+.screen-content::-webkit-scrollbar { display: none; }
 
+/* 5. 화면 스캔 광선 효과 */
+.screen-content::after {
+    content: ""; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+    animation: screen-sweep 10s linear infinite; pointer-events: none;
+}
 
 @keyframes screen-sweep { to { left: 200%; } }
 @keyframes screen-pulse { 0%, 100% { filter: brightness(0.95); } 50% { filter: brightness(1.1); } }
 /* [3] CRT 특수 효과 애니메이션 END */
 
 
-/* [4] 섹션 레이아웃: 완전 자동 중앙 정렬 (수정됨) */
+/* [4] 섹션 레이아웃: 완전 자동 정중앙 정렬 (최종 보정본) */
 .screen {
-    position: absolute; top: 0; left: 0; width: 100%; min-height: 100%;
+    /* 부모 컨테이너(.screen-content)를 오차 없이 꽉 채움 */
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%; /* 세로 중앙 정렬 기준을 위해 height 고정 */
     
-    /* [핵심 수정] Flexbox로 가로/세로 정중앙 강제 정렬 */
-    display: flex; 
-    flex-direction: column; 
+    /* [핵심] Flexbox를 통한 가로/세로 무조건 정중앙 정렬 */
+    display: flex;
+    flex-direction: column;
+    align-items: center;     /* 가로축 중앙 정렬 */
+    justify-content: center; /* 세로축 중앙 정렬 */
     
-    /* 가로축 중앙 정렬 (좌우 쏠림 해결) */
-    align-items: center; 
+    /* 좌우 패딩을 동일하게 설정하여 쏠림 현상 방지 */
+    padding: 20px;
+    box-sizing: border-box;
     
-    /* 세로축 중앙 정렬 (내용이 적을 때도 가운데 오게 함) */
-    justify-content: center; 
-    
-    /* 최소한의 여백만 유지 */
-    padding: 20px; 
-    
-    opacity: 0; pointer-events: none; 
+    /* 투명도 및 레이어 설정 */
+    opacity: 0;
+    pointer-events: none;
     transition: opacity 0.4s ease-in-out;
-    z-index: 10; backface-visibility: hidden;
+    z-index: 10;
+    backface-visibility: hidden;
+    
+    /* 내용이 많아질 경우 내부 스크롤 허용 (가로 스크롤은 차단) */
     overflow-y: auto;
+    overflow-x: hidden;
+    
+    /* 텍스트 기본 정렬을 중앙으로 고정 */
+    text-align: center;
 }
 
-.screen.active { opacity: 1; pointer-events: auto; }
+/* 활성화 상태: 화면을 부드럽게 나타내고 클릭 가능하게 변경 */
+.screen.active {
+    opacity: 1;
+    pointer-events: auto;
+}
 
-h1.shiny-title { 
-    font-size: 2.5rem; font-weight: 900; text-align: center; 
-    margin-top: 0; margin-bottom: 20px; width: 100%; 
+/* 제목 스타일: 반짝이는 사이버펑크 그라데이션 및 글리치 효과 */
+h1.shiny-title {
+    font-size: 2.5rem;
+    font-weight: 900;
+    text-align: center;
+    margin: 0 0 20px 0; /* 상단 여백을 제거하여 정중앙 정렬을 도움 */
+    width: 100%;
+    
+    /* 애니메이션 그라데이션 텍스트 */
     background: linear-gradient(180deg, #00ff41 0%, #ffffff 50%, #00ff41 100%);
-    background-size: auto 200%; color: transparent; -webkit-background-clip: text; background-clip: text;
-    text-shadow: 0 0 8px rgba(0, 255, 65, 0.6); animation: shine-v 3s linear infinite;
+    background-size: auto 200%;
+    color: transparent;
+    -webkit-background-clip: text;
+    background-clip: text;
+    text-shadow: 0 0 8px rgba(0, 255, 65, 0.6);
+    animation: shine-v 3s linear infinite;
 }
 
+/* 마우스 호버 시 지지직거리는 글리치(Glitch) 효과 강제 발생 */
 h1.shiny-title:hover {
     animation: glitch-anim 0.3s infinite;
     text-shadow: 
@@ -180,6 +213,7 @@ h1.shiny-title:hover {
         -2px 0 #00ffff;
 }
 
+/* [애니메이션 프레임 정리] */
 @keyframes glitch-anim {
     0% { transform: translate(0) }
     20% { transform: translate(-2px, 2px) }
@@ -189,180 +223,78 @@ h1.shiny-title:hover {
     100% { transform: translate(0) }
 }
 
-@keyframes shine-v { to { background-position: center 200%; } }
+@keyframes shine-v { 
+    to { background-position: center 200%; } 
+}
+
 /* [4] 섹션 레이아웃 및 텍스트 END */
 
 
-/* [5] UI 요소 및 결과 박스 START (수정됨) */
+/* [5] UI 요소 및 결과 박스 START */
 
-/* [수정] 모든 콘텐츠를 감싸는 래퍼 클래스 추가 (중앙 정렬의 핵심) */
-/* HTML에서 <div class="content-wrapper">로 감싼 부분에 적용됨 */
-.content-wrapper, .input-wrapper, .date-time-container, #map, button.cyber-btn, .result-box {
+/* 1. 공통 래퍼: 모든 요소를 480px 너비 내에서 중앙 정렬 */
+.content-wrapper, .date-time-container, #map, button.cyber-btn, .result-box {
     width: 100%;
-    max-width: 480px; /* 이 너비 안에서 요소들이 꽉 차게 배치됨 -> 중앙 정렬 효과 */
+    max-width: 480px; 
+    margin: 0 auto 15px auto !important; /* 가로 중앙 정렬 및 하단 간격 */
     display: flex; 
     flex-direction: column;
 }
-/* 1. 입력창 & 결과 박스 공통 (네모 박스 스타일 복구) */
-input[type="text"],
-input[type="date"],
-input[type="time"],
-select,
-.result-box {
-    /* [복구] 하얀 배경 방지 및 네모 테두리 부활 */
+
+/* 2. 입력창 & 결과 박스 (청록색 네모 스타일 복구) */
+input[type="text"], input[type="date"], input[type="time"], select, .result-box {
     background: rgba(10, 15, 30, 0.9) !important;
     border: 2px solid #00ffff !important; 
     border-radius: 4px !important; 
-    
     color: #00ffff !important;
     text-shadow: 0 0 5px rgba(0, 255, 255, 0.5) !important;
     box-shadow: inset 0 0 20px rgba(0, 255, 255, 0.2) !important;
-    
     padding: 10px;
-    font-family: 'DungGeunMo'; 
-    font-size: 1.0rem;
-    width: 100%; 
-    margin-bottom: 15px;
-    outline: none;
-    transition: all 0.3s ease;
-    
-    /* [핵심] 너비 계산 오류 및 쏠림 방지 */
+    font-family: 'DungGeunMo'; font-size: 1.0rem;
     box-sizing: border-box; 
-    color-scheme: dark; 
+    color-scheme: dark; /* 브라우저 기본 아이콘 최적화 */
 }
 
-/* [추가] 쏠림 방지를 위한 너비 제한 및 중앙 정렬 */
-.content-wrapper, 
-.input-wrapper, 
-.date-time-container, 
-#map, 
-button.cyber-btn {
-    width: 100%;
-    max-width: 480px; /* 이 너비를 기준으로 정중앙에 모입니다 */
-    display: flex; 
-    flex-direction: column;
-    
-    /* [핵심] 가로 중앙 정렬 강제 */
-    margin-left: auto !important;
-    margin-right: auto !important;
-}`
-.result-box {
-    width: 100%;
-    max-width: 480px; /* 이 너비를 기준으로 정중앙에 모입니다 */
-    display: flex; 
-    flex-direction: column;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-/* 2. 결과 박스 내부 제목 */
-.result-box h2 {
-    font-size: 1.1rem; font-weight: 900; margin-top: 0;
-    color: #ff00ff !important; text-shadow: 0 0 10px #ff00ff !important;
-    border-bottom: 1px dashed #ff00ff; padding-bottom: 10px; margin-bottom: 15px;
-}
-.result-content { font-size: 0.95rem; line-height: 1.6; color: inherit; }
-
-/* 3. 라벨 스타일 */
-label {
-    color: #ff00ff !important; text-shadow: 0 0 8px #ff00ff;
-    display: block; margin-bottom: 3px; font-weight: bold; font-size: 0.9rem;
-}
-
-/* 4. 날짜/시간 반응형 컨테이너 (가로 배치 -> 세로 배치) */
+/* 3. 날짜/시간 반응형 컨테이너 */
 .date-time-container {
-    display: flex;
-    flex-direction: row; /* 기본 가로 배치 */
+    flex-direction: row; 
     justify-content: space-between;
-    gap: 15px; 
-    flex-wrap: wrap; /* 공간 부족 시 자동 줄바꿈 */
+    gap: 15px; flex-wrap: wrap;
 }
+.input-group { flex: 1; min-width: 180px; display: flex; flex-direction: column; }
 
-/* 날짜/시간 각각의 그룹 */
-.input-group {
-    flex: 1; 
-    min-width: 180px; 
-    display: flex; 
-    flex-direction: column;
-}
-
-/* 5. TIME 라벨 헤더 */
-.time-header {
-    display: flex;
-    justify-content: space-between; 
-    align-items: center;
-    margin-bottom: 3px;
-}
-
-/* 6. '시간 모름' 체크박스 스타일 */
-.unknown-check {
-    display: flex;
-    align-items: center; /* 수직 중앙 정렬 */
-    cursor: pointer;
-}
+/* 4. TIME 헤더 및 '시간 모름' 체크박스 */
+.time-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px; }
+.unknown-check { display: flex; align-items: center; gap: 8px; color: #ffff00; text-shadow: 0 0 5px #ffff00; font-size: 0.85rem; cursor: pointer; }
 
 .unknown-check input[type="checkbox"] {
-    appearance: none;
-    -webkit-appearance: none;
-    width: 16px; height: 16px;
-    background: transparent;
-    border: 2px solid #ffff00;
-    border-radius: 0;
-    margin: 0 8px 0 0; /* 우측 여백만 부여 */
-    cursor: pointer;
-    position: relative;
-    box-shadow: 0 0 5px #ffff00;
-    flex-shrink: 0; /* 크기 고정 */
+    appearance: none; -webkit-appearance: none;
+    width: 16px; height: 16px; border: 2px solid #ffff00;
+    box-shadow: 0 0 5px #ffff00; cursor: pointer; position: relative;
 }
-
-/* 체크되었을 때 모습 */
-.unknown-check input[type="checkbox"]:checked {
-    background: #ffff00; /* 노란색 채우기 */
-    box-shadow: 0 0 10px #ffff00; /* 더 강한 발광 */
-}
-
-/* 체크 표시 (V 모양) 만들기 */
+.unknown-check input[type="checkbox"]:checked { background: #ffff00; }
 .unknown-check input[type="checkbox"]:checked::after {
-    content: '';
-    position: absolute;
-    top: 1px; left: 4px;
-    width: 4px; height: 8px;
-    border: solid black; /* 체크 무늬는 검은색 */
-    border-width: 0 2px 2px 0;
-    transform: rotate(45deg);
+    content: '✔'; color: black; font-size: 12px; position: absolute; left: 2px; top: -1px;
 }
 
-/* 7. 버튼 스타일 */
+/* 5. 버튼 및 지도 스타일 */
 button.cyber-btn {
-    background: rgba(0, 255, 255, 0.1);
-    border: 2px solid #00ff41;
-    color: #00ff41;
-    padding: 14px; width: 100%;
-    font-family: 'DungGeunMo'; font-weight: 900; font-size: 1.2rem; 
+    background: rgba(0, 255, 255, 0.1); border: 2px solid #00ff41; color: #00ff41;
+    padding: 14px; font-family: 'DungGeunMo'; font-weight: 900; font-size: 1.2rem; 
     cursor: pointer; box-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
-    margin-top: 5px; transition: all 0.3s ease; text-transform: uppercase;
+    text-transform: uppercase; transition: all 0.3s ease;
 }
-button.cyber-btn:hover { 
-    background: #00ff41; color: #000; 
-    box-shadow: 0 0 30px #00ff41; border-color: #00ff41;
-}
+button.cyber-btn:hover { background: #00ff41; color: #000; box-shadow: 0 0 30px #00ff41; }
 
-/* 8. 지도 */
-#map { 
-    height: 130px; width: 100%; 
-    border: 3px solid #00ffff; margin-top: 5px; 
-    filter: invert(100%) hue-rotate(180deg); background-color: #000; 
-}
+#map { height: 130px; border: 3px solid #00ffff; filter: invert(100%) hue-rotate(180deg); }
 
-/* 기타 유틸리티 */
-.button-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; }
+/* 6. 결과창 내부 및 유틸리티 */
+.result-box h2 {
+    font-size: 1.1rem; color: #ff00ff !important; text-shadow: 0 0 10px #ff00ff;
+    border-bottom: 1px dashed #ff00ff; padding-bottom: 10px; margin-bottom: 15px;
+}
+.result-content { font-size: 0.95rem; line-height: 1.6; }
+.button-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; max-width: 480px; margin: 0 auto; }
 .hidden-btn { display: none !important; }
-
-.star { 
-    position: absolute; background: #FFD700; border-radius: 0; opacity: 0; 
-    box-shadow: 0 0 8px #FFD700, -2px -2px 0px rgba(255, 215, 0, 0.4);
-    animation: shooting-star linear infinite; 
-}
-@keyframes shooting-star { 0% { transform: translate(0, 0); opacity: 0; } 15% { opacity: 1; } 85% { opacity: 1; } 100% { transform: translate(300px, 300px); opacity: 0; } }
 
 /* [5] UI 요소 및 결과 박스 END */
