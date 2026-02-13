@@ -123,32 +123,37 @@ body {
     animation: cyber-glitch 0.25s linear infinite;
 }
 
+/* 글리치 공통 설정 */
 .glitch-active::before,
 .glitch-active::after {
     content: "";
     position: absolute;
     top: 0; left: 0; width: 100%; height: 100%;
-    background: inherit; /* 부모 배경 복사 */
+    background: inherit;
     opacity: 0.8;
     pointer-events: none;
 }
 
-/* 핑크색 잔상 */
+/* 노란색 잔상 */
 .glitch-active::before {
     left: 4px;
-    text-shadow: -2px 0 #ff00ff;
+    text-shadow: -2px 0 #ffff00; /* 노란색 */
     clip-path: inset(20% 0 50% 0);
     animation: cyber-glitch 0.3s infinite reverse;
 }
 
-/* 사이언(청록)색 잔상 */
+/* 흰색에 가까운 회색 잔상 */
 .glitch-active::after {
     left: -4px;
-    text-shadow: 2px 0 #00ffff;
+    text-shadow: 2px 0 #d1d1d1; /* 회색빛 흰색 */
     clip-path: inset(60% 0 10% 0);
     animation: cyber-glitch 0.2s infinite;
 }
 
+/* 기본 텍스트는 기존의 초록색(#00ff41)을 유지하여 세 가지 색상이 모두 나타나게 합니다 */
+.glitch-active {
+    text-shadow: 0 0 5px #00ff41; /* 초록색 광원 효과 유지 */
+}
 /* 화면 깜빡임(Flicker) 강화 */
 @keyframes intense-flicker {
     0% { opacity: 0.7; }
