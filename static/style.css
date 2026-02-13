@@ -124,7 +124,21 @@ h1.shiny-title {
 /* [4] 섹션 레이아웃 및 텍스트 END */
 
 /* [5] UI 요소 및 결과 박스 START */
-input, select { background: rgba(0,0,0,0.8); border: 2px solid #00ff41; color: #00ff41; padding: 12px; font-family: 'DungGeunMo'; outline: none; font-size: 1.1rem; }
+
+/* [5] UI 요소 및 결과 박스 START */
+input, select { 
+    background: rgba(0,0,0,0.8); 
+    border: 2px solid #00ff41; 
+    color: #00ff41; 
+    padding: 12px; 
+    font-family: 'DungGeunMo'; 
+    outline: none; 
+    font-size: 1.1rem;
+    
+    /* [추가됨] 박스 크기 통일 */
+    width: 100%; 
+    box-sizing: border-box; 
+}
 
 button.cyber-btn {
     background: #00ff41; color: #000; border: 4px solid #008f11; padding: 16px; width: 100%;
