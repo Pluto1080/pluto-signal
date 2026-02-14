@@ -460,50 +460,60 @@ button.cyber-btn:hover { background: #00ff41; color: #000; box-shadow: 0 0 30px 
 
 /* [5] UI 요소 및 결과 박스 END */
 
-/* [6] 모바일 반응형 최종 보정 - 입력창 오차 박멸 버전 */
+/* [6] 모바일 반응형 최종 보정 - 레이아웃 완결판 */
 @media screen and (max-width: 600px) {
-    /* 1. 모니터 프레임 및 배젤 최적화 */
+    /* 1. 모니터 프레임 슬림화 및 높이 최적화 */
     .monitor-frame {
-        width: 98vw; height: 94vh;
+        width: 98vw; 
+        height: 94vh;
         max-height: none;
-        padding: 10px !important;
+        padding: 10px !important; 
         border-radius: 20px !important;
     }
 
-    /* 2. [핵심] 입력창 스타일 강제 재설정 (찌그러짐/흰색 배경 방지) */
-    input[type="text"],
-    input[type="date"],
-    input[type="time"],
-    select {
-        /* 모바일 기본 스타일 제거 */
-        appearance: none;
-        -webkit-appearance: none;
-        
-        /* 크기 및 배경 강제 고정 */
-        width: 100% !important;
-        height: 55px !important; 
-        background: rgba(10, 15, 30, 0.9) !important;
-        border: 2px solid #00ffff !important;
-        color: #00ffff !important;
-        
-        /* 폰트 및 정렬 */
-        font-size: 1.1rem !important;
-        padding: 0 15px !important;
-        line-height: 55px !important; /* 글자 세로 중앙 정렬 */
-        margin-bottom: 15px !important;
-        border-radius: 4px !important;
+    .screen-container { border-radius: 15px !important; }
+
+    /* 2. [핵심] 세로 중앙 정렬 해제 (짤림 방지) */
+    .content-wrapper {
+        margin: 0 auto !important; /* 상단부터 배치되도록 수정 */
+        padding-top: 10px;
+        padding-bottom: 60px !important; /* 하단 버튼 아래 여유 공간 확보 */
+        display: flex;
+        flex-direction: column;
     }
 
-    /* 3. 라벨 및 헤더 정렬 (겹침 방지) */
-    label {
-        font-size: 1.0rem !important;
-        margin-bottom: 8px !important;
-        display: block;
-        height: auto !important; /* 고정 높이 해제 */
+    /* 3. 스크롤 영역 및 비네팅 처리 */
+    .screen-content {
+        overflow-y: auto !important;
+        overflow-x: hidden;
+        /* 비네팅 안쪽에서 스크롤이 자연스럽게 끝나도록 패딩 조절 */
+        padding-bottom: 80px !important; 
+    }
+
+    .screen {
+        height: auto !important;
+        min-height: 100%;
+        justify-content: flex-start !important; /* 무조건 위에서부터 시작 */
+        padding: 25px 15px !important;
+    }
+
+    /* 4. 운세 상세 페이지(Fortune Detail) 요소 간격 조정 */
+    .result-box {
+        margin-bottom: 25px !important; /* 버튼과의 간격 확보 */
+        padding: 15px !important;
+        height: auto !important;
+    }
+
+    /* 5. 입력창 및 버튼 모바일 최적화 */
+    input[type="text"], input[type="date"], input[type="time"], select {
+        height: 52px !important;
+        font-size: 1.1rem !important;
+        margin-bottom: 12px !important;
+        appearance: none;
+        -webkit-appearance: none;
     }
 
     .time-header {
-        display: flex;
         flex-direction: column !important;
         align-items: flex-start !important;
         height: auto !important;
@@ -511,30 +521,11 @@ button.cyber-btn:hover { background: #00ff41; color: #000; box-shadow: 0 0 30px 
         margin-bottom: 8px !important;
     }
 
-    /* 4. 비네팅 및 스크롤 최적화 */
-    .screen-content {
-        padding-bottom: 120px !important;
-        overflow-y: auto !important;
+    button.cyber-btn {
+        margin-bottom: 20px !important; /* 버튼이 바닥에 붙지 않게 */
+        padding: 14px !important;
     }
 
-    .screen {
-        height: auto !important;
-        min-height: 100%;
-        justify-content: flex-start !important;
-        padding-top: 30px;
-    }
-
-    /* 5. 날짜/시간 컨테이너 세로 배치 */
-    .date-time-container {
-        flex-direction: column !important;
-        gap: 0px !important;
-    }
-
-    .input-group {
-        width: 100% !important;
-        margin-bottom: 5px !important;
-    }
-
-    /* 모니터 하단 부속품 숨김 */
+    /* 6. 모니터 부속품 숨김 */
     .monitor-neck, .monitor-base { display: none; }
 }
