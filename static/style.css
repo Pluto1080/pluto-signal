@@ -460,9 +460,9 @@ button.cyber-btn:hover { background: #00ff41; color: #000; box-shadow: 0 0 30px 
 
 /* [5] UI 요소 및 결과 박스 END */
 
-/* [6] 모바일 반응형 최종 보정 - 레이아웃 완결판 */
+/* [6] 모바일 반응형 최종 보정 - 레이아웃 및 입력창 완전 최적화 */
 @media screen and (max-width: 600px) {
-    /* 1. 모니터 프레임 슬림화 및 높이 최적화 */
+    /* 1. 모니터 프레임: 슬림 배젤 유지 */
     .monitor-frame {
         width: 98vw; 
         height: 94vh;
@@ -473,59 +473,78 @@ button.cyber-btn:hover { background: #00ff41; color: #000; box-shadow: 0 0 30px 
 
     .screen-container { border-radius: 15px !important; }
 
-    /* 2. [핵심] 세로 중앙 정렬 해제 (짤림 방지) */
+    /* 2. [수정] 세로 중앙 정렬 해제 및 짤림 방지 */
+    /* 기존의 'margin: auto 0'이 내용을 아래로 밀어내어 짤리게 만들었습니다. */
     .content-wrapper {
-        margin: 0 auto !important; /* 상단부터 배치되도록 수정 */
+        margin: 0 auto !important; /* 상단부터 배치하여 짤림 방지 */
         padding-top: 10px;
-        padding-bottom: 60px !important; /* 하단 버튼 아래 여유 공간 확보 */
+        padding-bottom: 80px !important; /* 하단 버튼이 비네팅에 가려지지 않게 여백 확보 */
         display: flex;
         flex-direction: column;
     }
 
-    /* 3. 스크롤 영역 및 비네팅 처리 */
+    /* 3. 스크롤 및 화면 구성 */
     .screen-content {
         overflow-y: auto !important;
         overflow-x: hidden;
-        /* 비네팅 안쪽에서 스크롤이 자연스럽게 끝나도록 패딩 조절 */
-        padding-bottom: 80px !important; 
+        padding-bottom: 100px !important; /* 스크롤 끝부분 여유 공간 */
     }
 
     .screen {
         height: auto !important;
         min-height: 100%;
-        justify-content: flex-start !important; /* 무조건 위에서부터 시작 */
+        justify-content: flex-start !important; /* 내용이 적어도 위에서부터 시작 */
         padding: 25px 15px !important;
     }
 
-    /* 4. 운세 상세 페이지(Fortune Detail) 요소 간격 조정 */
-    .result-box {
-        margin-bottom: 25px !important; /* 버튼과의 간격 확보 */
-        padding: 15px !important;
-        height: auto !important;
-    }
-
-    /* 5. 입력창 및 버튼 모바일 최적화 */
+    /* 4. [수정] 입력창 스타일 (찌그러짐 방지 및 크기 고정) */
     input[type="text"], input[type="date"], input[type="time"], select {
-        height: 52px !important;
-        font-size: 1.1rem !important;
-        margin-bottom: 12px !important;
         appearance: none;
         -webkit-appearance: none;
+        width: 100% !important;
+        height: 52px !important; /* 높이를 명확히 고정 */
+        background: rgba(10, 15, 30, 0.9) !important;
+        border: 2px solid #00ffff !important;
+        color: #00ffff !important;
+        font-size: 1.1rem !important;
+        padding: 0 15px !important;
+        margin-bottom: 12px !important;
+        border-radius: 4px !important;
+    }
+
+    /* 5. [수정] 라벨 및 TIME 헤더 정렬 */
+    label {
+        font-size: 1.0rem !important;
+        margin-bottom: 6px !important;
+        display: block;
+        height: auto !important; /* PC의 25px 고정 높이 해제 */
     }
 
     .time-header {
-        flex-direction: column !important;
+        display: flex;
+        flex-direction: column !important; /* 시간 모름을 라벨 아래로 */
         align-items: flex-start !important;
         height: auto !important;
         gap: 5px;
         margin-bottom: 8px !important;
     }
 
+    /* 6. 날짜/시간 영역 세로 배치 */
+    .date-time-container {
+        flex-direction: column !important;
+        gap: 0 !important;
+    }
+
+    .input-group {
+        width: 100% !important;
+        margin-bottom: 5px !important;
+    }
+
+    /* 7. 기타 요소 보정 */
     button.cyber-btn {
-        margin-bottom: 20px !important; /* 버튼이 바닥에 붙지 않게 */
+        margin-bottom: 15px !important;
         padding: 14px !important;
     }
 
-    /* 6. 모니터 부속품 숨김 */
     .monitor-neck, .monitor-base { display: none; }
 }
