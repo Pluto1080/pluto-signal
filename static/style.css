@@ -455,14 +455,14 @@ button.cyber-btn:hover { background: #00ff41; color: #000; box-shadow: 0 0 30px 
 
 /* [5] UI 요소 및 결과 박스 END */
 
-/* [6] 모바일 반응형 최종 보정 */
+/* [6] 모바일 반응형 최종 보정 (수정본) */
 @media screen and (max-width: 600px) {
     /* 1. 모니터 프레임: 슬림 배젤 및 공간 최적화 */
     .monitor-frame {
         width: 98vw;
-        height: 94vh; /* 높이 확보 */
+        height: 94vh;
         max-height: none;
-        padding: 10px !important; /* 배젤 두께 최소화 */
+        padding: 10px !important;
         border-radius: 20px !important;
     }
 
@@ -470,29 +470,31 @@ button.cyber-btn:hover { background: #00ff41; color: #000; box-shadow: 0 0 30px 
         border-radius: 15px !important;
     }
 
-    /* 2. [핵심] TIME 영역 레이아웃 수정 */
-    /* '시간 모름'을 'TIME' 라벨 밑으로 내려서 공간 확보 및 밀림 방지 */
+    /* 2. [핵심 수정] TIME 영역 겹침 현상 해결 */
     .time-header {
         display: flex;
-        flex-direction: column !important; /* 위아래 수직 배치 */
+        flex-direction: column !important; /* 세로 배치 */
         align-items: flex-start !important; /* 왼쪽 정렬 */
-        gap: 5px; /* 라벨과 체크박스 사이 간격 */
+        
+        /* [중요] 높이 제한을 풀어야 체크박스가 입력창을 덮지 않습니다 */
+        height: auto !important; 
+        
+        gap: 8px; /* 라벨과 체크박스 사이 간격 */
         width: 100%;
-        margin-bottom: 8px !important;
+        margin-bottom: 10px !important; /* 입력창과의 거리 확보 */
     }
 
     /* 3. 스크롤바 및 비네팅 짤림 방지 */
     .screen-content {
         overflow-y: auto !important;
         overflow-x: hidden;
-        /* 하단 여백을 대폭 늘려 비네팅 안쪽에서 내용이 끝나게 함 */
         padding-bottom: 120px !important; 
     }
 
     .screen {
         height: auto !important;
         min-height: 100%;
-        justify-content: flex-start !important; /* 상단부터 배치 */
+        justify-content: flex-start !important; 
         padding-top: 20px;
     }
 
@@ -506,8 +508,10 @@ button.cyber-btn:hover { background: #00ff41; color: #000; box-shadow: 0 0 30px 
         width: 100% !important;
         min-width: 0 !important;
         margin-bottom: 10px;
+        /* 입력창이 위 요소에 밀리지 않고 자기 자리를 잡도록 설정 */
+        flex: none !important; 
     }
 
-    /* 5. 모니터 부속품 숨김 또는 축소 */
+    /* 5. 모니터 부속품 숨김 */
     .monitor-neck, .monitor-base { display: none; }
 }
