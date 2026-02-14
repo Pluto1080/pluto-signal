@@ -507,6 +507,18 @@ button.cyber-btn:hover { background: #00ff41; color: #000; box-shadow: 0 0 30px 
         justify-content: flex-start; /* 모바일은 상단부터 정렬 */
         padding-top: 30px;
     }
+    
+@media screen and (max-width: 600px) {
+    .monitor-frame {
+        /* 모바일은 공간이 없으므로 배젤을 10px까지 극단적으로 줄임 */
+        padding: 10px !important; 
+        border-radius: 20px !important;
+    }
+    
+    .screen-container {
+        border-radius: 15px !important;
+    }
+}
 
     /* 5. 모니터 부속품 크기 축소 */
     .monitor-neck { width: 80px; height: 20px; }
