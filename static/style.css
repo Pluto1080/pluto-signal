@@ -454,3 +454,61 @@ button.cyber-btn:hover { background: #00ff41; color: #000; box-shadow: 0 0 30px 
 .hidden-btn { display: none !important; }
 
 /* [5] UI 요소 및 결과 박스 END */
+
+/* [6] 모바일 반응형 최종 보정 */
+@media screen and (max-width: 600px) {
+    /* 1. 모니터 프레임: 모바일 화면에 맞춰 높이 확장 및 정렬 */
+    .monitor-frame {
+        width: 98vw;
+        height: 92vh; /* 모바일 세로 길이에 맞춰 충분히 확보 */
+        max-height: none;
+        padding: 20px 15px;
+        border-radius: 40px; /* 모바일에서는 곡률을 살짝 줄임 */
+    }
+
+    /* 2. 비네팅 및 CRT 효과가 스크롤 시에도 유지되도록 고정 */
+    .crt-overlay {
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        z-index: 100;
+        pointer-events: none;
+    }
+
+    /* 3. [핵심] TIME 영역 밀림 방지 */
+    .date-time-container {
+        flex-direction: column !important; /* 모바일은 위아래 배치가 정석 */
+        gap: 10px;
+    }
+
+    .input-group {
+        width: 100% !important;
+        min-width: 0 !important;
+    }
+
+    .time-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+    }
+
+    /* 4. 스크롤바 중복 및 비네팅 짤림 해결 */
+    .screen-content {
+        overflow-y: auto !important;
+        overflow-x: hidden;
+        /* 하단 여백을 주어 비네팅 안쪽에서 내용이 끝나게 함 */
+        padding-bottom: 60px !important; 
+    }
+
+    .screen {
+        height: auto !important; /* 내용에 따라 늘어나게 설정 */
+        min-height: 100%;
+        justify-content: flex-start; /* 모바일은 상단부터 정렬 */
+        padding-top: 30px;
+    }
+
+    /* 5. 모니터 부속품 크기 축소 */
+    .monitor-neck { width: 80px; height: 20px; }
+    .monitor-base { width: 200px; height: 15px; }
+}
