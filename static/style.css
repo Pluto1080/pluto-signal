@@ -304,35 +304,44 @@ body {
 
 /* 제목 스타일: 반짝이는 사이버펑크 그라데이션 및 글리치 효과 */
 h1.shiny-title {
-    font-family: 'Passion One', cursive; /* 날카롭고 묵직한 정통 고딕 스타일 */
-    font-size: 4.5rem; /* 더 높고 웅장하게 확대 */
+    font-family: 'Passion One', cursive;
+    font-size: 4.5rem;
     font-weight: 900;
     text-align: center;
     margin: 0 0 20px 0 !important;
     text-transform: uppercase;
-    letter-spacing: -1px; /* 글자 사이를 좁혀서 더 단단한 느낌 부여 */
+    letter-spacing: -1px;
     
-    /* 색상: 상단은 하얗고 하단으로 갈수록 진해지는 금속성 그라데이션 */
-    background: linear-gradient(to bottom, #ffffff 20%, #00ff41 55%, #004d1a 100%);
+    /* [수정] 칙칙한 녹색을 버리고, 맑은 은색-하늘색-파란색으로 이어지는 크롬 그라데이션 */
+    background: linear-gradient(to bottom, 
+        #ffffff 0%,   /* 상단 하이라이트 */
+        #a6f7ff 40%,  /* 밝은 하늘색 */
+        #00d4ff 50%,  /* 중간층 (수평선 느낌) */
+        #0057ff 55%,  /* 깊은 파란색 */
+        #002b80 100%  /* 하단 마무리 */
+    );
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
 
-    /* [핵심] 3D Chiseled 효과: 그림자를 더 날카롭고 어둡게 겹쳐 쌓음 */
     display: inline-block;
-    transform: perspective(500px) rotateX(25deg) scaleY(1.2); /* 앞으로 튀어나오는 각도 강화 */
+    /* 원근감은 유지하되, 글자가 너무 눕지 않게 살짝 조정 */
+    transform: perspective(500px) rotateX(20deg) scaleY(1.1); 
     
-    filter: drop-shadow(0 0 15px rgba(0, 255, 65, 0.4)); /* 전체적인 네온 광택 */
+    /* [수정] 네온 광원을 파란색 계열로 변경하여 청량감 부여 */
+    filter: drop-shadow(0 0 15px rgba(0, 212, 255, 0.6));
 
+    /* [수정] 그림자(3D 두께)를 맑은 파란색으로 쌓아서 입체감 극대화 */
     text-shadow: 
-        0 1px 0 #003311,
-        0 2px 0 #003311,
-        0 3px 0 #003311,
-        0 4px 0 #003311,
-        0 5px 0 #003311,
-        0 6px 0 #003311,
-        0 8px 10px rgba(0, 0, 0, 0.8); /* 깊이감을 주는 어두운 그림자 */
+        0 1px 0 #0044cc,
+        0 2px 0 #0033aa,
+        0 3px 0 #002288,
+        0 4px 0 #001166,
+        0 5px 0 #000a44,
+        0 6px 0 #000522,
+        0 8px 15px rgba(0, 0, 0, 0.9); /* 바닥으로 떨어지는 깊은 그림자 */
 
+    /* 애니메이션은 그대로 유지 */
     animation: shine-v 4s linear infinite, navigator-float 3s ease-in-out infinite;
 }
 
