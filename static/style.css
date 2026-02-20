@@ -393,11 +393,11 @@ button.cyber-btn,
 }
 
 /* 2. 입력창 & 결과 박스 공통 스타일 */
+/* [수정 후] 콤마(,) 뒤에 있던 .result-box를 지워서 분리합니다 */
 input[type="text"],
 input[type="date"],
 input[type="time"],
-select,
-.result-box {
+select {
     background: rgba(10, 15, 30, 0.9) !important;
     border: 2px solid #00ffff !important; 
     border-radius: 4px !important; 
@@ -418,32 +418,40 @@ select,
 /* [공통] 터미널 로그 박스 디자인 */
 .result-box {
     background: #000000 !important;
-    border: 2px solid var(--theme-color, #ff00ff) !important; /* 변수로 색상 제어 */
+    border: 2px solid var(--theme-color, #ff00ff) !important;
     padding: 0 !important;
     display: flex;
     flex-direction: column;
     margin-bottom: 20px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    
+    /* [핵심 수정] 55px 고정 높이를 풀고 콘텐츠에 맞게 자동 조절되도록 변경 */
+    height: auto !important; 
 }
 
 .result-box h2 {
     background: var(--theme-color, #ff00ff) !important;
     color: #000000 !important;
     margin: 0 !important;
-    padding: 8px 12px !important;
-    font-size: 1rem !important;
+    padding: 10px 15px !important; /* 안정감을 위해 패딩 약간 증가 */
+    font-size: 1.1rem !important;
     text-align: left !important;
     justify-content: flex-start !important;
     border-bottom: none !important;
     transform: none !important;
+    
+    /* [핵심 수정] 헤더의 줄 간격 정상화 */
+    line-height: 1.2 !important; 
 }
 
 .result-content {
     padding: 15px !important;
-    color: #00ff41; /* 기본 본문은 연두색 */
+    color: #00ff41; 
     text-align: left !important;
-    font-size: 1rem;
-    line-height: 1.5;
+    font-size: 1rem !important;
+    
+    /* [핵심 수정] 55px로 벌어져 있던 본문 줄 간격을 읽기 좋게 정상화 */
+    line-height: 1.6 !important; 
 }
 
 /* [색상별 변수 설정] */
