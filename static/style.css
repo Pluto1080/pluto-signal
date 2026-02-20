@@ -368,8 +368,7 @@ select,
 .result-box {
     height: auto !important;
     line-height: 1.6 !important;
-    /* [핵심] 상하 패딩을 25px로 똑같이 주어 텍스트를 박스 정중앙에 위치시킴 */
-    padding: 25px 15px !important; 
+    padding: 12px 15px 22px 15px !important;
     gap: 0 !important; 
 }
 
