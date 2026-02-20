@@ -82,7 +82,12 @@ function startAnalysis() {
     const name = document.getElementById('userName').value;
     const date = document.getElementById('birthDate').value;
     const time = document.getElementById('birthTime').value || "12:00";
-    if(!name || !date) { alert("데이터를 입력하라."); return; }
+    
+    // 기본 입력 검증
+    if(!name || !date) { 
+        alert("데이터를 입력하라."); 
+        return; 
+    }
     
     startLoadingAnimation();
 
@@ -91,17 +96,35 @@ function startAnalysis() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, date, time, lat: selectedLat, lon: selectedLon })
     })
-    .then(res => res.json())
+    .then(res => {
+        // HTTP 상태 코드가 정상이 아닐 경우 에러 투척
+        if (!res.ok) throw new Error('Network response was not ok');
+        return res.json();
+    })
     .then(data => {
         stopLoadingAnimation();
-        if(data.error) { alert(data.error); switchScreen('screen-input'); return; }
+        
+        // 백엔드에서 전달한 로직 에러 처리 (API 키 미설정, 데이터 오류 등)
+        if(data.error) { 
+            alert(data.error); 
+            switchScreen('screen-input'); 
+            return; 
+        }
+        
+        // 데이터 정상 수신 시 UI 업데이트
         globalData = data;
         document.getElementById('res-personality').innerText = data.personality;
         document.getElementById('res-pros').innerText = data.pros;
         document.getElementById('res-cons').innerText = data.cons;
         switchScreen('screen-personality');
     })
-    .catch(err => { stopLoadingAnimation(); switchScreen('screen-input'); });
+    .catch(err => { 
+        // 3번 수정 사항: 통신 실패 시 사용자 알림 추가
+        stopLoadingAnimation(); 
+        console.error("Analysis Error:", err);
+        alert("별과의 연결이 불안정하거나 서버 응답이 없습니다. 통신 상태를 확인하고 다시 시도해줘."); 
+        switchScreen('screen-input'); 
+    });
 }
 /* [5] 데이터 분석 및 통신 END */
 
