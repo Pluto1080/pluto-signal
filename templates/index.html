@@ -56,30 +56,28 @@
                     </div>
                 </section>
 
-
                 <section id="screen-loading" class="screen">
                     <div class="content-wrapper">
                         <h2 id="loading-text" class="shiny-title" style="font-size: 1.5rem;">별의 소리를 관측하는 중...</h2>
                     </div>
                 </section>
 
-
                 <section id="screen-personality" class="screen">
                     <div class="content-wrapper">
                         <h2 class="shiny-title" style="font-size:2rem;">ANALYSIS_COMPLETE</h2>
                         
-                        <div class="result-box">
+                        <div class="result-box theme-personality">
                             <h2>[DATA] PERSONALITY_CORE</h2>
                             <div id="res-personality" class="result-content"></div>
                         </div>
 
                         <div class="button-grid">
-                            <div class="result-box">
-                                <h2 style="color:#00ffff;">[+] PROS</h2>
+                            <div class="result-box theme-blue">
+                                <h2>[+] PROS</h2>
                                 <div id="res-pros" class="result-content"></div>
                             </div>
-                            <div class="result-box">
-                                <h2 style="color:#ff0055;">[-] CONS</h2>
+                            <div class="result-box theme-red">
+                                <h2>[-] CONS</h2>
                                 <div id="res-cons" class="result-content"></div>
                             </div>
                         </div>
@@ -88,7 +86,6 @@
                     </div>
                 </section>
 
-
                 <section id="screen-selection" class="screen">
                     <div class="content-wrapper">
                         <h1 class="shiny-title" style="font-size:2rem;">SELECT_TARGET</h1>
@@ -96,15 +93,14 @@
                         
                         <div class="button-grid">
                             <button id="btn-love" class="cyber-btn" onclick="showFortune('love')" style="border-color:#ff00ff; color:#ff00ff;">LOVE_SIGNAL</button>
-                            <button id="btn-money" class="cyber-btn" onclick="showFortune('money')" style="border-color:#ffd700; color:#ffd700;">WEALTH_FLOW</button>
+                            <button id="btn-money" class="cyber-btn" onclick="showFortune('money')" style="border-color:#00ff41; color:#00ff41;">WEALTH_FLOW</button>
                             <button id="btn-career" class="cyber-btn" onclick="showFortune('career')" style="border-color:#00ffff; color:#00ffff;">CAREER_PATH</button>
-                            <button id="btn-health" class="cyber-btn" onclick="showFortune('health')" style="border-color:#00ff41; color:#00ff41;">VITALITY_LOG</button>
+                            <button id="btn-health" class="cyber-btn" onclick="showFortune('health')" style="border-color:#ffff00; color:#ffff00;">VITALITY_LOG</button>
                         </div>
 
                         <button id="btn-final-report" class="cyber-btn hidden-btn" onclick="showFinalReport()" style="margin-top:20px; background:#fff; color:#000; border-color:#fff;">FINAL_REPORT >></button>
                     </div>
                 </section>
-
 
                 <section id="screen-fortune-detail" class="screen">
                     <div class="content-wrapper">
@@ -119,17 +115,16 @@
                     </div>
                 </section>
 
-
                 <section id="screen-final-advice" class="screen">
                     <div class="content-wrapper">
                         <h1 class="shiny-title" style="font-size:2rem;">SUMMARY_LOG</h1>
                         
-                        <div class="result-box" style="border-color:#ffffff; color:#ffffff;">
+                        <div class="result-box theme-purple">
                             <h2>TOTAL_SUMMARY</h2>
                             <div id="res-summary" class="result-content"></div>
                         </div>
 
-                        <div class="result-box" style="border-color:#ff00ff; color:#ff00ff;">
+                        <div class="result-box theme-whisper">
                             <h2>PLUTO'S_WHISPER</h2>
                             <div id="res-final-advice" class="result-content" style="font-weight:bold;"></div>
                         </div>
@@ -138,12 +133,11 @@
                     </div>
                 </section>
 
-
                 <section id="screen-monthly-final" class="screen">
                     <div class="content-wrapper">
                         <h1 class="shiny-title" style="font-size:2rem;">THIS_MONTH</h1>
                         
-                        <div class="result-box" style="border-color:#fff; color:#fff;">
+                        <div class="result-box theme-rainbow">
                             <h2>MONTHLY_SIGNAL</h2>
                             <div id="res-monthly-content" class="result-content"></div>
                         </div>
@@ -162,5 +156,3 @@
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
-
-
