@@ -103,17 +103,19 @@ body {
     }
     10% {
         transform: translate(-5px, -2px);
-        clip-path: inset(10% 0 80% 0); /* 화면 상단 띠 */
-        filter: hue-rotate(90deg) brightness(1.5);
+        clip-path: inset(10% 0 80% 0);
+        /* hue-rotate를 조절하여 빨간색을 피하고 하늘색/연두색 범위를 유지 */
+        filter: hue-rotate(-45deg) brightness(1.2); 
     }
     20% {
         transform: translate(5px, 2px);
-        clip-path: inset(80% 0 5% 0); /* 화면 하단 띠 */
+        clip-path: inset(80% 0 5% 0);
     }
     30% {
         transform: translate(-3px, 5px);
-        clip-path: inset(40% 0 40% 0); /* 가운데 띠 */
-        filter: invert(1);
+        clip-path: inset(40% 0 40% 0);
+        /* [중요] 빨간색을 만드는 invert(1)을 제거하고 밝기만 조절 */
+        filter: brightness(1.5); 
     }
     40% {
         transform: translate(0);
@@ -291,7 +293,7 @@ body {
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    gap: 30px;
+    gap: 15px;
     z-index: 10;
 }
 
@@ -306,7 +308,7 @@ h1.shiny-title {
     font-weight: 900;
     text-align: center;
     /* [수정] 하단 마진을 40px로 늘려 아래 내용과 확실히 떨어뜨립니다 */
-    margin: 0 0 40px 0 !important; 
+    margin: 0 0 20px 0 !important; 
     width: 100%;
     background: linear-gradient(180deg, #00ff41 0%, #ffffff 50%, #00ff41 100%);
     background-size: auto 200%;
@@ -357,7 +359,7 @@ button.cyber-btn,
     margin-bottom: 0 !important;
     display: flex; 
     flex-direction: column;
-    gap: 20px; 
+    gap: 15px; 
 }
 
 /* 2. 입력창 & 결과 박스 공통 스타일 */
@@ -423,7 +425,7 @@ select,
     height: 25px !important; 
     display: flex !important;
     align-items: center !important; 
-    margin-bottom: 5px !important;
+    margin-bottom: 2px !important;
     color: #ff00ff !important; 
     text-shadow: 0 0 8px #ff00ff;
     font-weight: bold; 
@@ -434,7 +436,7 @@ select,
 .date-time-container {
     flex-direction: row !important; 
     justify-content: space-between;
-    gap: 15px; 
+    gap: 8px; 
     flex-wrap: wrap;
     margin-bottom: 0px !important;
 }
