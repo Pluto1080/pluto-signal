@@ -10,19 +10,21 @@
 }
 
 body {
-    background: #050505; margin: 0; padding: 0;
+    background: #000000; /* 기본 배경은 블랙 */
+    margin: 0; padding: 0;
     display: flex; flex-direction: column; 
     align-items: center; justify-content: center; 
     height: 100vh; width: 100vw; overflow: hidden;
     font-family: 'DungGeunMo', monospace;
 
-    background-image: 
-        radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 3px),
-        radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 2px),
-        radial-gradient(white, rgba(255,255,255,.1) 2px, transparent 3px);
-    background-size: 550px 550px, 350px 350px, 250px 250px;
-    background-position: 0 0, 40px 60px, 130px 270px;
+    /* [수정] 별 효과 제거 및 '어두운 방' 분위기 연출 */
+    /* 중앙(모니터 뒤쪽)은 아주 약간 밝고, 외곽으로 갈수록 암전되는 효과 */
+    background-image: radial-gradient(circle at center, #1a1a1a 0%, #050505 50%, #000000 100%);
+    
+    /* 기존 별 관련 설정 삭제 */
+    /* background-size, background-position 줄은 아예 지워주세요 */
 }
+
 /* [1] 기본 설정 및 변수 END */
 
 
