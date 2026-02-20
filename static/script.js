@@ -158,44 +158,68 @@ function stopLoadingAnimation() {
 }
 /* [6] 로딩 및 별똥별 애니메이션 END */
 
-/* [7] 운세별 테마 및 상세 표시 START */
+/* [7] 운세별 테마 및 상세 표시 START (수정본) */
 function showFortune(type) {
+    // 배경색 설정 (화면 글로우 효과)
     const bgColors = { 
-        'love': ['#3a0d2e', '#1a0515', '#ff00ff'], 
-        'money': ['#3a2e0d', '#1a1505', '#ffd700'], 
-        'career': ['#0d2e3a', '#05151a', '#00ffff'],
-        'health': ['#0d3a2e', '#051a14', '#00ff41'],
-        'monthly': ['#1a0414', '#0a0208', '#ffffff']
+        'love': ['#3a0d2e', '#1a0515'], 
+        'money': ['#0d3a1a', '#051a0d'], 
+        'career': ['#0d2e3a', '#05151a'],
+        'health': ['#3a3a0d', '#1a1a05'],
+        'monthly': ['#1a0414', '#0a0208']
     };
     
+    const box = document.getElementById('fortune-box');
+    const t = document.getElementById('fortune-title');
+    const st = document.getElementById('fortune-sub-title');
+    const c = document.getElementById('res-fortune-content');
+
+    // 1. 기존 테마 클래스 초기화
+    box.className = 'result-box';
+
     if(type !== 'monthly') {
         viewedFortunes[type] = true;
 
-        // [수정] 클릭한 버튼 외의 모든 버튼을 즉시 숨겨서 빨려 들어갈 때 지저분함 방지
+        // 버튼 숨김 처리 로직 (기존 유지)
         const allButtons = document.querySelectorAll('#screen-selection .cyber-btn');
         allButtons.forEach(btn => {
-            if (btn.id !== `btn-${type}`) {
-                btn.classList.add('hidden-btn'); 
-            }
+            if (btn.id !== `btn-${type}`) btn.classList.add('hidden-btn'); 
         });
 
         setScreenColor(bgColors[type][0], bgColors[type][1]);
         
-        const t = document.getElementById('fortune-title'), 
-              st = document.getElementById('fortune-sub-title'), 
-              c = document.getElementById('res-fortune-content'), 
-              box = document.getElementById('fortune-box');
-        
-        box.style.borderColor = bgColors[type][2];
-        box.style.color = bgColors[type][2];
-
-        if (type === 'love') { t.innerText = "2026_LOVE"; st.innerText = "[♥] RELATIONSHIP_LOG"; c.innerText = globalData.fortune_2026.love; }
-        else if (type === 'money') { t.innerText = "2026_MONEY"; st.innerText = "[$] WEALTH_STATUS"; c.innerText = globalData.fortune_2026.money; }
-        else if (type === 'career') { t.innerText = "2026_CAREER"; st.innerText = "[!] CAREER_UPDATE"; c.innerText = globalData.fortune_2026.career; }
-        else if (type === 'health') { t.innerText = "2026_HEALTH"; st.innerText = "[+] VITALITY_LOG"; c.innerText = globalData.fortune_2026.health; }
+        // 2. 카테고리에 맞는 테마 클래스 및 텍스트 적용
+        if (type === 'love') { 
+            box.classList.add('theme-love'); // 핑크
+            t.innerText = "2026_LOVE"; 
+            st.innerText = "[♥] LOVE_SIGNAL"; 
+            c.innerText = globalData.fortune_2026.love; 
+        }
+        else if (type === 'money') { 
+            box.classList.add('theme-money'); // 초록
+            t.innerText = "2026_MONEY"; 
+            st.innerText = "[$] WEALTH_STATUS"; 
+            c.innerText = globalData.fortune_2026.money; 
+        }
+        else if (type === 'career') { 
+            box.classList.add('theme-career'); // 하늘
+            t.innerText = "2026_CAREER"; 
+            st.innerText = "[!] CAREER_UPDATE"; 
+            c.innerText = globalData.fortune_2026.career; 
+        }
+        else if (type === 'health') { 
+            box.classList.add('theme-health'); // 노랑
+            t.innerText = "2026_HEALTH"; 
+            st.innerText = "[+] VITALITY_LOG"; 
+            c.innerText = globalData.fortune_2026.health; 
+        }
         
         switchScreen('screen-fortune-detail');
     } else {
+        // 월별 운세: 무지개 테마
+        const monthlyBox = document.querySelector('#screen-monthly-final .result-box');
+        monthlyBox.className = 'result-box theme-rainbow';
+        
         setScreenColor(bgColors.monthly[0], bgColors.monthly[1]);
         document.getElementById('res-monthly-content').innerText = globalData.fortune_2026.monthly;
         switchScreen('screen-monthly-final');
@@ -209,16 +233,12 @@ function showFortune(type) {
 function returnToSelection() {
     setScreenColor('#444444', '#111111');
 
-    // [추가] 돌아왔을 때, 아직 관측하지 않은(안 본) 버튼들만 다시 표시
     const fortuneTypes = ['love', 'money', 'career', 'health'];
     fortuneTypes.forEach(type => {
         const btn = document.getElementById(`btn-${type}`);
         if (btn) {
-            if (viewedFortunes[type]) {
-                btn.classList.add('hidden-btn'); // 이미 본 건 숨김 유지
-            } else {
-                btn.classList.remove('hidden-btn'); // 안 본 건 다시 보여줌
-            }
+            if (viewedFortunes[type]) btn.classList.add('hidden-btn');
+            else btn.classList.remove('hidden-btn');
         }
     });
 
@@ -226,6 +246,14 @@ function returnToSelection() {
 }
 
 function showFinalReport() {
+    // 최종 리포트 화면의 박스들 타겟팅
+    const summaryBox = document.querySelector('#screen-final-advice .result-box:nth-child(2)');
+    const whisperBox = document.querySelector('#screen-final-advice .result-box:nth-child(3)');
+
+    // 3. 요약(보라) 및 속삭임(흑백반전) 테마 클래스 적용
+    if (summaryBox) summaryBox.className = 'result-box theme-purple';
+    if (whisperBox) whisperBox.className = 'result-box theme-whisper';
+
     document.getElementById('res-summary').innerText = globalData.fortune_2026.summary;
     document.getElementById('res-final-advice').innerText = globalData.fortune_2026.final_advice;
     switchScreen('screen-final-advice');
