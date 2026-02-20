@@ -720,11 +720,15 @@ button.cyber-btn:hover { background: #00ff41; color: #000; box-shadow: 0 0 30px 
         padding: 14px !important;
     }
     
+   /* ... 기타 모바일 설정들 생략 ... */
+    
     .typewriter-text {
         font-size: 1.2rem;
         line-height: 1.6;
     }
-}
 
-    .monitor-neck, .monitor-base { display: none; }
-}
+    .monitor-neck, .monitor-base { 
+        display: none; 
+    }
+
+} /* <-- 전체 파일을 통틀어 맨 마지막 줄에는 닫는 괄호가 딱 한 개만 있어야 합니다! */
