@@ -227,20 +227,23 @@ body {
 @keyframes screen-sweep { to { left: 200%; } }
 /* [3] CRT 특수 효과 애니메이션 END */
 
-/* [4] 섹션 레이아웃: 자동 시각적 중앙 정렬 및 여백 최적화 */
+/* [4] 섹션 레이아웃: 여백 확보 및 안정적인 중앙 정렬 */
 .screen {
     position: absolute; 
-    top: 0; left: 0; 
+    top: 0; 
+    left: 0; 
     width: 100%; 
     min-height: 100%; 
+    height: auto; 
     display: flex; 
     flex-direction: column; 
     align-items: center; 
     
-    /* [수정] 다시 정중앙 정렬로 복구합니다 */
+    /* [수정] 다시 정중앙 정렬로 복구하여 '난리 난' 쏠림을 잡습니다 */
     justify-content: center; 
     
-    padding: 20px; 
+    /* [수정] 위쪽 여백을 60px 이상 확보하여 제목이 천장에 붙는 현상 방지 */
+    padding: 60px 20px; 
     box-sizing: border-box;
     opacity: 0;
     visibility: hidden;
@@ -251,12 +254,7 @@ body {
 }
 
 /* [수정] 아래쪽(after) 힘을 훨씬 강하게 주어, 전체 내용을 화면 위쪽으로 번쩍 들어 올립니다! */
-.screen::before, .screen::after { display: none; }
-
-/* [추가] 시각적 보정: 위쪽 스프링에 힘을 더 주어 전체 내용을 살짝 위로 들어 올림 */
-.screen::before {
-    flex: 1.4; 
-}
+.screen::before, .screen::after { display: none !important; }
 
 .content-wrapper {
     width: 100%;
@@ -264,11 +262,9 @@ body {
     margin: 0 auto; 
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    /* 요소 간 간격을 30px로 넓혀서 답답함을 해소함 */
+    gap: 30px; 
     z-index: 10;
-    
-    /* [핵심] 수학적 중앙에서 위로 5%만큼 살짝 들어 올려 '시각적 중앙'을 맞춥니다. */
-    transform: translateY(-5%); 
 }
 
 /* 불필요한 하단 스크롤 방지 핵심 코드 */
@@ -290,8 +286,8 @@ h1.shiny-title {
     font-size: 2.5rem;
     font-weight: 900;
     text-align: center;
-    /* 제목 아래 마진을 줄여 본문이 너무 내려가지 않게 함 */
-    margin: 0 0 15px 0 !important; 
+    /* [수정] 하단 마진을 40px로 늘려 아래 내용과 확실히 떨어뜨립니다 */
+    margin: 0 0 40px 0 !important; 
     width: 100%;
     background: linear-gradient(180deg, #00ff41 0%, #ffffff 50%, #00ff41 100%);
     background-size: auto 200%;
@@ -301,6 +297,7 @@ h1.shiny-title {
     text-shadow: 0 0 8px rgba(0, 255, 65, 0.6);
     animation: shine-v 3s linear infinite;
 }
+
 
 /* 마우스 호버 시 글리치 효과 */
 h1.shiny-title:hover {
@@ -336,12 +333,12 @@ button.cyber-btn,
     max-width: 480px; 
     margin-left: auto !important;
     margin-right: auto !important;
+    /* 강제 마진 제거하여 중앙 정렬 보존 */
     margin-top: 0 !important;
     margin-bottom: 0 !important;
     display: flex; 
     flex-direction: column;
-    /* 요소 사이의 간격을 15px로 조밀하게 조정 */
-    gap: 15px; 
+    gap: 20px; 
 }
 
 /* 2. 입력창 & 결과 박스 공통 스타일 */
@@ -357,8 +354,6 @@ select,
     text-shadow: 0 0 5px rgba(0, 255, 255, 0.5) !important;
     box-shadow: inset 0 0 20px rgba(0, 255, 255, 0.2) !important;
 
-    margin-bottom: 10px !important; /* 박스 사이 간격 축소 */
-
     height: 55px !important;
     line-height: 55px !important; 
     padding: 0 15px !important; 
@@ -369,28 +364,27 @@ select,
     color-scheme: dark; 
 }
 
-/* [수정] 결과 박스 내부 쏠림 방지 */
+/* [수정] 결과 박스 내부 정중앙 배치 핵심 */
 .result-box {
     height: auto !important;
-    /* 본문 텍스트가 박스 내부에서 위로 붙게 패딩 조정 */
-    padding: 12px 15px 18px 15px !important; 
-    /* 박스 내부 gap을 없애 제목과 본문 거리를 좁힘 */
+    line-height: 1.6 !important;
+    /* [핵심] 상하 패딩을 25px로 똑같이 주어 텍스트를 박스 정중앙에 위치시킴 */
+    padding: 25px 15px !important; 
     gap: 0 !important; 
 }
 
-/* [수정] 박스 내부 제목 마진 축소 */
+/* [수정] 박스 내부 제목 여백 확보 */
 .result-box h2 { 
     font-size: 1.1rem; 
     color: #ff00ff !important; 
     border-bottom: 1px dashed #ff00ff; 
-    padding-bottom: 4px !important; 
-    margin-bottom: 8px !important; 
+    padding-bottom: 10px !important; 
+    /* [수정] 제목 아래 여백을 15px로 늘려 본문과 떨어뜨립니다 */
+    margin-bottom: 15px !important; 
 }
 
 .result-content {
-    line-height: 1.6;
-    /* 본문 텍스트의 불필요한 위쪽 여백 제거 */
-    margin-top: 0 !important; 
+    margin-top: 0 !important;
 }
 
 /* 3. 라벨 스타일 및 높이 고정 */
