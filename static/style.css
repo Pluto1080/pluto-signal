@@ -415,38 +415,66 @@ select,
     color-scheme: dark; 
 }
 
-/* [수정] 결과 박스 내부 정중앙 배치 핵심 */
+/* [공통] 터미널 로그 박스 디자인 */
 .result-box {
-    height: auto !important;
-    line-height: 1.6 !important;
-
-    /* 상단을 줄이고 하단을 살짝 늘려 시각적 중앙 보정 */
-    padding: 10px 15px 22px 15px !important;
-
-    gap: 0 !important; 
+    background: #000000 !important;
+    border: 2px solid var(--theme-color, #ff00ff) !important; /* 변수로 색상 제어 */
+    padding: 0 !important;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
 
-/* [최종] 제목 영역 정중앙 + CRT 시각 보정 */
 .result-box h2 {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    height: 48px;
-    line-height: 1;
-    padding: 0 !important;
-    margin: 0 0 12px 0 !important;
-
-    /* CRT + 글로우 + 스캔라인 시각 보정 */
-    transform: translateY(-2px);
-
-    font-size: 1.1rem; 
-    color: #ff00ff !important; 
-    border-bottom: 1px dashed #ff00ff; 
+    background: var(--theme-color, #ff00ff) !important;
+    color: #000000 !important;
+    margin: 0 !important;
+    padding: 8px 12px !important;
+    font-size: 1rem !important;
+    text-align: left !important;
+    justify-content: flex-start !important;
+    border-bottom: none !important;
+    transform: none !important;
 }
 
 .result-content {
-    margin-top: 0 !important;
+    padding: 15px !important;
+    color: #00ff41; /* 기본 본문은 연두색 */
+    text-align: left !important;
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+/* [색상별 변수 설정] */
+.theme-personality { --theme-color: #ff00ff; } /* 핑크 유지 */
+.theme-blue { --theme-color: #0088ff; }        /* 장점: 파랑 */
+.theme-red { --theme-color: #ff3333; }         /* 단점: 빨강 */
+.theme-love { --theme-color: #ff00ff; }        /* 연애: 핑크 */
+.theme-health { --theme-color: #ffff00; }      /* 건강: 노랑 */
+.theme-career { --theme-color: #00ffff; }      /* 커리어: 하늘 */
+.theme-money { --theme-color: #00ff41; }       /* 재물: 초록 */
+.theme-purple { --theme-color: #bf00ff; }      /* 전체: 보라 */
+
+/* 플루토의 속삭임: 검은색 반전 (헤더 흰색, 본문 흰색) */
+.theme-whisper { --theme-color: #ffffff; }
+.theme-whisper .result-content { color: #ffffff !important; }
+
+/* 월별 운세: 무지개색 애니메이션 */
+.theme-rainbow {
+    border-image: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet) 1 !important;
+}
+.theme-rainbow h2 {
+    background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet) !important;
+    color: #ffffff !important;
+}
+
+@keyframes rainbow-text {
+    0% { color: #ff0000; } 20% { color: #ffff00; } 40% { color: #00ff00; }
+    60% { color: #00ffff; } 80% { color: #0000ff; } 100% { color: #ff0000; }
+}
+.theme-rainbow .result-content {
+    animation: rainbow-text 3s infinite linear;
 }
 
 /* 3. 라벨 스타일 및 높이 고정 */
