@@ -77,7 +77,7 @@ function switchScreen(id) {
 
 /* [4] 화면 전환 기능 END */
 
-/* [5] 데이터 분석 및 통신 START */
+/* [5] 데이터 분석 및 통신 START (수정본) */
 function startAnalysis() {
     const name = document.getElementById('userName').value;
     const date = document.getElementById('birthDate').value;
@@ -97,34 +97,70 @@ function startAnalysis() {
         body: JSON.stringify({ name, date, time, lat: selectedLat, lon: selectedLon })
     })
     .then(res => {
-        // HTTP 상태 코드가 정상이 아닐 경우 에러 투척
         if (!res.ok) throw new Error('Network response was not ok');
         return res.json();
     })
     .then(data => {
         stopLoadingAnimation();
         
-        // 백엔드에서 전달한 로직 에러 처리 (API 키 미설정, 데이터 오류 등)
         if(data.error) { 
             alert(data.error); 
             switchScreen('screen-input'); 
             return; 
         }
         
-        // 데이터 정상 수신 시 UI 업데이트
         globalData = data;
+
+        // 1. 데이터를 먼저 채워넣습니다.
         document.getElementById('res-personality').innerText = data.personality;
         document.getElementById('res-pros').innerText = data.pros;
         document.getElementById('res-cons').innerText = data.cons;
+
+        // 2. [추가] 결과 박스들을 미리 투명하게 숨깁니다.
+        const resultBoxes = document.querySelectorAll('#screen-personality .result-box');
+        resultBoxes.forEach(box => {
+            box.style.opacity = "0";
+            box.style.transform = "translateY(20px)"; // 아래에서 위로 올라오는 효과
+            box.style.transition = "none"; // 초기화 시에는 애니메이션 차단
+        });
+
+        // 3. 화면은 전환하되, 박스들은 아직 숨겨진 상태입니다.
         switchScreen('screen-personality');
+
+        // 4. [추가] 박스들을 하나씩 글리치와 함께 등장시키는 함수 실행
+        setTimeout(() => {
+            displayResultsSequentially(resultBoxes);
+        }, 500); // 화면 전환 애니메이션 직후 시작
     })
     .catch(err => { 
-        // 3번 수정 사항: 통신 실패 시 사용자 알림 추가
         stopLoadingAnimation(); 
         console.error("Analysis Error:", err);
-        alert("별과의 연결이 불안정하거나 서버 응답이 없습니다. 통신 상태를 확인하고 다시 시도해줘."); 
+        alert("별과의 연결이 불안정하거나 서버 응답이 없습니다."); 
         switchScreen('screen-input'); 
     });
+}
+
+// [신규 함수] 박스를 하나씩 순차적으로 글리치 효과와 함께 표시
+async function displayResultsSequentially(boxes) {
+    for (let i = 0; i < boxes.length; i++) {
+        // 각 박스 사이의 등장 간격 (0.8초)
+        await new Promise(resolve => setTimeout(resolve, 800)); 
+        
+        const box = boxes[i];
+        
+        // 지지직거리는 글리치 효과 클래스 추가
+        box.classList.add('glitch-active');
+        
+        // 박스 서서히 보이기
+        box.style.transition = "all 0.4s ease";
+        box.style.opacity = "1";
+        box.style.transform = "translateY(0)";
+
+        // 0.4초 후 글리치 효과 제거 (가독성 유지)
+        setTimeout(() => {
+            box.classList.remove('glitch-active');
+        }, 400);
+    }
 }
 /* [5] 데이터 분석 및 통신 END */
 
