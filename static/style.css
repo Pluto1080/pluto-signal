@@ -578,46 +578,56 @@ button.cyber-btn:hover { background: #00ff41; color: #000; box-shadow: 0 0 30px 
 
     .screen-container { border-radius: 15px !important; }
 
+    /* [추가] 1-2. 메인 헤드라인 짤림 방지 */
+    h1.shiny-title {
+        font-size: 2.2rem !important; /* 크기를 줄여서 한 화면에 들어오게 함 */
+        letter-spacing: -1px; 
+        margin-bottom: 15px !important;
+        
+        /* 입체 효과 각도를 조절하여 좌우 짤림 방지 */
+        transform: perspective(500px) rotateX(15deg) scale(0.9) !important;
+        
+        white-space: normal;
+        word-break: keep-all;
+        line-height: 1.1;
+    }
+
+    h2.shiny-title {
+        font-size: 1.5rem !important;
+    }
+
     /* 2. [수정] 세로 중앙 정렬 해제 및 짤림 방지 */
-    /* 기존의 'margin: auto 0'이 내용을 아래로 밀어내어 짤리게 만들었습니다. */
     .content-wrapper {
         margin: 0 auto !important; 
         padding-top: 10px;
-        /* [수정] 80px는 너무 깁니다. 30px 정도로 줄여서 불필요한 스크롤을 막습니다. */
         padding-bottom: 30px !important; 
         display: flex;
         flex-direction: column;
     }
 
     /* 3. 스크롤 및 화면 구성 */
-
-    /* 실제 스크롤 담당 */
     .screen-content {
         width: 100%;
         flex: 1;
-    
-        /* 🔥 핵심 수정 */
         min-height: 0;
         overflow-y: auto;
         overflow-x: hidden;
-    
         position: relative;
     }
 
-   .screen {
+    .screen {
         height: auto !important;
         min-height: 100%;
-        /* [수정] 모바일에서도 중앙 정렬을 유지하도록 복구 (짤림은 padding으로 해결) */
         justify-content: flex-start !important;
         padding: 20px 15px !important;
     }
 
-    /* 4. [수정] 입력창 스타일 (찌그러짐 방지 및 크기 고정) */
+    /* 4. [수정] 입력창 스타일 */
     input[type="text"], input[type="date"], input[type="time"], select {
         appearance: none;
         -webkit-appearance: none;
         width: 100% !important;
-        height: 52px !important; /* 높이를 명확히 고정 */
+        height: 52px !important; 
         background: rgba(10, 15, 30, 0.9) !important;
         border: 2px solid #00ffff !important;
         color: #00ffff !important;
@@ -632,12 +642,12 @@ button.cyber-btn:hover { background: #00ff41; color: #000; box-shadow: 0 0 30px 
         font-size: 1.0rem !important;
         margin-bottom: 6px !important;
         display: block;
-        height: auto !important; /* PC의 25px 고정 높이 해제 */
+        height: auto !important; 
     }
 
     .time-header {
         display: flex;
-        flex-direction: column !important; /* 시간 모름을 라벨 아래로 */
+        flex-direction: column !important; 
         align-items: flex-start !important;
         height: auto !important;
         gap: 5px;
