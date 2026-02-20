@@ -248,7 +248,10 @@ body {
     width: 100%;
     min-height: auto !important;
     height: auto;
-    display: flex;
+    
+    /* 공간을 차지하지 않도록 수정 (기존 display: flex; 삭제) */
+    display: none; 
+    
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
@@ -262,10 +265,15 @@ body {
     z-index: 1;
 
     overflow: hidden;
-    transition: opacity 0.15s ease-in-out;
+    /* display가 변경될 경우 CSS opacity 애니메이션은 무시되지만, 
+       JavaScript 글리치 효과가 화면 전환을 덮어주므로 그대로 두어도 무방합니다. */
+    transition: opacity 0.15s ease-in-out; 
 }
 
 .screen.active {
+    /* 활성화 시에만 화면 공간을 차지하도록 flex 속성 부여 */
+    display: flex; 
+    
     opacity: 1;
     visibility: visible;
     pointer-events: auto;
