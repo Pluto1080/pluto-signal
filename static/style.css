@@ -311,40 +311,45 @@ h1.shiny-title {
     text-align: center;
     margin: 0 0 20px 0 !important;
     text-transform: uppercase;
-    letter-spacing: -1px;
+    letter-spacing: 2px; /* 네온 빛이 번질 공간 확보 */
 
-    /* [핵심 수정] 리버스 그라데이션: 상하단은 밝고 중앙은 어둡게 설정 */
-    background: linear-gradient(to bottom, 
-        #ffffff 0%,     /* 상단: 가장 밝음 (겉) */
-        #ce93d8 25%,    /* 중간으로 가며 보라색이 짙어짐 */
-        #4a148c 50%,    /* 중앙: 가장 깊고 어두운 보라 (안) */
-        #ce93d8 75%,    /* 다시 밝아짐 */
-        #ffffff 100%    /* 하단: 가장 밝음 (겉) */
+    /* [핵심 1] 사진처럼 쨍한 마젠타 색상과 가로 스캔라인 패턴 */
+    background: repeating-linear-gradient(
+        0deg,
+        #ff00ff 0%,     /* 메인 네온 핑크 */
+        #ff00ff 50%,    /* 색상 유지 */
+        #330033 51%,    /* 어두운 스캔라인 줄무늬 */
+        #330033 100%
     );
+    background-size: 100% 4px; /* 스캔라인의 촘촘함 조절 */
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
 
     display: inline-block;
-    transform: perspective(500px) rotateX(20deg) scaleY(1.1);
+    /* 사진처럼 약간 기울어진 역동적인 느낌 부여 */
+    transform: perspective(500px) rotateX(10deg) skewX(-5deg);
 
-    /* [수정] 겉으로 갈수록 밝아지는 광채 효과 강화 */
-    filter: drop-shadow(0 0 15px rgba(225, 190, 231, 0.9));
+    /* [핵심 2] 사진 속 '눈부신 광채'를 재현하는 다중 네온 쉐도우 */
+    filter: drop-shadow(0 0 15px rgba(255, 0, 255, 0.8)); /* 전체적인 후광 */
 
     text-shadow: 
-        0 0 8px rgba(255, 255, 255, 0.8), /* 글자 테두리 밝은 광원 */
-        0 0 20px rgba(206, 147, 216, 0.5), /* 은은한 보라 후광 */
-        /* 3D 입체 두께는 중앙의 어두운 톤에 맞춰 묵직하게 설정 */
-        0 1px 0 #310062,
-        0 2px 0 #310062,
-        0 3px 0 #210042,
-        0 4px 0 #210042,
-        0 5px 0 #120024,
-        0 8px 15px rgba(0, 0, 0, 0.7);
+        0 0 5px #fff,                /* 가장 안쪽의 하얀 심지 (제일 밝은 부분) */
+        0 0 10px #ff00ff,            /* 마젠타 핵심 광원 */
+        0 0 20px #ff00ff,            /* 중간 광원 */
+        0 0 40px #ff00ff,            /* 멀리 번지는 네온 빛 */
+        3px 3px 0px #330033;         /* 입체감을 살짝 더해주는 어두운 경계선 */
 
-    animation: shine-v 4s linear infinite, navigator-float 3s ease-in-out infinite;
+    /* 애니메이션: 살짝 지지직거리는 듯한 느낌을 위해 필터 효과 추가 */
+    animation: neon-flicker 2s infinite alternate, navigator-float 3s ease-in-out infinite;
 }
 
+/* 네온이 미세하게 떨리는 효과 추가 (진짜 옛날 모니터 느낌) */
+@keyframes neon-flicker {
+    0%, 100% { opacity: 1; filter: drop-shadow(0 0 15px rgba(255, 0, 255, 0.8)); }
+    92% { opacity: 0.9; filter: drop-shadow(0 0 12px rgba(255, 0, 255, 0.6)); }
+    96% { opacity: 1; filter: drop-shadow(0 0 18px rgba(255, 0, 255, 1)); }
+}
 @keyframes navigator-float {
     0%, 100% { transform: perspective(500px) rotateX(25deg) scaleY(1.2) translateY(0); }
     50% { transform: perspective(500px) rotateX(25deg) scaleY(1.2) translateY(-15px); }
