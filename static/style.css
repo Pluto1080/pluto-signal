@@ -229,28 +229,31 @@ body {
 
 /* [4] 섹션 레이아웃: 여백 확보 및 안정적인 중앙 정렬 */
 .screen {
-    position: absolute; 
-    top: 0; 
-    left: 0; 
-    width: 100%; 
-    min-height: 100%; 
-    height: auto; 
-    display: flex; 
-    flex-direction: column; 
-    align-items: center; 
-    
-    /* [수정] 다시 정중앙 정렬로 복구하여 '난리 난' 쏠림을 잡습니다 */
-    justify-content: center; 
-    
-    /* [수정] 위쪽 여백을 60px 이상 확보하여 제목이 천장에 붙는 현상 방지 */
-    padding: 60px 20px; 
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 60px 20px;
     box-sizing: border-box;
+    text-align: center;
+
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
     z-index: 1;
-    overflow: visible !important;
-    text-align: center;
+
+    overflow: hidden;
+    transition: opacity 0.15s ease-in-out;
+}
+
+.screen.active {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    z-index: 10;
 }
 
 /* [수정] 아래쪽(after) 힘을 훨씬 강하게 주어, 전체 내용을 화면 위쪽으로 번쩍 들어 올립니다! */
@@ -259,26 +262,16 @@ body {
 .content-wrapper {
     width: 100%;
     max-width: 480px;
-    margin: 0 auto; 
+    margin: 0 auto;
     display: flex;
     flex-direction: column;
-    /* 요소 간 간격을 30px로 넓혀서 답답함을 해소함 */
-    gap: 30px; 
+    gap: 30px;
     z-index: 10;
 }
 
 /* 불필요한 하단 스크롤 방지 핵심 코드 */
 .content-wrapper > *:last-child {
     margin-bottom: 0 !important;
-}
-
-/* 활성화 상태 */
-.screen.active {
-    opacity: 1;
-    visibility: visible;
-    pointer-events: auto;
-    z-index: 10;
-    transition: opacity 0.15s ease-in-out;
 }
 
 /* 제목 스타일: 반짝이는 사이버펑크 그라데이션 및 글리치 효과 */
@@ -511,12 +504,16 @@ button.cyber-btn:hover { background: #00ff41; color: #000; box-shadow: 0 0 30px 
     }
 
     /* 3. 스크롤 및 화면 구성 */
+
+    /* 실제 스크롤 담당 */
     .screen-content {
-        overflow-y: auto !important;
+        width: 100%;
+        flex: 1;
+        overflow-y: auto;
         overflow-x: hidden;
-        /* [수정] 100px 삭제. 부모 패딩만으로도 충분합니다. */
-        padding-bottom: 0 !important; 
     }
+
+
 
    .screen {
         height: auto !important;
