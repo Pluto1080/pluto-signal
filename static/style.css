@@ -231,7 +231,7 @@ body {
 .screen {
     position: relative;
     width: 100%;
-    min-height: 100%;
+    min-height: unset;   /* ★ 핵심 */
     height: auto;
     display: flex;
     flex-direction: column;
