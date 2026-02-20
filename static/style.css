@@ -304,19 +304,36 @@ body {
 
 /* 제목 스타일: 반짝이는 사이버펑크 그라데이션 및 글리치 효과 */
 h1.shiny-title {
-    font-size: 2.5rem;
-    font-weight: 900;
+    font-family: 'Audiowide', cursive; /* 우주적인 고딕 느낌 */
+    font-size: 3.5rem; /* 크기를 좀 더 키워서 웅장하게 */
+    font-weight: normal;
     text-align: center;
-    /* [수정] 하단 마진을 40px로 늘려 아래 내용과 확실히 떨어뜨립니다 */
-    margin: 0 0 20px 0 !important; 
+    margin: 0 0 30px 0 !important;
     width: 100%;
-    background: linear-gradient(180deg, #00ff41 0%, #ffffff 50%, #00ff41 100%);
-    background-size: auto 200%;
-    color: transparent;
+    
+    /* 색상: 밝은 연두색에서 청록색으로 흐르는 그라데이션 */
+    background: linear-gradient(180deg, #00ff41 0%, #ffffff 50%, #00ffff 100%);
     -webkit-background-clip: text;
     background-clip: text;
-    text-shadow: 0 0 8px rgba(0, 255, 65, 0.6);
-    animation: shine-v 3s linear infinite;
+    color: transparent;
+
+    /* [핵심] 날아갈 듯한 느낌을 주는 변형 */
+    display: inline-block;
+    transform: perspective(500px) rotateX(20deg) skewX(-10deg); /* 화면 밖으로 튀어나오며 기운 느낌 */
+    letter-spacing: 5px; /* 글자 사이 간격을 벌려 개방감 부여 */
+    
+    /* 네온 광원 효과 */
+    text-shadow: 
+        0 0 10px rgba(0, 255, 65, 0.8),
+        0 0 20px rgba(0, 255, 255, 0.4);
+    
+    animation: shine-v 3s linear infinite, floating 2s ease-in-out infinite;
+}
+
+/* 위아래로 살짝 흔들리는 애니메이션 추가 (비행 느낌) */
+@keyframes floating {
+    0%, 100% { transform: perspective(500px) rotateX(20deg) skewX(-10deg) translateY(0); }
+    50% { transform: perspective(500px) rotateX(20deg) skewX(-10deg) translateY(-10px); }
 }
 
 
