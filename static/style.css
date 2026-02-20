@@ -368,20 +368,26 @@ select,
 .result-box {
     height: auto !important;
     line-height: 1.6 !important;
-    padding: 12px 15px 22px 15px !important;
+
+    /* 상단을 줄이고 하단을 살짝 늘려 시각적 중앙 보정 */
+    padding: 10px 15px 22px 15px !important;
+
     gap: 0 !important; 
 }
 
-/* [수정] 박스 내부 제목 여백 확보 */
+/* [최종] 제목 영역 정중앙 + CRT 시각 보정 */
 .result-box h2 {
     display: flex;
     align-items: center;
     justify-content: center;
 
-    height: 48px;   /* 제목 바 높이 */
+    height: 48px;
     line-height: 1;
     padding: 0 !important;
     margin: 0 0 12px 0 !important;
+
+    /* CRT + 글로우 + 스캔라인 시각 보정 */
+    transform: translateY(-2px);
 
     font-size: 1.1rem; 
     color: #ff00ff !important; 
