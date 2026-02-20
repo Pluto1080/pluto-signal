@@ -9,25 +9,41 @@ const rootStyle = document.documentElement.style;
 
 
 /* ==========================================
-   [2] 터치해야 넘어가는 스토리 엔진 START
+   [2] 부드러운 페이드인/아웃 스토리 엔진 START
    ========================================== */
 function playStory(lines, callback) {
-    switchScreen('screen-story');
     const storyText = document.getElementById('story-text');
     const screen = document.getElementById('screen-story');
-    let lineIndex = 0;
-    let isTyping = false;
+    
+    // [핵심 해결 1] 화면 전환 전에 텍스트를 즉시 비워서 '잔상 깜빡임' 완벽 차단
+    storyText.innerHTML = ''; 
+    storyText.style.opacity = '0';
 
-    // 화면을 클릭했을 때 실행될 함수
+    switchScreen('screen-story');
+
+    let lineIndex = 0;
+    let isAnimating = false; // 애니메이션 도중 중복 터치 방지
+
     const handleNext = () => {
-        if (isTyping) return; // 타이핑 중에는 클릭 무시
-        screen.removeEventListener('click', handleNext); // 중복 클릭 방지
-        typeLine();
+        if (isAnimating) return; 
+        isAnimating = true;
+
+        // 1. 터치 시 현재 텍스트가 위로 스르륵 사라짐 (Fade Out)
+        storyText.style.transition = "all 0.3s ease";
+        storyText.style.opacity = "0";
+        storyText.style.transform = "translateY(-20px)";
+
+        // 2. 0.3초 후 다음 대사 준비
+        setTimeout(() => {
+            lineIndex++;
+            showLine();
+        }, 300);
     };
 
-    function typeLine() {
-        // 모든 문장을 다 읽었다면 콜백 실행 (다음 화면으로)
+    function showLine() {
         if (lineIndex >= lines.length) {
+            // 스토리가 끝났으면 클릭 이벤트 지우고 다음 화면으로 이동
+            screen.removeEventListener('click', handleNext);
             callback();
             return;
         }
@@ -36,7 +52,16 @@ function playStory(lines, callback) {
         let textStr = typeof lineData === 'string' ? lineData : lineData.text;
         let isGlitch = typeof lineData === 'object' && lineData.glitch;
 
-        storyText.innerHTML = ''; 
+        // 3. 타이핑 없이 완성된 텍스트 즉시 세팅
+        storyText.innerHTML = textStr; 
+        
+        // 하단 터치 안내 문구 추가
+        const hint = document.createElement('div');
+        hint.className = 'touch-hint'; 
+        hint.innerText = "[ 터치하여 계속 ]";
+        storyText.appendChild(hint);
+
+        // 4. 글리치 효과 처리 (지지직거리는 효과)
         if (isGlitch) {
             storyText.classList.add('glitch-active');
             storyText.style.color = "#ff00ff"; 
@@ -45,37 +70,29 @@ function playStory(lines, callback) {
             storyText.style.color = "#00ff41"; 
         }
 
-        let charIndex = 0;
-        isTyping = true; // 타이핑 시작
-
-        function typeChar() {
-            if (charIndex < textStr.length) {
-                storyText.innerHTML += textStr.charAt(charIndex);
-                charIndex++;
-                setTimeout(typeChar, 40); // 타이핑 속도
-            } else {
-                isTyping = false; // 타이핑 종료
-                lineIndex++;
-                
-                // 타이핑이 끝나면 클릭을 기다림
-                screen.addEventListener('click', handleNext);
-                
-                // 하단에 작은 안내 문구 추가
-                const hint = document.createElement('div');
-                hint.style.fontSize = "0.8rem";
-                hint.style.opacity = "0.5";
-                hint.style.marginTop = "20px";
-                hint.innerText = "[ 터치하여 계속 ]";
-                storyText.appendChild(hint);
-            }
-        }
-        typeChar();
+        // 5. 미래의 텍스트를 아래쪽에 투명하게 숨겨둠
+        storyText.style.transition = "none"; 
+        storyText.style.transform = "translateY(20px)"; 
+        
+        // 6. 브라우저가 인식할 아주 짧은 시간(50ms) 대기 후, 아래에서 위로 부드럽게 등장 (Fade In)
+        setTimeout(() => {
+            storyText.style.transition = "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)";
+            storyText.style.opacity = "1";
+            storyText.style.transform = "translateY(0)";
+            isAnimating = false; // 애니메이션이 끝나면 터치 허용
+        }, 50);
     }
-    // 첫 번째 문장은 자동으로 시작
-    setTimeout(typeLine, 600);
+
+    // 화면 터치 이벤트 등록
+    screen.addEventListener('click', handleNext);
+
+    // 첫 화면 전환 효과(약 450ms)가 끝난 후 첫 대사 등장
+    setTimeout(() => {
+        showLine();
+    }, 600);
 }
 
-// [핵심 해결 1] 처음 접속 시 하얀 화면에서 무한 대기하는 버그 방지
+// 처음 접속 시 초기화
 function initTerminal() {
     playStory([
         { text: "지직... 지직..", glitch: true },
