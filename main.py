@@ -1,6 +1,7 @@
 import os
 import json
 import time
+import re 
 from datetime import datetime
 import swisseph as swe
 from flask import Flask, request, jsonify, render_template
@@ -58,6 +59,9 @@ def index():
 
 
 # [SECTION 4: 데이터 분석 로직 START]
+import re  # 파일 최상단에 반드시 추가
+
+# [SECTION 4: 데이터 분석 로직 START]
 @app.route('/analyze', methods=['POST'])
 def analyze():
     if not client:
@@ -65,6 +69,19 @@ def analyze():
 
     try:
         data = request.json
+        
+        # --- [1번 보안 수정: 입력값 검증 로직 추가] ---
+        raw_name = data.get('name', '')
+        
+        # 정규표현식을 사용하여 한글, 영문, 숫자, 공백만 허용하고 모든 특수문자 제거
+        # 이를 통해 프롬프트 인젝션(명령어 주입) 공격을 1차적으로 차단함
+        clean_name = re.sub(r'[^a-zA-Z가-힣0-9\s]', '', raw_name).strip()
+        
+        # 이름이 비어있거나 20자를 초과할 경우 에러 반환 (비정상적인 긴 문장 차단)
+        if not clean_name or len(clean_name) > 20:
+            return jsonify({"error": "유효하지 않은 이름이야! 특수문자를 제외하고 1~20자 이내로 입력해줘."}), 200
+        # ----------------------------------------------
+
         user_lang = data.get('language', 'ko-KR')
         lat, lon = float(data.get('lat')), float(data.get('lon'))
         
@@ -75,7 +92,7 @@ def analyze():
         now = datetime.now(timezone)
 
         # 궤도 데이터 (2026년 고정 및 현재 시점)
-        jd_year = swe.julday(2026, 7, 1, 12.0) # 미래 기준점
+        jd_year = swe.julday(2026, 7, 1, 12.0) 
         jd_now = swe.julday(now.year, now.month, now.day, now.hour)
         
         transit_year = get_transits(jd_year)
@@ -85,7 +102,7 @@ def analyze():
         prompt = f"""
         너는 먼 우주에서온 쪽집게 점성술사 플루토야. 반드시 '{user_lang}' 언어로, 반말 스타일로 대답해.
         [데이터]
-        - 이름: {data.get('name')}
+        - 이름: {clean_name}  # <-- [수정] 검증된 이름 변수인 clean_name을 사용
         - 탄생 차트: {json.dumps(natal_data, ensure_ascii=False)}
         - 2026년 행성 흐름: {json.dumps(transit_year, ensure_ascii=False)}
         - 현재 시점({now.year}년 {now.month}월) 흐름: {json.dumps(transit_now, ensure_ascii=False)}
@@ -139,5 +156,6 @@ def analyze():
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 8080)))
+
 
 
