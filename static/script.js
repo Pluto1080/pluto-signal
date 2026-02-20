@@ -7,6 +7,61 @@ let loadingInterval;
 const rootStyle = document.documentElement.style;
 /* [1] 전역 변수 설정 END */
 
+/* ==========================================
+   [신규] 스토리 타이핑 엔진 START
+   ========================================== */
+function playStory(lines, callback) {
+    switchScreen('screen-story');
+    const storyText = document.getElementById('story-text');
+    let lineIndex = 0;
+
+    function typeLine() {
+        if (lineIndex >= lines.length) {
+            setTimeout(callback, 800);
+            return;
+        }
+
+        let lineData = lines[lineIndex];
+        let textStr = typeof lineData === 'string' ? lineData : lineData.text;
+        let isGlitch = typeof lineData === 'object' && lineData.glitch;
+
+        storyText.innerHTML = ''; 
+        if (isGlitch) {
+            storyText.classList.add('glitch-active');
+            storyText.style.color = "#ff00ff"; 
+        } else {
+            storyText.classList.remove('glitch-active');
+            storyText.style.color = "#00ff41"; 
+        }
+
+        let charIndex = 0;
+        function typeChar() {
+            if (charIndex < textStr.length) {
+                storyText.innerHTML += textStr.charAt(charIndex);
+                charIndex++;
+                setTimeout(typeChar, 50);
+            } else {
+                lineIndex++;
+                setTimeout(typeLine, 1500);
+            }
+        }
+        typeChar();
+    }
+    setTimeout(typeLine, 600);
+}
+
+// 1. 처음 접속 시: 스토리 재생 후 입력창 띄우기
+window.addEventListener('load', () => {
+    playStory([
+        { text: "지직... 지직..", glitch: true },
+        "나는 플루토야. 저 멀리서 너를 도와주기 위해서 왔지!"
+    ], () => {
+        switchScreen('screen-input');
+        setTimeout(() => { map.invalidateSize(); }, 500);
+    });
+});
+/* [신규] 스토리 타이핑 엔진 END */
+
 // [추가] 시간 모름 체크박스 로직
 document.addEventListener('DOMContentLoaded', () => {
     const noTimeBox = document.getElementById('noTime');
@@ -45,19 +100,15 @@ function switchScreen(id) {
     isSwitching = true;
 
     const content = document.getElementById('content');
-    const container = document.getElementById('container'); // 배경 애니메이션용
+    const container = document.getElementById('container'); 
     
-    // 1. 효과 시작: 글리치 + 워프(빨려들어가는 느낌) 클래스 추가
     content.classList.add('glitch-active');
-    // container가 있다면 배경 워프 효과를 위해 추가 (CSS에 warping-bg 정의 필요)
     if (container) container.classList.add('warping-bg');
     content.classList.add('warping-content');
 
-    // 2. 중요: 새 화면으로 넘어가기 전 스크롤 위치를 맨 위로 리셋
     content.scrollTo({ top: 0, behavior: 'instant' });
 
     setTimeout(() => {
-        // 3. 화면 교체
         const screens = document.querySelectorAll('.screen');
         screens.forEach(s => s.classList.remove('active'));
 
@@ -65,16 +116,14 @@ function switchScreen(id) {
         if (target) {
             target.classList.add('active');
         }
-    }, 150); // 전환 타이밍을 150ms로 약간 늘려 효과를 인지하게 함
+    }, 150);
 
     setTimeout(() => {
-        // 4. 효과 제거 및 상태 해제
         content.classList.remove('glitch-active', 'warping-content');
         if (container) container.classList.remove('warping-bg');
         isSwitching = false;
     }, 450);
 }
-
 /* [4] 화면 전환 기능 END */
 
 /* [5] 데이터 분석 및 통신 START (수정본) */
@@ -83,7 +132,6 @@ function startAnalysis() {
     const date = document.getElementById('birthDate').value;
     const time = document.getElementById('birthTime').value || "12:00";
     
-    // 기본 입력 검증
     if(!name || !date) { 
         alert("데이터를 입력하라."); 
         return; 
@@ -110,27 +158,24 @@ function startAnalysis() {
         }
         
         globalData = data;
-
-        // 1. 데이터를 먼저 채워넣습니다.
         document.getElementById('res-personality').innerText = data.personality;
         document.getElementById('res-pros').innerText = data.pros;
         document.getElementById('res-cons').innerText = data.cons;
 
-        // 2. [추가] 결과 박스들을 미리 투명하게 숨깁니다.
         const resultBoxes = document.querySelectorAll('#screen-personality .result-box');
         resultBoxes.forEach(box => {
             box.style.opacity = "0";
-            box.style.transform = "translateY(20px)"; // 아래에서 위로 올라오는 효과
-            box.style.transition = "none"; // 초기화 시에는 애니메이션 차단
+            box.style.transform = "translateY(20px)";
+            box.style.transition = "none";
         });
 
-        // 3. 화면은 전환하되, 박스들은 아직 숨겨진 상태입니다.
-        switchScreen('screen-personality');
-
-        // 4. [추가] 박스들을 하나씩 글리치와 함께 등장시키는 함수 실행
-        setTimeout(() => {
-            displayResultsSequentially(resultBoxes);
-        }, 500); // 화면 전환 애니메이션 직후 시작
+        // 2. 분석 후 스토리 -> 결과창 띄우기
+        playStory([
+            "내가 너의 성격과 장단점을 알아왔어!"
+        ], () => {
+            switchScreen('screen-personality');
+            setTimeout(() => { displayResultsSequentially(resultBoxes); }, 500);
+        });
     })
     .catch(err => { 
         stopLoadingAnimation(); 
@@ -140,23 +185,14 @@ function startAnalysis() {
     });
 }
 
-// [신규 함수] 박스를 하나씩 순차적으로 글리치 효과와 함께 표시
 async function displayResultsSequentially(boxes) {
     for (let i = 0; i < boxes.length; i++) {
-        // 각 박스 사이의 등장 간격 (0.8초)
         await new Promise(resolve => setTimeout(resolve, 800)); 
-        
         const box = boxes[i];
-        
-        // 지지직거리는 글리치 효과 클래스 추가
         box.classList.add('glitch-active');
-        
-        // 박스 서서히 보이기
         box.style.transition = "all 0.4s ease";
         box.style.opacity = "1";
         box.style.transform = "translateY(0)";
-
-        // 0.4초 후 글리치 효과 제거 (가독성 유지)
         setTimeout(() => {
             box.classList.remove('glitch-active');
         }, 400);
@@ -196,7 +232,6 @@ function stopLoadingAnimation() {
 
 /* [7] 운세별 테마 및 상세 표시 START (수정본) */
 function showFortune(type) {
-    // 배경색 설정 (화면 글로우 효과)
     const bgColors = { 
         'love': ['#3a0d2e', '#1a0515'], 
         'money': ['#0d3a1a', '#051a0d'], 
@@ -210,52 +245,23 @@ function showFortune(type) {
     const st = document.getElementById('fortune-sub-title');
     const c = document.getElementById('res-fortune-content');
 
-    // 1. 기존 테마 클래스 초기화
     box.className = 'result-box';
 
     if(type !== 'monthly') {
         viewedFortunes[type] = true;
-
-        // 버튼 숨김 처리 로직 (기존 유지)
         const allButtons = document.querySelectorAll('#screen-selection .cyber-btn');
         allButtons.forEach(btn => {
             if (btn.id !== `btn-${type}`) btn.classList.add('hidden-btn'); 
         });
-
         setScreenColor(bgColors[type][0], bgColors[type][1]);
-        
-        // 2. 카테고리에 맞는 테마 클래스 및 텍스트 적용
-        if (type === 'love') { 
-            box.classList.add('theme-love'); // 핑크
-            t.innerText = "2026_LOVE"; 
-            st.innerText = "[♥] LOVE_SIGNAL"; 
-            c.innerText = globalData.fortune_2026.love; 
-        }
-        else if (type === 'money') { 
-            box.classList.add('theme-money'); // 초록
-            t.innerText = "2026_MONEY"; 
-            st.innerText = "[$] WEALTH_STATUS"; 
-            c.innerText = globalData.fortune_2026.money; 
-        }
-        else if (type === 'career') { 
-            box.classList.add('theme-career'); // 하늘
-            t.innerText = "2026_CAREER"; 
-            st.innerText = "[!] CAREER_UPDATE"; 
-            c.innerText = globalData.fortune_2026.career; 
-        }
-        else if (type === 'health') { 
-            box.classList.add('theme-health'); // 노랑
-            t.innerText = "2026_HEALTH"; 
-            st.innerText = "[+] VITALITY_LOG"; 
-            c.innerText = globalData.fortune_2026.health; 
-        }
-        
+        if (type === 'love') { box.classList.add('theme-love'); t.innerText = "2026_LOVE"; st.innerText = "[♥] LOVE_SIGNAL"; c.innerText = globalData.fortune_2026.love; }
+        else if (type === 'money') { box.classList.add('theme-money'); t.innerText = "2026_MONEY"; st.innerText = "[$] WEALTH_STATUS"; c.innerText = globalData.fortune_2026.money; }
+        else if (type === 'career') { box.classList.add('theme-career'); t.innerText = "2026_CAREER"; st.innerText = "[!] CAREER_UPDATE"; c.innerText = globalData.fortune_2026.career; }
+        else if (type === 'health') { box.classList.add('theme-health'); t.innerText = "2026_HEALTH"; st.innerText = "[+] VITALITY_LOG"; c.innerText = globalData.fortune_2026.health; }
         switchScreen('screen-fortune-detail');
     } else {
-        // 월별 운세: 무지개 테마
         const monthlyBox = document.querySelector('#screen-monthly-final .result-box');
         monthlyBox.className = 'result-box theme-rainbow';
-        
         setScreenColor(bgColors.monthly[0], bgColors.monthly[1]);
         document.getElementById('res-monthly-content').innerText = globalData.fortune_2026.monthly;
         switchScreen('screen-monthly-final');
@@ -268,7 +274,6 @@ function showFortune(type) {
 
 function returnToSelection() {
     setScreenColor('#444444', '#111111');
-
     const fortuneTypes = ['love', 'money', 'career', 'health'];
     fortuneTypes.forEach(type => {
         const btn = document.getElementById(`btn-${type}`);
@@ -277,21 +282,41 @@ function returnToSelection() {
             else btn.classList.remove('hidden-btn');
         }
     });
-
     switchScreen('screen-selection');
 }
 
+// 2-2. 성격 결과 후 선택 화면 전 스토리
+function goToSelectionStory() {
+    playStory([
+        "자 그럼 이제 진짜 너가 궁금해할만한거 4개 준비해왔어"
+    ], () => {
+        switchScreen('screen-selection');
+    });
+}
+
+// 3. 최종 리포트 전 스토리
 function showFinalReport() {
-    // 최종 리포트 화면의 박스들 타겟팅
-    const summaryBox = document.querySelector('#screen-final-advice .result-box:nth-child(2)');
-    const whisperBox = document.querySelector('#screen-final-advice .result-box:nth-child(3)');
+    playStory([
+        "어떤거같아? 올해가 이제 기대되지?",
+        "내가 한번에 정리해주고 내가 꼭 너에게 해주고싶은 말도 적어봤어! 한번 버튼눌러볼래?"
+    ], () => {
+        const summaryBox = document.querySelector('#screen-final-advice .result-box:nth-child(2)');
+        const whisperBox = document.querySelector('#screen-final-advice .result-box:nth-child(3)');
+        if (summaryBox) summaryBox.className = 'result-box theme-purple';
+        if (whisperBox) whisperBox.className = 'result-box theme-whisper';
+        document.getElementById('res-summary').innerText = globalData.fortune_2026.summary;
+        document.getElementById('res-final-advice').innerText = globalData.fortune_2026.final_advice;
+        switchScreen('screen-final-advice');
+    });
+}
 
-    // 3. 요약(보라) 및 속삭임(흑백반전) 테마 클래스 적용
-    if (summaryBox) summaryBox.className = 'result-box theme-purple';
-    if (whisperBox) whisperBox.className = 'result-box theme-whisper';
-
-    document.getElementById('res-summary').innerText = globalData.fortune_2026.summary;
-    document.getElementById('res-final-advice').innerText = globalData.fortune_2026.final_advice;
-    switchScreen('screen-final-advice');
+// 3-2. 이번 달 운세 전 스토리
+function goToMonthlyStory() {
+    playStory([
+        "모든 운세는 그냥 흐름이니까 가장 중요한건 너의 의지인거 알지?",
+        "꼭 잘되길 바랄게! 마지막으로 이번달 운세 알려줄게!"
+    ], () => {
+        showFortune('monthly');
+    });
 }
 /* [7] 운세별 테마 및 상세 표시 END */
