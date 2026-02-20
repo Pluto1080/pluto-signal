@@ -303,6 +303,7 @@ body {
 }
 
 /* 제목 스타일: 반짝이는 사이버펑크 그라데이션 및 글리치 효과 */
+/* [수정] 안쪽은 어둡고 바깥쪽은 밝은 '리버스 보라' 네온 스타일 */
 h1.shiny-title {
     font-family: 'Passion One', cursive;
     font-size: 4.5rem;
@@ -312,13 +313,13 @@ h1.shiny-title {
     text-transform: uppercase;
     letter-spacing: -1px;
 
-    /* [핵심 수정] 밝은 보라색 그라데이션 적용 */
+    /* [핵심 수정] 리버스 그라데이션: 상하단은 밝고 중앙은 어둡게 설정 */
     background: linear-gradient(to bottom, 
-        #ffffff 0%,   /* 상단 하이라이트 (순백색) */
-        #f3e5f5 30%,  /* 아주 밝은 연보라 */
-        #e1bee7 50%,  /* 밝은 라벤더 */
-        #ce93d8 70%,  /* 중간 톤 보라 */
-        #ba68c8 100%  /* 하단 진한 보라 */
+        #ffffff 0%,     /* 상단: 가장 밝음 (겉) */
+        #ce93d8 25%,    /* 중간으로 가며 보라색이 짙어짐 */
+        #4a148c 50%,    /* 중앙: 가장 깊고 어두운 보라 (안) */
+        #ce93d8 75%,    /* 다시 밝아짐 */
+        #ffffff 100%    /* 하단: 가장 밝음 (겉) */
     );
     -webkit-background-clip: text;
     background-clip: text;
@@ -327,17 +328,19 @@ h1.shiny-title {
     display: inline-block;
     transform: perspective(500px) rotateX(20deg) scaleY(1.1);
 
-    /* [핵심 수정] 보라색 네온 광채로 가독성 극대화 */
-    filter: drop-shadow(0 0 10px rgba(225, 190, 231, 0.8)); /* 밝은 보라빛 후광 */
+    /* [수정] 겉으로 갈수록 밝아지는 광채 효과 강화 */
+    filter: drop-shadow(0 0 15px rgba(225, 190, 231, 0.9));
 
     text-shadow: 
-        0 0 5px rgba(255, 255, 255, 0.8), /* 글자 테두리 흰색 광원 */
-        0 0 15px rgba(206, 147, 216, 0.6), /* 중간 보라 광채 */
-        0 0 30px rgba(186, 104, 200, 0.4), /* 넓게 퍼지는 보라 빛 */
-        0 2px 0 #9c27b0, /* 입체감을 위한 진한 테두리 */
-        0 4px 0 #7b1fa2,
-        0 6px 0 #4a148c,
-        0 8px 15px rgba(0, 0, 0, 0.5); /* 바닥 그림자 */
+        0 0 8px rgba(255, 255, 255, 0.8), /* 글자 테두리 밝은 광원 */
+        0 0 20px rgba(206, 147, 216, 0.5), /* 은은한 보라 후광 */
+        /* 3D 입체 두께는 중앙의 어두운 톤에 맞춰 묵직하게 설정 */
+        0 1px 0 #310062,
+        0 2px 0 #310062,
+        0 3px 0 #210042,
+        0 4px 0 #210042,
+        0 5px 0 #120024,
+        0 8px 15px rgba(0, 0, 0, 0.7);
 
     animation: shine-v 4s linear infinite, navigator-float 3s ease-in-out infinite;
 }
