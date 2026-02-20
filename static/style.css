@@ -252,9 +252,11 @@ body {
 .content-wrapper {
     width: 100%;
     max-width: 480px;
-    margin: auto 0;
+    /* [수정] margin: auto 0; 대신 상단 마진을 음수(-30px)로 주어 전체를 위로 끌어올립니다. */
+    margin: -30px auto auto auto; 
     display: flex;
     flex-direction: column;
+    gap: 25px; 
 }
 
 /* 불필요한 하단 스크롤 방지 핵심 코드 */
@@ -338,7 +340,7 @@ button.cyber-btn,
 }
 
 /* 2. 입력창 & 결과 박스 공통 스타일 
-/* [5] -> [2]번 주석 위치 */
+/* [5] -> [2]번 주석 위치: 입력창 & 결과 박스 공통 스타일 */
 input[type="text"],
 input[type="date"],
 input[type="time"],
@@ -351,12 +353,14 @@ select,
     text-shadow: 0 0 5px rgba(0, 255, 255, 0.5) !important;
     box-shadow: inset 0 0 20px rgba(0, 255, 255, 0.2) !important;
 
-    /* [수정] 아래 요소(버튼 등)와의 간격을 35px로 벌립니다. */
+    /* 아래 요소와의 간격 유지 */
     margin-bottom: 18px !important; 
 
-    /* 아래는 기존 스타일 유지 (이미 있다면 그대로 두세요) */
+    /* [수정] 수직 중앙 정렬 보정 */
     height: 55px !important;
+    line-height: 55px !important; /* 텍스트가 박스 중앙에 오도록 높이와 맞춤 */
     padding: 0 15px !important; 
+    
     font-family: 'DungGeunMo'; 
     font-size: 1.2rem;
     outline: none;
@@ -364,14 +368,15 @@ select,
     color-scheme: dark; 
 }
 
-/* 결과 박스는 내용에 따라 높이가 늘어나야 하므로 height 속성 제외 */
+/* 결과 박스는 내용에 따라 높이가 늘어나야 하므로 height 해제 및 패딩 보정 */
 .result-box {
     height: auto !important;
-    padding: 12px !important;
+    line-height: 1.5 !important; /* 본문 텍스트 줄간격 확보 */
+    /* [수정] 하단 패딩을 살짝 늘려 시각적 무게 중심을 맞춤 */
+    padding: 12px 12px 20px 12px !important; 
 }
 
-/* 3. 라벨 스타일 및 높이 고정 (정렬 뒤틀림 해결의 핵심) */
-/* DATE 라벨과 TIME 헤더의 높이를 25px로 통일하여 아래 입력창 위치를 맞춥니다. */
+/* 3. 라벨 스타일 및 높이 고정 */
 .input-group > label, 
 .time-header {
     height: 25px !important; 
@@ -384,7 +389,7 @@ select,
     font-size: 0.9rem;
 }
 
-/* 4. 날짜/시간 영역 (반응형 가로 배치) */
+/* 4. 날짜/시간 영역 */
 .date-time-container {
     flex-direction: row !important; 
     justify-content: space-between;
@@ -402,7 +407,7 @@ select,
     vertical-align: top;
 }
 
-/* 5. TIME 헤더 (라벨과 시간모름 체크박스 정렬) */
+/* 5. TIME 헤더 */
 .time-header {
     justify-content: space-between; 
     width: 100%;
@@ -448,16 +453,24 @@ button.cyber-btn {
     box-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
     text-transform: uppercase;
     transition: all 0.3s ease;
-    height: auto !important; /* 버튼은 내용에 맞게 */
+    height: auto !important;
 }
 button.cyber-btn:hover { background: #00ff41; color: #000; box-shadow: 0 0 30px #00ff41; }
 
 /* 8. 지도 및 기타 유틸리티 */
 #map { height: 140px; border: 3px solid #00ffff; filter: invert(100%) hue-rotate(180deg); margin-bottom: 15px; }
 .button-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
-.result-box h2 { font-size: 1.1rem; color: #ff00ff !important; border-bottom: 1px dashed #ff00ff; padding-bottom: 10px; margin-bottom: 15px; }
-.hidden-btn { display: none !important; }
 
+/* [수정] 박스 내부 제목이 본문을 아래로 너무 밀어내지 않게 마진 축소 */
+.result-box h2 { 
+    font-size: 1.1rem; 
+    color: #ff00ff !important; 
+    border-bottom: 1px dashed #ff00ff; 
+    padding-bottom: 6px; 
+    margin-bottom: 10px; /* 기존 15px에서 10px로 축소 */
+}
+
+.hidden-btn { display: none !important; }
 /* [5] UI 요소 및 결과 박스 END */
 
 /* [6] 모바일 반응형 최종 보정 - 레이아웃 및 입력창 완전 최적화 */
@@ -476,9 +489,10 @@ button.cyber-btn:hover { background: #00ff41; color: #000; box-shadow: 0 0 30px 
     /* 2. [수정] 세로 중앙 정렬 해제 및 짤림 방지 */
     /* 기존의 'margin: auto 0'이 내용을 아래로 밀어내어 짤리게 만들었습니다. */
     .content-wrapper {
-        margin: 0 auto !important; /* 상단부터 배치하여 짤림 방지 */
+        margin: 0 auto !important; 
         padding-top: 10px;
-        padding-bottom: 80px !important; /* 하단 버튼이 비네팅에 가려지지 않게 여백 확보 */
+        /* [수정] 80px는 너무 깁니다. 30px 정도로 줄여서 불필요한 스크롤을 막습니다. */
+        padding-bottom: 30px !important; 
         display: flex;
         flex-direction: column;
     }
@@ -487,14 +501,16 @@ button.cyber-btn:hover { background: #00ff41; color: #000; box-shadow: 0 0 30px 
     .screen-content {
         overflow-y: auto !important;
         overflow-x: hidden;
-        padding-bottom: 100px !important; /* 스크롤 끝부분 여유 공간 */
+        /* [수정] 100px 삭제. 부모 패딩만으로도 충분합니다. */
+        padding-bottom: 0 !important; 
     }
 
-    .screen {
+   .screen {
         height: auto !important;
         min-height: 100%;
-        justify-content: flex-start !important; /* 내용이 적어도 위에서부터 시작 */
-        padding: 25px 15px !important;
+        /* [수정] 모바일에서도 중앙 정렬을 유지하도록 복구 (짤림은 padding으로 해결) */
+        justify-content: center !important; 
+        padding: 20px 15px !important;
     }
 
     /* 4. [수정] 입력창 스타일 (찌그러짐 방지 및 크기 고정) */
