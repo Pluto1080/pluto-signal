@@ -253,11 +253,12 @@ body {
     text-align: center;
 }
 
-/* [추가] 자동 정렬용 스프링 (내용물 위아래 배치) */
-.screen::before,
+/* [수정] 아래쪽(after) 힘을 훨씬 강하게 주어, 전체 내용을 화면 위쪽으로 번쩍 들어 올립니다! */
+.screen::before {
+    flex: 0.5; 
+}
 .screen::after {
-    content: "";
-    flex: 1; /* 남는 공간을 자동으로 채움 */
+    flex: 1.5; 
 }
 
 /* [추가] 시각적 보정: 위쪽 스프링에 힘을 더 주어 전체 내용을 살짝 위로 들어 올림 */
@@ -340,20 +341,17 @@ button.cyber-btn,
 .content-wrapper > div {
     width: 100%;
     max-width: 480px; 
-    
-    /* [수정] 모든 음수 마진과 무거운 !important 설정을 제거하여 부모의 자동 정렬을 방해하지 않게 함 */
     margin-left: auto !important;
     margin-right: auto !important;
     margin-top: 0 !important;
     margin-bottom: 0 !important;
-    
     display: flex; 
     flex-direction: column;
+    /* 요소들 사이의 간격 */
     gap: 15px; 
 }
 
-/* 2. 입력창 & 결과 박스 공통 스타일 
-/* [5] -> [2]번 주석 위치: 입력창 & 결과 박스 공통 스타일 */
+/* 2. 입력창 & 결과 박스 공통 스타일 */
 input[type="text"],
 input[type="date"],
 input[type="time"],
@@ -366,7 +364,6 @@ select,
     text-shadow: 0 0 5px rgba(0, 255, 255, 0.5) !important;
     box-shadow: inset 0 0 20px rgba(0, 255, 255, 0.2) !important;
 
-    /* 버튼과의 거리는 유지 */
     margin-bottom: 18px !important; 
 
     height: 55px !important;
@@ -379,12 +376,15 @@ select,
     color-scheme: dark; 
 }
 
-/* 결과 박스는 내용에 따라 높이가 늘어나야 하므로 height 해제 및 패딩 보정 */
+/* [수정] 결과 박스 내부 텍스트 쏠림 완벽 해결 */
 .result-box {
     height: auto !important;
     line-height: 1.5 !important;
-    /* 하단 패딩을 더 줘서 텍스트가 바닥에 붙어 보이는 현상(쏠림) 해결 */
-    padding: 12px 12px 20px 12px !important; 
+    /* 하단 패딩을 20px로 늘려 글자가 바닥에 붙어 보이는 현상 방지 */
+    padding: 12px 15px 20px 15px !important; 
+    /* [핵심] 공통 설정에서 상속받은 gap을 제거하여 제목과 본문을 밀착시킴 */
+    gap: 0 !important; 
+    justify-content: flex-start !important;
 }
 
 /* 3. 라벨 스타일 및 높이 고정 */
@@ -472,16 +472,22 @@ button.cyber-btn:hover { background: #00ff41; color: #000; box-shadow: 0 0 30px 
 #map { height: 140px; border: 3px solid #00ffff; filter: invert(100%) hue-rotate(180deg); margin-bottom: 15px; }
 .button-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
 
-/* [수정] 박스 내부 제목이 본문을 아래로 너무 밀어내지 않게 마진 축소 */
+/* [수정] 박스 내부 제목 마진을 최소화하여 본문 텍스트를 위로 끌어올림 */
 .result-box h2 { 
     font-size: 1.1rem; 
     color: #ff00ff !important; 
     border-bottom: 1px dashed #ff00ff; 
-    padding-bottom: 6px; 
-    /* 15px -> 8px로 축소: 제목과 본문이 너무 멀어 보이지 않게 */
-    margin-bottom: 8px; 
+    padding-bottom: 5px !important; 
+    margin-bottom: 5px !important; 
 }
+
+/* [추가] 본문 텍스트 자체의 상단 여백 제거 */
+.result-content {
+    margin-top: 0 !important; 
+}
+
 .hidden-btn { display: none !important; }
+
 /* [5] UI 요소 및 결과 박스 END */
 
 /* [6] 모바일 반응형 최종 보정 - 레이아웃 및 입력창 완전 최적화 */
