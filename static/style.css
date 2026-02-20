@@ -230,20 +230,17 @@ body {
 /* [4] 섹션 레이아웃: 자동 시각적 중앙 정렬 및 여백 최적화 */
 .screen {
     position: absolute; 
-    top: 0; 
-    left: 0; 
+    top: 0; left: 0; 
     width: 100%; 
     min-height: 100%; 
-    height: auto; 
     display: flex; 
     flex-direction: column; 
     align-items: center; 
     
-    /* [수정] 자식 요소 정렬을 스페이서에 맡기기 위해 flex-start로 변경 */
-    justify-content: flex-start; 
+    /* [수정] 다시 정중앙 정렬로 복구합니다 */
+    justify-content: center; 
     
-    /* [수정] 상하 패딩을 제거하여 스페이서가 화면 끝까지 닿게 함 */
-    padding: 0 20px; 
+    padding: 20px; 
     box-sizing: border-box;
     opacity: 0;
     visibility: hidden;
@@ -254,12 +251,7 @@ body {
 }
 
 /* [수정] 아래쪽(after) 힘을 훨씬 강하게 주어, 전체 내용을 화면 위쪽으로 번쩍 들어 올립니다! */
-.screen::before {
-    flex: 0.5; 
-}
-.screen::after {
-    flex: 1.5; 
-}
+.screen::before, .screen::after { display: none; }
 
 /* [추가] 시각적 보정: 위쪽 스프링에 힘을 더 주어 전체 내용을 살짝 위로 들어 올림 */
 .screen::before {
@@ -269,14 +261,14 @@ body {
 .content-wrapper {
     width: 100%;
     max-width: 480px;
-    
-    /* [수정] 음수 마진 제거: 이제 위의 스페이서(::before)가 대신 위로 밀어줍니다. */
     margin: 0 auto; 
-    
     display: flex;
     flex-direction: column;
-    gap: 25px; 
+    gap: 20px;
     z-index: 10;
+    
+    /* [핵심] 수학적 중앙에서 위로 5%만큼 살짝 들어 올려 '시각적 중앙'을 맞춥니다. */
+    transform: translateY(-5%); 
 }
 
 /* 불필요한 하단 스크롤 방지 핵심 코드 */
@@ -298,7 +290,8 @@ h1.shiny-title {
     font-size: 2.5rem;
     font-weight: 900;
     text-align: center;
-    margin: 0 0 10px 0; 
+    /* 제목 아래 마진을 줄여 본문이 너무 내려가지 않게 함 */
+    margin: 0 0 15px 0 !important; 
     width: 100%;
     background: linear-gradient(180deg, #00ff41 0%, #ffffff 50%, #00ff41 100%);
     background-size: auto 200%;
@@ -347,7 +340,7 @@ button.cyber-btn,
     margin-bottom: 0 !important;
     display: flex; 
     flex-direction: column;
-    /* 요소들 사이의 간격 */
+    /* 요소 사이의 간격을 15px로 조밀하게 조정 */
     gap: 15px; 
 }
 
@@ -364,7 +357,7 @@ select,
     text-shadow: 0 0 5px rgba(0, 255, 255, 0.5) !important;
     box-shadow: inset 0 0 20px rgba(0, 255, 255, 0.2) !important;
 
-    margin-bottom: 18px !important; 
+    margin-bottom: 10px !important; /* 박스 사이 간격 축소 */
 
     height: 55px !important;
     line-height: 55px !important; 
@@ -376,15 +369,28 @@ select,
     color-scheme: dark; 
 }
 
-/* [수정] 결과 박스 내부 텍스트 쏠림 완벽 해결 */
+/* [수정] 결과 박스 내부 쏠림 방지 */
 .result-box {
     height: auto !important;
-    line-height: 1.5 !important;
-    /* 하단 패딩을 20px로 늘려 글자가 바닥에 붙어 보이는 현상 방지 */
-    padding: 12px 15px 20px 15px !important; 
-    /* [핵심] 공통 설정에서 상속받은 gap을 제거하여 제목과 본문을 밀착시킴 */
+    /* 본문 텍스트가 박스 내부에서 위로 붙게 패딩 조정 */
+    padding: 12px 15px 18px 15px !important; 
+    /* 박스 내부 gap을 없애 제목과 본문 거리를 좁힘 */
     gap: 0 !important; 
-    justify-content: flex-start !important;
+}
+
+/* [수정] 박스 내부 제목 마진 축소 */
+.result-box h2 { 
+    font-size: 1.1rem; 
+    color: #ff00ff !important; 
+    border-bottom: 1px dashed #ff00ff; 
+    padding-bottom: 4px !important; 
+    margin-bottom: 8px !important; 
+}
+
+.result-content {
+    line-height: 1.6;
+    /* 본문 텍스트의 불필요한 위쪽 여백 제거 */
+    margin-top: 0 !important; 
 }
 
 /* 3. 라벨 스타일 및 높이 고정 */
@@ -471,21 +477,6 @@ button.cyber-btn:hover { background: #00ff41; color: #000; box-shadow: 0 0 30px 
 /* 8. 지도 및 기타 유틸리티 */
 #map { height: 140px; border: 3px solid #00ffff; filter: invert(100%) hue-rotate(180deg); margin-bottom: 15px; }
 .button-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
-
-/* [수정] 박스 내부 제목 마진을 최소화하여 본문 텍스트를 위로 끌어올림 */
-.result-box h2 { 
-    font-size: 1.1rem; 
-    color: #ff00ff !important; 
-    border-bottom: 1px dashed #ff00ff; 
-    padding-bottom: 5px !important; 
-    margin-bottom: 5px !important; 
-}
-
-/* [추가] 본문 텍스트 자체의 상단 여백 제거 */
-.result-content {
-    margin-top: 0 !important; 
-}
-
 .hidden-btn { display: none !important; }
 
 /* [5] UI 요소 및 결과 박스 END */
