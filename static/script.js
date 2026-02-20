@@ -7,8 +7,9 @@ let loadingInterval;
 const rootStyle = document.documentElement.style;
 /* [1] 전역 변수 설정 END */
 
+
 /* ==========================================
-   [수정] 터치해야 넘어가는 스토리 엔진 START
+   [2] 터치해야 넘어가는 스토리 엔진 START
    ========================================== */
 function playStory(lines, callback) {
     switchScreen('screen-story');
@@ -51,7 +52,7 @@ function playStory(lines, callback) {
             if (charIndex < textStr.length) {
                 storyText.innerHTML += textStr.charAt(charIndex);
                 charIndex++;
-                setTimeout(typeChar, 40); // 타이핑 속도 (살짝 빠르게 조절)
+                setTimeout(typeChar, 40); // 타이핑 속도
             } else {
                 isTyping = false; // 타이핑 종료
                 lineIndex++;
@@ -59,7 +60,7 @@ function playStory(lines, callback) {
                 // 타이핑이 끝나면 클릭을 기다림
                 screen.addEventListener('click', handleNext);
                 
-                // 하단에 작은 안내 문구 추가 (가독성 위해)
+                // 하단에 작은 안내 문구 추가
                 const hint = document.createElement('div');
                 hint.style.fontSize = "0.8rem";
                 hint.style.opacity = "0.5";
@@ -70,45 +71,59 @@ function playStory(lines, callback) {
         }
         typeChar();
     }
-
     // 첫 번째 문장은 자동으로 시작
     setTimeout(typeLine, 600);
 }
-/* [수정] 스토리 엔진 END */
 
-// [추가] 시간 모름 체크박스 로직
+// [핵심 해결 1] 처음 접속 시 하얀 화면에서 무한 대기하는 버그 방지
+function initTerminal() {
+    playStory([
+        { text: "지직... 지직..", glitch: true },
+        "나는 플루토야. 저 멀리서 너를 도와주기 위해서 왔지!"
+    ], () => {
+        switchScreen('screen-input');
+        setTimeout(() => { map.invalidateSize(); }, 500);
+    });
+}
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initTerminal);
+} else {
+    initTerminal();
+}
+/* [2] 스토리 엔진 END */
+
+
+/* [3] 기타 초기화 및 유틸리티 로직 START */
+// 시간 모름 체크박스 로직
 document.addEventListener('DOMContentLoaded', () => {
     const noTimeBox = document.getElementById('noTime');
     const timeInput = document.getElementById('birthTime');
-    
     if(noTimeBox && timeInput) {
         noTimeBox.addEventListener('change', (e) => {
             if(e.target.checked) {
-                timeInput.value = "";     // 값 초기화
-                timeInput.disabled = true; // 입력 막기
+                timeInput.value = "";     
+                timeInput.disabled = true; 
             } else {
-                timeInput.disabled = false; // 입력 풀기
+                timeInput.disabled = false; 
             }
         });
     }
 });
 
-/* [2] 지도 초기화 START */
+// 지도 초기화
 const map = L.map('map', { zoomControl: false }).setView([selectedLat, selectedLon], 6);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 let marker = L.marker([selectedLat, selectedLon]).addTo(map);
 map.on('click', (e) => { selectedLat = e.latlng.lat; selectedLon = e.latlng.lng; marker.setLatLng(e.latlng); });
 setTimeout(() => { map.invalidateSize(); }, 500);
-/* [2] 지도 초기화 END */
 
-/* [3] 화면 색상 제어 함수 START */
+// 화면 색상 제어 함수
 function setScreenColor(center, edge) {
     rootStyle.setProperty('--screen-bg-center', center);
     rootStyle.setProperty('--screen-bg-edge', edge);
 }
-/* [3] 화면 색상 제어 함수 END */
 
-/* [4] 화면 전환 기능 수정 (강화 버전) */
+// 화면 전환 기능
 function switchScreen(id) {
     if (isSwitching) return;
     isSwitching = true;
@@ -120,7 +135,7 @@ function switchScreen(id) {
     if (container) container.classList.add('warping-bg');
     content.classList.add('warping-content');
 
-    content.scrollTo({ top: 0, behavior: 'instant' });
+    content.scrollTop = 0; // 스크롤 맨 위로 초기화
 
     setTimeout(() => {
         const screens = document.querySelectorAll('.screen');
@@ -138,18 +153,16 @@ function switchScreen(id) {
         isSwitching = false;
     }, 450);
 }
-/* [4] 화면 전환 기능 END */
+/* [3] 기타 초기화 및 유틸리티 로직 END */
 
-/* [5] 데이터 분석 및 통신 START (수정본) */
+
+/* [4] 데이터 통신 및 애니메이션 제어 START */
 function startAnalysis() {
     const name = document.getElementById('userName').value;
     const date = document.getElementById('birthDate').value;
     const time = document.getElementById('birthTime').value || "12:00";
     
-    if(!name || !date) { 
-        alert("데이터를 입력하라."); 
-        return; 
-    }
+    if(!name || !date) { alert("데이터를 입력하라."); return; }
     
     startLoadingAnimation();
 
@@ -163,7 +176,7 @@ function startAnalysis() {
         return res.json();
     })
     .then(data => {
-        stopLoadingAnimation();
+        stopLoadingAnimation(); 
         
         if(data.error) { 
             alert(data.error); 
@@ -183,7 +196,6 @@ function startAnalysis() {
             box.style.transition = "none";
         });
 
-        // 2. 분석 후 스토리 -> 결과창 띄우기
         playStory([
             "내가 너의 성격과 장단점을 알아왔어!"
         ], () => {
@@ -207,14 +219,10 @@ async function displayResultsSequentially(boxes) {
         box.style.transition = "all 0.4s ease";
         box.style.opacity = "1";
         box.style.transform = "translateY(0)";
-        setTimeout(() => {
-            box.classList.remove('glitch-active');
-        }, 400);
+        setTimeout(() => { box.classList.remove('glitch-active'); }, 400);
     }
 }
-/* [5] 데이터 분석 및 통신 END */
 
-/* [6] 로딩 및 별똥별 애니메이션 START */
 function startLoadingAnimation() {
     switchScreen('screen-loading');
     setScreenColor('#1a0414', '#0a0208'); 
@@ -241,30 +249,29 @@ function stopLoadingAnimation() {
     clearInterval(loadingInterval);
     setScreenColor('#444444', '#111111');
     document.querySelectorAll('.star').forEach(s => s.remove());
+    
+    // [핵심 해결 2] 통신이 너무 빨리 끝나서 화면 전환 락이 안 풀려버리는 버그 수정
+    isSwitching = false; 
 }
-/* [6] 로딩 및 별똥별 애니메이션 END */
+/* [4] 데이터 통신 및 애니메이션 제어 END */
 
-/* [7] 운세별 테마 및 상세 표시 START (수정본) */
+
+/* [5] 운세별 테마 및 스토리 표시 START */
 function showFortune(type) {
     const bgColors = { 
-        'love': ['#3a0d2e', '#1a0515'], 
-        'money': ['#0d3a1a', '#051a0d'], 
-        'career': ['#0d2e3a', '#05151a'],
-        'health': ['#3a3a0d', '#1a1a05'],
+        'love': ['#3a0d2e', '#1a0515'], 'money': ['#0d3a1a', '#051a0d'], 
+        'career': ['#0d2e3a', '#05151a'], 'health': ['#3a3a0d', '#1a1a05'],
         'monthly': ['#1a0414', '#0a0208']
     };
-    
     const box = document.getElementById('fortune-box');
     const t = document.getElementById('fortune-title');
     const st = document.getElementById('fortune-sub-title');
     const c = document.getElementById('res-fortune-content');
-
     box.className = 'result-box';
 
     if(type !== 'monthly') {
         viewedFortunes[type] = true;
-        const allButtons = document.querySelectorAll('#screen-selection .cyber-btn');
-        allButtons.forEach(btn => {
+        document.querySelectorAll('#screen-selection .cyber-btn').forEach(btn => {
             if (btn.id !== `btn-${type}`) btn.classList.add('hidden-btn'); 
         });
         setScreenColor(bgColors[type][0], bgColors[type][1]);
@@ -299,16 +306,14 @@ function returnToSelection() {
     switchScreen('screen-selection');
 }
 
-// 2-2. 성격 결과 후 선택 화면 전 스토리
+// 성격 결과 후 선택 화면 전 스토리
 function goToSelectionStory() {
     playStory([
         "자 그럼 이제 진짜 너가 궁금해할만한거 4개 준비해왔어"
-    ], () => {
-        switchScreen('screen-selection');
-    });
+    ], () => { switchScreen('screen-selection'); });
 }
 
-// 3. 최종 리포트 전 스토리
+// 최종 리포트 전 스토리
 function showFinalReport() {
     playStory([
         "어떤거같아? 올해가 이제 기대되지?",
@@ -324,13 +329,11 @@ function showFinalReport() {
     });
 }
 
-// 3-2. 이번 달 운세 전 스토리
+// 이번 달 운세 전 스토리
 function goToMonthlyStory() {
     playStory([
         "모든 운세는 그냥 흐름이니까 가장 중요한건 너의 의지인거 알지?",
         "꼭 잘되길 바랄게! 마지막으로 이번달 운세 알려줄게!"
-    ], () => {
-        showFortune('monthly');
-    });
+    ], () => { showFortune('monthly'); });
 }
-/* [7] 운세별 테마 및 상세 표시 END */
+/* [5] 운세별 테마 및 스토리 표시 END */
