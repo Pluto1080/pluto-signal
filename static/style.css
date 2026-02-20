@@ -575,6 +575,33 @@ button.cyber-btn:hover { background: #00ff41; color: #000; box-shadow: 0 0 30px 
 .button-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
 .hidden-btn { display: none !important; }
 
+.typewriter-text {
+    color: #00ff41; /* 플루토의 시그니처 연두색 */
+    font-size: 1.6rem;
+    text-align: center;
+    line-height: 1.8;
+    font-weight: bold;
+    text-shadow: 0 0 10px rgba(0, 255, 65, 0.6);
+    min-height: 120px;
+    word-break: keep-all;
+    width: 100%;
+}
+
+/* 타이핑 커서 효과 (깜빡이는 블록) */
+.typewriter-text::after {
+    content: '█';
+    display: inline-block;
+    vertical-align: bottom;
+    animation: cursor-blink 1s step-end infinite;
+    margin-left: 8px;
+    color: #00ff41;
+}
+
+@keyframes cursor-blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
 /* [5] UI 요소 및 결과 박스 END */
 
 /* [6] 모바일 반응형 최종 보정 - 레이아웃 및 입력창 완전 최적화 */
@@ -682,6 +709,12 @@ button.cyber-btn:hover { background: #00ff41; color: #000; box-shadow: 0 0 30px 
         margin-bottom: 15px !important;
         padding: 14px !important;
     }
+    
+    .typewriter-text {
+        font-size: 1.2rem;
+        line-height: 1.6;
+    }
+}
 
     .monitor-neck, .monitor-base { display: none; }
 }
