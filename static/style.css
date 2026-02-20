@@ -303,47 +303,51 @@ body {
 }
 
 /* 제목 스타일: 반짝이는 사이버펑크 그라데이션 및 글리치 효과 */
-/* [수정] 안쪽은 어둡고 바깥쪽은 밝은 '리버스 보라' 네온 스타일 */
-/* [최종] 보라-흰색-보라 레이어드 + 가로 확장 네온 디자인 */
-/* [최종 수정] 차분한 3D 입체감의 '리버스 보라' 디자인 */
+/* [최종] 깊고 웅장한 보라-라벤더 레이어드 디자인 */
 h1.shiny-title {
     font-family: 'Passion One', cursive;
-    font-size: 4rem; /* 모바일 고려하여 살짝 축소 */
+    font-size: 4rem;
     font-weight: 900;
     text-align: center;
     margin: 0 0 25px 0 !important;
     text-transform: uppercase;
     
-    /* [수정] 양옆으로 적당히 늘리기 (기존 1.5에서 1.2로 하향 조절) */
+    /* 양옆 확장감 유지 */
     letter-spacing: 4px; 
     display: inline-block;
     transform: perspective(500px) rotateX(15deg) scaleX(1.2) scaleY(1.1);
 
-    /* [핵심] 리버스 그라데이션: 겉(상하단)은 연보라, 안(중앙)은 진보라 */
+    /* [핵심 수정] 더 진한 보라-라벤더 리버스 그라데이션 */
     background: linear-gradient(to bottom, 
-        #f3e5f5 0%,     /* 상단: 밝은 라벤더 */
-        #ce93d8 35%,    /* 중간 상부 */
-        #4a148c 50%,    /* 중앙: 깊고 어두운 보라 (다크 코어) */
-        #ce93d8 65%,    /* 중간 하부 */
-        #f3e5f5 100%    /* 하단: 밝은 라벤더 */
+        #d1c4e9 0%,     /* 상단: 진한 라벤더 */
+        #9575cd 30%,    /* 중간 상부: 미디엄 퍼플 */
+        #311b92 50%,    /* 중앙: 깊고 진한 딥 인디고 (다크 코어) */
+        #9575cd 70%,    /* 중간 하부 */
+        #d1c4e9 100%    /* 하단: 진한 라벤더 */
     );
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
 
-    /* [수정] 번지는 광채를 최소화하고 텍스트 윤곽을 강조 */
-    filter: drop-shadow(0 0 8px rgba(206, 147, 216, 0.4));
+    /* 네온 광채: 채도가 높은 보라색으로 가독성 확보 */
+    filter: drop-shadow(0 0 10px rgba(149, 117, 205, 0.5));
 
-    /* [수정] 레이어드 그림자: 얇고 날카로운 흰색 코어 + 묵직한 보라색 두께 */
+    /* 레이어드 쉐도우: 묵직한 금속 질감 표현 */
     text-shadow: 
-        0 0 2px rgba(255, 255, 255, 0.5), /* 아주 얇은 흰색 윤곽선 */
-        0 1px 0 #310062,                 /* 3D 레이어 1 */
-        0 2px 0 #310062,                 /* 3D 레이어 2 */
-        0 3px 0 #210042,                 /* 3D 레이어 3 */
-        0 4px 0 #210042,                 /* 3D 레이어 4 */
-        0 6px 12px rgba(0, 0, 0, 0.6);   /* 부드러운 하단 그림자 */
+        0 0 2px rgba(255, 255, 255, 0.4), /* 미세한 하이라이트 윤곽 */
+        0 1px 0 #21014a,                 /* 3D 레이어 1: 가장 어두운 보라 */
+        0 2px 0 #21014a,                 /* 3D 레이어 2 */
+        0 3px 0 #120024,                 /* 3D 레이어 3 */
+        0 4px 0 #120024,                 /* 3D 레이어 4 */
+        0 6px 15px rgba(0, 0, 0, 0.8);   /* 바닥으로 떨어지는 깊은 그림자 */
 
     animation: navigator-float 3s ease-in-out infinite;
+}
+
+/* 애니메이션 비율 유지 */
+@keyframes navigator-float {
+    0%, 100% { transform: perspective(500px) rotateX(15deg) scaleX(1.2) scaleY(1.1) translateY(0); }
+    50% { transform: perspective(500px) rotateX(15deg) scaleX(1.2) scaleY(1.1) translateY(-10px); }
 }
 
 /* 애니메이션에서도 scaleX(1.2) 비율 유지 */
