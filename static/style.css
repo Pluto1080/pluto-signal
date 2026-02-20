@@ -374,13 +374,19 @@ select,
 }
 
 /* [수정] 박스 내부 제목 여백 확보 */
-.result-box h2 { 
+.result-box h2 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    height: 48px;   /* 제목 바 높이 */
+    line-height: 1;
+    padding: 0 !important;
+    margin: 0 0 12px 0 !important;
+
     font-size: 1.1rem; 
     color: #ff00ff !important; 
     border-bottom: 1px dashed #ff00ff; 
-    padding-bottom: 10px !important; 
-    /* [수정] 제목 아래 여백을 15px로 늘려 본문과 떨어뜨립니다 */
-    margin-bottom: 15px !important; 
 }
 
 .result-content {
