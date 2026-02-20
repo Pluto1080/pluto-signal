@@ -305,52 +305,54 @@ body {
 /* 제목 스타일: 반짝이는 사이버펑크 그라데이션 및 글리치 효과 */
 /* [수정] 안쪽은 어둡고 바깥쪽은 밝은 '리버스 보라' 네온 스타일 */
 /* [최종] 보라-흰색-보라 레이어드 + 가로 확장 네온 디자인 */
+/* [최종 수정] 차분한 3D 입체감의 '리버스 보라' 디자인 */
 h1.shiny-title {
     font-family: 'Passion One', cursive;
-    font-size: 4.5rem;
+    font-size: 4rem; /* 모바일 고려하여 살짝 축소 */
     font-weight: 900;
     text-align: center;
-    margin: 0 0 20px 0 !important;
+    margin: 0 0 25px 0 !important;
     text-transform: uppercase;
     
-    /* [수정] 양옆으로 시원하게 늘리기 (자간 + 가로 스케일) */
-    letter-spacing: 10px; 
+    /* [수정] 양옆으로 적당히 늘리기 (기존 1.5에서 1.2로 하향 조절) */
+    letter-spacing: 4px; 
     display: inline-block;
-    /* scaleX(1.5)를 통해 텍스트를 옆으로 쫙 늘려 웅장함 부여 */
-    transform: perspective(500px) rotateX(15deg) scaleX(1.5) scaleY(1.1);
+    transform: perspective(500px) rotateX(15deg) scaleX(1.2) scaleY(1.1);
 
-    /* [핵심] 레이어드 네온 효과: 텍스트 자체를 흰색으로 두어 밝은 심지를 만듦 */
-    color: #ffffff; 
-    
-    /* 다중 그림자를 통해 보라색 잔상과 3D 깊이감을 동시에 표현 */
-    text-shadow: 
-        0 0 10px #ff00ff,   /* 레이어 1: 안쪽 보라색 번짐 */
-        0 0 20px #ff00ff,   /* 레이어 2: 중간 보라색 광원 */
-        0 0 40px #ff00ff,   /* 레이어 3: 바깥쪽 거대 보라 잔상 */
-        0 0 70px #ff00ff,   /* 레이어 4: 공간을 채우는 네온 후광 */
-        /* 3D 레이어: 어두운 보라색 오프셋으로 금속성 입체감 추가 */
-        3px 3px 0px #4a148c,
-        6px 6px 0px #310062,
-        8px 8px 20px rgba(0, 0, 0, 0.8);
-
-    /* 미세한 스캔라인 질감 (글자 내부) */
-    background: linear-gradient(rgba(255, 255, 255, 0.1) 50%, transparent 50%);
-    background-size: 100% 4px;
+    /* [핵심] 리버스 그라데이션: 겉(상하단)은 연보라, 안(중앙)은 진보라 */
+    background: linear-gradient(to bottom, 
+        #f3e5f5 0%,     /* 상단: 밝은 라벤더 */
+        #ce93d8 35%,    /* 중간 상부 */
+        #4a148c 50%,    /* 중앙: 깊고 어두운 보라 (다크 코어) */
+        #ce93d8 65%,    /* 중간 하부 */
+        #f3e5f5 100%    /* 하단: 밝은 라벤더 */
+    );
     -webkit-background-clip: text;
     background-clip: text;
+    color: transparent;
 
-    animation: neon-flicker 2s infinite alternate, navigator-float 3s ease-in-out infinite;
+    /* [수정] 번지는 광채를 최소화하고 텍스트 윤곽을 강조 */
+    filter: drop-shadow(0 0 8px rgba(206, 147, 216, 0.4));
+
+    /* [수정] 레이어드 그림자: 얇고 날카로운 흰색 코어 + 묵직한 보라색 두께 */
+    text-shadow: 
+        0 0 2px rgba(255, 255, 255, 0.5), /* 아주 얇은 흰색 윤곽선 */
+        0 1px 0 #310062,                 /* 3D 레이어 1 */
+        0 2px 0 #310062,                 /* 3D 레이어 2 */
+        0 3px 0 #210042,                 /* 3D 레이어 3 */
+        0 4px 0 #210042,                 /* 3D 레이어 4 */
+        0 6px 12px rgba(0, 0, 0, 0.6);   /* 부드러운 하단 그림자 */
+
+    animation: navigator-float 3s ease-in-out infinite;
 }
 
-/* [중요] 애니메이션에서도 늘어난 가로 비율(scaleX)이 유지되도록 수정 */
+/* 애니메이션에서도 scaleX(1.2) 비율 유지 */
 @keyframes navigator-float {
-    0%, 100% { 
-        transform: perspective(500px) rotateX(15deg) scaleX(1.5) scaleY(1.1) translateY(0); 
-    }
-    50% { 
-        transform: perspective(500px) rotateX(15deg) scaleX(1.5) scaleY(1.1) translateY(-15px); 
-    }
+    0%, 100% { transform: perspective(500px) rotateX(15deg) scaleX(1.2) scaleY(1.1) translateY(0); }
+    50% { transform: perspective(500px) rotateX(15deg) scaleX(1.2) scaleY(1.1) translateY(-10px); }
 }
+
+
 /* 네온이 미세하게 떨리는 효과 추가 (진짜 옛날 모니터 느낌) */
 @keyframes neon-flicker {
     0%, 100% { opacity: 1; filter: drop-shadow(0 0 15px rgba(255, 0, 255, 0.8)); }
