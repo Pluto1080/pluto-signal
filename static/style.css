@@ -278,7 +278,7 @@ h1.shiny-title {
     font-size: 2.5rem;
     font-weight: 900;
     text-align: center;
-    margin: 0 0 20px 0; /* 상단 여백을 제거하여 정중앙 정렬을 도움 */
+    margin: 0 0 40px 0; /* 상단 여백을 제거하여 정중앙 정렬을 도움 */
     width: 100%;
     
     /* 애니메이션 그라데이션 텍스트 */
@@ -319,6 +319,7 @@ h1.shiny-title:hover {
 /* [5] UI 요소 및 결과 박스 START */
 
 /* 1. 공통 너비 제한 및 중앙 정렬 */
+/* 1. 공통 너비 제한 및 중앙 정렬 */
 .content-wrapper, 
 .input-wrapper, 
 .date-time-container, 
@@ -332,9 +333,12 @@ button.cyber-btn,
     margin-right: auto !important;
     display: flex; 
     flex-direction: column;
+    /* [추가] 요소들 사이에 30px 정도의 간격을 줌 */
+    gap: 30px; 
 }
 
 /* 2. 입력창 & 결과 박스 공통 스타일 
+/* [5] -> [2]번 주석 위치 */
 input[type="text"],
 input[type="date"],
 input[type="time"],
@@ -346,19 +350,15 @@ select,
     color: #00ffff !important;
     text-shadow: 0 0 5px rgba(0, 255, 255, 0.5) !important;
     box-shadow: inset 0 0 20px rgba(0, 255, 255, 0.2) !important;
-    
-    /* [수정] 높이를 45px -> 55px로 키워 터치하기 편하고 시원하게 만듭니다 */
+
+    /* [수정] 아래 요소(버튼 등)와의 간격을 35px로 벌립니다. */
+    margin-bottom: 35px !important; 
+
+    /* 아래는 기존 스타일 유지 (이미 있다면 그대로 두세요) */
     height: 55px !important;
-    
-    /* [수정] 좌우 여백을 늘려 텍스트가 덜 답답해 보이게 함 */
     padding: 0 15px !important; 
-    
     font-family: 'DungGeunMo'; 
-    
-    /* [수정] 글자 크기도 1.0rem -> 1.2rem으로 키움 */
     font-size: 1.2rem;
-    
-    margin-bottom: 15px;
     outline: none;
     box-sizing: border-box; 
     color-scheme: dark; 
