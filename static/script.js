@@ -8,16 +8,26 @@ const rootStyle = document.documentElement.style;
 /* [1] 전역 변수 설정 END */
 
 /* ==========================================
-   [신규] 스토리 타이핑 엔진 START
+   [수정] 터치해야 넘어가는 스토리 엔진 START
    ========================================== */
 function playStory(lines, callback) {
     switchScreen('screen-story');
     const storyText = document.getElementById('story-text');
+    const screen = document.getElementById('screen-story');
     let lineIndex = 0;
+    let isTyping = false;
+
+    // 화면을 클릭했을 때 실행될 함수
+    const handleNext = () => {
+        if (isTyping) return; // 타이핑 중에는 클릭 무시
+        screen.removeEventListener('click', handleNext); // 중복 클릭 방지
+        typeLine();
+    };
 
     function typeLine() {
+        // 모든 문장을 다 읽었다면 콜백 실행 (다음 화면으로)
         if (lineIndex >= lines.length) {
-            setTimeout(callback, 800);
+            callback();
             return;
         }
 
@@ -35,32 +45,36 @@ function playStory(lines, callback) {
         }
 
         let charIndex = 0;
+        isTyping = true; // 타이핑 시작
+
         function typeChar() {
             if (charIndex < textStr.length) {
                 storyText.innerHTML += textStr.charAt(charIndex);
                 charIndex++;
-                setTimeout(typeChar, 50);
+                setTimeout(typeChar, 40); // 타이핑 속도 (살짝 빠르게 조절)
             } else {
+                isTyping = false; // 타이핑 종료
                 lineIndex++;
-                setTimeout(typeLine, 1500);
+                
+                // 타이핑이 끝나면 클릭을 기다림
+                screen.addEventListener('click', handleNext);
+                
+                // 하단에 작은 안내 문구 추가 (가독성 위해)
+                const hint = document.createElement('div');
+                hint.style.fontSize = "0.8rem";
+                hint.style.opacity = "0.5";
+                hint.style.marginTop = "20px";
+                hint.innerText = "[ 터치하여 계속 ]";
+                storyText.appendChild(hint);
             }
         }
         typeChar();
     }
+
+    // 첫 번째 문장은 자동으로 시작
     setTimeout(typeLine, 600);
 }
-
-// 1. 처음 접속 시: 스토리 재생 후 입력창 띄우기
-window.addEventListener('load', () => {
-    playStory([
-        { text: "지직... 지직..", glitch: true },
-        "나는 플루토야. 저 멀리서 너를 도와주기 위해서 왔지!"
-    ], () => {
-        switchScreen('screen-input');
-        setTimeout(() => { map.invalidateSize(); }, 500);
-    });
-});
-/* [신규] 스토리 타이핑 엔진 END */
+/* [수정] 스토리 엔진 END */
 
 // [추가] 시간 모름 체크박스 로직
 document.addEventListener('DOMContentLoaded', () => {
