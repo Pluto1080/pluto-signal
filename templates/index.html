@@ -20,7 +20,13 @@
             
             <div id="content" class="screen-content">
                 
-                <section id="screen-input" class="screen active">
+                <section id="screen-story" class="screen active">
+                    <div class="content-wrapper" style="justify-content: center; height: 100%; min-height: 50vh;">
+                        <div id="story-text" class="typewriter-text"></div>
+                    </div>
+                </section>
+
+                <section id="screen-input" class="screen">
                     <div class="content-wrapper">
                         <h1 class="shiny-title">ACCESS: PLUTO</h1>
 
@@ -82,7 +88,7 @@
                             </div>
                         </div>
 
-                        <button class="cyber-btn" onclick="switchScreen('screen-selection')">NEXT_SEQUENCE >></button>
+                        <button class="cyber-btn" onclick="goToSelectionStory()">NEXT_SEQUENCE >></button>
                     </div>
                 </section>
 
@@ -129,7 +135,7 @@
                             <div id="res-final-advice" class="result-content" style="font-weight:bold;"></div>
                         </div>
 
-                        <button class="cyber-btn" onclick="showFortune('monthly')">CHECK_THIS_MONTH >></button>
+                        <button class="cyber-btn" onclick="goToMonthlyStory()">CHECK_THIS_MONTH >></button>
                     </div>
                 </section>
 
