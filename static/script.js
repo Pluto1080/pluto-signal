@@ -402,24 +402,32 @@ function startEnding() {
     });
 }
 
-/* script.js 하단의 triggerTVOn 함수를 이대로 덮어씌우세요 */
+/* script.js 하단의 triggerTVOn 함수 수정 */
 function triggerTVOn(callback) {
-    const container = document.getElementById('container');
-    const content = document.getElementById('content');
+    const container = document.getElementById('container'); // .screen-container (프레임)
+    const content = document.getElementById('content');     // #content (내용물)
+    const monitorFrame = document.querySelector('.monitor-frame'); // 가장 바깥 프레임
+
+    // 초기화: 내용물 숨김
+    content.style.visibility = 'hidden';
+
+    // 1. 프레임 열리는 애니메이션(tv-on) 실행
+    container.style.animation = 'tv-on 1.2s cubic-bezier(0.15, 0.85, 0.35, 1) forwards';
     
-    // 1. 시작: 모니터 안을 완전 검은색으로 설정 (전원 꺼짐 상태)
-    setScreenColor('#000000', '#000000'); 
-    
-    // 2. 애니메이션 실행: content(회색 화면)가 검은 배경 위에서 펼쳐짐
-    content.style.visibility = 'visible';
-    content.style.animation = 'tv-on 1.2s cubic-bezier(0.15, 0.85, 0.35, 1) forwards';
-    
-    // 3. [핵심] 애니메이션이 끝나는 시점에 원래의 회색 테마로 복구
+    // 2. 애니메이션이 완전히 끝나는 시간(1.2초)에 맞춘 로직
     setTimeout(() => {
-        // 원래 terminal의 기본 회색 값으로 복구합니다.
-        setScreenColor('#444444', '#111111'); 
-        if (callback) callback();
-    }, 1200);
+        // [핵심 1] 프레임이 다 열렸으니 이제 글리치 효과(crt-overlay)를 켭니다.
+        if (monitorFrame) monitorFrame.classList.add('crt-active');
+        
+        // [핵심 2] 내용물(#content)을 보여주고 뚝딱거리는 flicker 애니메이션 시작
+        content.style.visibility = 'visible';
+        content.style.animation = 'content-on 0.6s ease-out forwards';
+        
+        // 데이터 업데이트 등 기존 로직...
+        setTerminalTime();
+        
+        if (callback) callback(); // initTerminal 실행
+    }, 1200); // tv-on 애니메이션 1.2초와 동일하게 맞춤
 }
 
 /* [컷 8] 브라운관 TV 꺼지는 효과 */
