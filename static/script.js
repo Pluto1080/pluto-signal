@@ -402,25 +402,26 @@ function startEnding() {
     });
 }
 
-/* script.js 파일 하단 triggerTVOn 함수 수정 */
+/* script.js의 triggerTVOn 함수를 이 내용으로 교체하세요 */
 function triggerTVOn(callback) {
     const container = document.getElementById('container');
     const content = document.getElementById('content');
     
-    // [추가] 켜지는 동안은 배경색 변수들을 완전 검은색으로 유지합니다.
+    // 1. 시작할 때는 화면을 검은색으로 강제 설정
     setScreenColor('#000000', '#000000'); 
     
-    // 애니메이션 실행
+    // 2. 켜지는 애니메이션(tv-on) 실행
     container.style.transformOrigin = 'center center';
     container.style.animation = 'tv-on 1.2s cubic-bezier(0.15, 0.85, 0.35, 1) forwards';
     
-    // [핵심 추가] 애니메이션이 끝나갈 무렵(1s 뒤) 내용물 공개
+    // 3. 애니메이션 중간에 숨겨놨던 내용물(#content)을 가시화
     setTimeout(() => {
         if (content) content.style.visibility = 'visible';
     }, 1000);
 
-    // 애니메이션이 완전히 끝나는 시간(1.2초)에 맞춰 스토리 시작
+    // 4. [중요] 애니메이션이 끝나는 시점에 원래의 모니터 회색으로 복구
     setTimeout(() => {
+        setScreenColor('#444444', '#111111'); // 원래의 배경색 변수값
         if (callback) callback();
     }, 1200);
 }
