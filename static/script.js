@@ -278,13 +278,17 @@ function showAnimalResult(data) {
     });
 }
 
-/* [컷 5] 동물 → 상세 성격 스토리 */
+/* [컷 5] 동물 → 상세 성격 스토리 (수식어 공개!) */
 function goToPersonalityStory() {
+    // AI가 만들어둔 수식어 가져오기
+    const modifier = globalData.animal_modifier ? globalData.animal_modifier : "특별한";
+    const animalName = globalData.animal.name;
+
     playStory([
-        "하지만 동물이 전부는 아니야",
-        "사자도 어떤 사자는 소심할 수 있잖아?",
-        "어떤 고양이도 개냥이일 수 있고!",
-        "너는 어떠한 특별한 사람인지 알려줄게"
+        "하지만 이런 진부한 동물 이야기를 하려고 너랑 말하는게 아니라구~",
+        `너는 그냥 평범한 ${animalName}이(가) 아니라...`,
+        `바로 [ ${modifier} ${animalName} ] 타입이야!`,
+        "너의 진짜 성격을 알려줄게"
     ], () => {
         switchScreen('screen-personality');
         const boxes = document.querySelectorAll('#screen-personality .result-box');
