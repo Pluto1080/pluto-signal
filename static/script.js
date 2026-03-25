@@ -402,22 +402,22 @@ function startEnding() {
     });
 }
 
-/* script.js 하단의 triggerTVOn 함수 수정 */
+/* script.js 하단의 triggerTVOn 함수를 이대로 덮어씌우세요 */
 function triggerTVOn(callback) {
-    const container = document.getElementById('container'); // 고정된 검은 틀
-    const content = document.getElementById('content');     // 애니메이션 내용물
+    const container = document.getElementById('container');
+    const content = document.getElementById('content');
     
-    // 1. 초기화: 내용물을 보이게 하고 tv-on 애니메이션 실행
+    // 1. 시작: 모니터 안을 완전 검은색으로 설정 (전원 꺼짐 상태)
+    setScreenColor('#000000', '#000000'); 
+    
+    // 2. 애니메이션 실행: content(회색 화면)가 검은 배경 위에서 펼쳐짐
     content.style.visibility = 'visible';
     content.style.animation = 'tv-on 1.2s cubic-bezier(0.15, 0.85, 0.35, 1) forwards';
     
-    // ... 중간 생략 ...
-
-    // 2. [수정 포인트 3] 애니메이션 완료 시점(1200ms)에 
-    // CSS에서 변경한 더 밝은 회색 테마(#666666)로 변경
+    // 3. [핵심] 애니메이션이 끝나는 시점에 원래의 회색 테마로 복구
     setTimeout(() => {
-        // 이 부분을 CSS의 새로운 변수 값과 똑같이 맞춰야 연결이 자연스럽습니다.
-        setScreenColor('#666666', '#222222'); 
+        // 원래 terminal의 기본 회색 값으로 복구합니다.
+        setScreenColor('#444444', '#111111'); 
         if (callback) callback();
     }, 1200);
 }
