@@ -83,9 +83,10 @@ function initTerminal() {
         { text: "...",          glitch: true },
         { text: ".....지직",    glitch: true },
         { text: "...ㅇ..어 됐다!!!",   glitch: true },
-        "안녕!! 나는 저 먼 플루라는 행성에서 지금<br/>시그널을 보내고있는 플루토라해",
+        "안녕!",
+        "나는 저 먼 플루라는 행성에서 지금 시그널을 보내고있는 플루토라해",
         "나를 만났다니... 너 정말 행운인걸?",
-        "나는 별을 사용해서 너의 미래를 조금 볼 수 있거든!",
+        "왜냐면 난 별을 측정하면서, 너의 미래를 조금 볼 수 있거든!",
         "너랑 나랑 이렇게 닿은 건 운명이니까!<br/>한번 내가 봐줄게!",
         { text: "너의 탄생을 확인해 보자!",   glitch: true } 
     ], () => {
@@ -259,25 +260,19 @@ function stopLoadingAnimation() {
 function showAnimalResult(data) {
     const animal = data.animal;
     if (!animal) {
-        playStory(["내가 너의 성격과 장단점을 알아왔어!"], () => {
-            switchScreen('screen-personality');
-            const boxes = document.querySelectorAll('#screen-personality .result-box');
-            setTimeout(() => { displayResultsSequentially(boxes); }, 500);
-        });
+        // ... (생략)
         return;
     }
 
-    // AI가 만들어준 수식어(animal_modifier)가 있으면 붙이고, 없으면 기본 이름만 출력
-    const fullAnimalName = data.animal_modifier ? `${data.animal_modifier} ${animal.name}` : animal.name;
-
+    // 화면에는 수식어 없이 기본 동물만 출력
     document.getElementById('animal-box-title').innerText  = `[TYPE] ${animal.name.toUpperCase()}_SIGNAL`;
-    document.getElementById('animal-name').innerText        = fullAnimalName; // 수식어 + 이름 출력
+    document.getElementById('animal-name').innerText        = animal.name;
     document.getElementById('animal-keyword').innerText     = `# ${animal.keyword}`;
     document.getElementById('animal-description').innerText = animal.description;
 
     playStory([
         `오 너는...`,
-        `${fullAnimalName}과(와) 같은 느낌이야!`
+        `${animal.name}과(와) 같은 느낌이야!`
     ], () => {
         switchScreen('screen-animal');
     });
@@ -289,7 +284,7 @@ function goToPersonalityStory() {
         "하지만 동물이 전부는 아니야",
         "사자도 어떤 사자는 소심할 수 있잖아?",
         "어떤 고양이도 개냥이일 수 있고!",
-        "너는 어떠한 사람인지 알려줄게"
+        "너는 어떠한 특별한 사람인지 알려줄게"
     ], () => {
         switchScreen('screen-personality');
         const boxes = document.querySelectorAll('#screen-personality .result-box');
