@@ -83,11 +83,11 @@ function initTerminal() {
         { text: "...",          glitch: true },
         { text: ".....지직",    glitch: true },
         { text: "...ㅇ..어 됐다!!!",   glitch: true },
-        "안녕!! 나는 저 먼 플루라는 행성에서 지금 시그널을 보내고있는 플루토라해",
+        "안녕!! 나는 저 먼 플루라는 행성에서 지금<br/>시그널을 보내고있는 플루토라해",
         "나를 만났다니... 너 정말 행운인걸?",
-        "나는 너의 미래를 아주 조금! 볼 수 있거든!",
-        "너랑 나랑 이어진건 운명이니까! 한번 내가 봐줄게!",
-        "너의 탄생을 한번 확인해볼까?"
+        "나는 별을 사용해서 너의 미래를 조금 볼 수 있거든!",
+        "너랑 나랑 이렇게 닿은 건 운명이니까!<br/>한번 내가 봐줄게!",
+        { text: "너의 탄생을 확인해 보자!",   glitch: true },"
     ], () => {
         switchScreen('screen-input');
         setTimeout(() => { map.invalidateSize(); }, 500);
@@ -273,7 +273,8 @@ function showAnimalResult(data) {
     document.getElementById('animal-description').innerText = animal.description;
 
     playStory([
-        `오 너는 ${animal.name}과 같은 느낌이야`
+        `오 너는...`
+         `${animal.name}과 같은 느낌이야!`
     ], () => {
         switchScreen('screen-animal');
     });
@@ -285,7 +286,7 @@ function goToPersonalityStory() {
         "하지만 동물이 전부는 아니야",
         "사자도 어떤 사자는 소심할 수 있잖아?",
         "어떤 고양이도 개냥이일 수 있고!",
-        "너는 어떤 성격인지 알려줄게"
+        "너는 어떠한 사람인지 알려줄게"
     ], () => {
         switchScreen('screen-personality');
         const boxes = document.querySelectorAll('#screen-personality .result-box');
