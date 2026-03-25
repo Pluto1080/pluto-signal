@@ -283,9 +283,11 @@ button.cyber-btn,
 /* 커서: CSS ::after 로만 처리 — 항상 텍스트 마지막 줄 바로 뒤에 인라인으로 붙음 */
 #story-text::after {
     content: '▮';
-    display: inline;
+    display: inline-block; /* inline-block으로 바꿔야 위치 조절이 먹힙니다 */
     margin-left: 6px;
-    vertical-align: baseline;
+    vertical-align: middle; /* baseline 대신 middle 사용 */
+    position: relative;
+    top: -3px; /* 마이너스 값을 주어 커서를 위로 살짝 당겨 올립니다 */
     animation: blink-animation 1s steps(2, start) infinite;
 }
 
@@ -422,7 +424,7 @@ button.cyber-btn:hover { background: #00ff41; color: #000; box-shadow: 0 0 30px 
     color: #00ff41; font-size: 1.6rem;
     text-align: center; line-height: 1.8; font-weight: bold;
     text-shadow: 0 0 10px rgba(0,255,65,0.6);
-    min-height: 120px; word-break: keep-all; width: 100%;
+    word-break: keep-all; width: 100%;
 }
 /* [6] END */
 
