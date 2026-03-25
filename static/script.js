@@ -402,19 +402,22 @@ function startEnding() {
     });
 }
 
-/* script.js 하단의 triggerTVOn 함수를 이 내용으로 교체하세요 */
+/* script.js 하단의 triggerTVOn 함수 수정 */
 function triggerTVOn(callback) {
-    const container = document.getElementById('container'); // 검은색 배경 (고정)
-    const content = document.getElementById('content');     // 회색 내용물 (확장)
+    const container = document.getElementById('container'); // 고정된 검은 틀
+    const content = document.getElementById('content');     // 애니메이션 내용물
     
-    // 1. 초기화: 내용물을 보이게 하고 애니메이션을 입힙니다.
+    // 1. 초기화: 내용물을 보이게 하고 tv-on 애니메이션 실행
     content.style.visibility = 'visible';
     content.style.animation = 'tv-on 1.2s cubic-bezier(0.15, 0.85, 0.35, 1) forwards';
     
-    // 2. 애니메이션이 끝날 때 배경색을 회색 테마로 부드럽게 연결
+    // ... 중간 생략 ...
+
+    // 2. [수정 포인트 3] 애니메이션 완료 시점(1200ms)에 
+    // CSS에서 변경한 더 밝은 회색 테마(#666666)로 변경
     setTimeout(() => {
-        // container의 배경을 회색 그라데이션으로 변경하여 자연스럽게 연결
-        setScreenColor('#444444', '#111111');
+        // 이 부분을 CSS의 새로운 변수 값과 똑같이 맞춰야 연결이 자연스럽습니다.
+        setScreenColor('#666666', '#222222'); 
         if (callback) callback();
     }, 1200);
 }
