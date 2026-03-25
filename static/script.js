@@ -56,19 +56,18 @@ function triggerTVOn(callback) {
 
     if (content) content.style.visibility = 'hidden';
     
-    // 처음엔 무조건 암전 (검은색)
-    setScreenColor('#000000', '#000000'); 
+    // [수정] 켜지기 시작할 때 이미 회색 배경으로 세팅합니다.
+    // 그래야 틈새가 벌어질 때 안쪽이 회색으로 보입니다.
+    setScreenColor('#444444', '#111111'); 
 
-    // 애니메이션 실행
+    // 애니메이션 실행 (1.2초 동안 진행)
     container.style.animation = 'tv-on 1.2s cubic-bezier(0.15, 0.85, 0.35, 1) forwards';
     
     setTimeout(() => {
-        // 1.2초 뒤 원래의 회색 배경으로 부드럽게 복구
-        setScreenColor('#444444', '#111111'); 
+        // 이미 색상은 세팅되었으므로, 여기서는 글리치와 내용물만 노출합니다.
         if (monitorFrame) monitorFrame.classList.add('crt-active');
         if (content) content.style.visibility = 'visible';
         
-        // 콜백(initTerminal) 실행
         if (callback) callback(); 
     }, 1200);
 }
