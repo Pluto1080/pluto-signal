@@ -71,12 +71,16 @@ function playStory(lines, callback) {
         storyText.style.transform = "translateY(20px)";
 
         setTimeout(() => {
-            storyText.style.transition = "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)";
-            storyText.style.opacity = "1";
-            storyText.style.transform = "translateY(0)";
-            isAnimating = false;
-        }, 50);
-    }
+          storyText.style.transition = "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)";
+              storyText.style.opacity = "1";
+              storyText.style.transform = "translateY(0)";
+              isAnimating = false;
+          }, 50);
+      }
+
+      screen.addEventListener('click', handleNext);
+      setTimeout(() => { showLine(); }, 600);
+  }
 
 /* [컷 1] 인트로 스토리 — 8개 대사 */
 function initTerminal() {
