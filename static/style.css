@@ -71,11 +71,24 @@ body {
 }
 
 /* 켜지는 애니메이션 (더 밝은 빛줄기 효과) */
+/* style.css 하단 @keyframes tv-on 수정 */
 @keyframes tv-on {
-    0%   { transform: scaleY(0.005) scaleX(0); background: #ffffff; filter: brightness(20); opacity: 1; box-shadow: 0 0 100px 20px #ffffff; }
-    40%  { transform: scaleY(0.005) scaleX(1); background: #ffffff; filter: brightness(20); opacity: 1; box-shadow: 0 0 100px 20px #ffffff; }
-    70%  { transform: scaleY(1) scaleX(1);     background: var(--screen-bg-center); filter: brightness(2); box-shadow: 0 0 0px 0px transparent; }
-    100% { transform: scaleY(1) scaleX(1);     background: var(--screen-bg-center); filter: brightness(1); }
+    0%   { transform: scaleY(0) scaleX(0);    background: #ffffff; filter: brightness(20); opacity: 0; }
+    45%  { transform: scaleY(0.005) scaleX(1); background: #ffffff; filter: brightness(20); opacity: 1; box-shadow: 0 0 100px 20px #ffffff; }
+    
+    /* [핵심 수정] 위아래로 펼쳐지기 시작할 때(65%) 회색을 미리 넣어줍니다. */
+    65%  { 
+        transform: scaleY(0.04) scaleX(1);   
+        background: var(--screen-bg-center); /* 이때 회색으로 변경 */
+        filter: brightness(5) saturate(0);  /* 하지만 여전히 밝고 흑백 상태 */
+        box-shadow: 0 0 120px rgba(255,255,255,0.9); 
+    }
+    
+    100% { 
+        transform: scaleY(1) scaleX(1);       
+        background: var(--screen-bg-center); 
+        filter: brightness(1) saturate(1);   /* 정상 밝기, 정상 색상 */
+    }
 }
 
 #content {
