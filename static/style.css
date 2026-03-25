@@ -71,13 +71,11 @@ body {
     overflow: hidden;
     box-shadow: inset 0 0 80px rgba(0,0,0,0.9), inset 0 0 20px rgba(0,255,65,0.2);
     z-index: 50;
-    
-    /* [핵심] 고정된 색상 대신 JS 변수와 연동합니다. !important는 절대 금지! */
+    /* JS 변수와 연동 */
     background: radial-gradient(circle at center, var(--screen-bg-center) 0%, var(--screen-bg-edge) 100%);
-    
-    /* 초기 상태: 내용물 확장을 위해 scaleY(1)로 유지하고 내부 content를 조절합니다 */
-    transform: none; 
+    transform: scaleY(0); 
     display: flex; flex-direction: column;
+    will-change: transform, filter; /* [추가] 버벅임 방지 */
 }
 
 /* 켜지는 애니메이션 (더 밝은 빛줄기 효과) */
