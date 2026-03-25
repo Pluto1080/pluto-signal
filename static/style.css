@@ -152,6 +152,29 @@ body {
 }
 .ending-glitch { animation: ending-glitch-anim 0.08s infinite !important; }
 
+/* [추가] TV가 켜지는 애니메이션 */
+@keyframes tv-on {
+    0%   { transform: scaleY(0);    filter: brightness(0); opacity: 0; }
+    45%  { transform: scaleY(0.02); filter: brightness(10); opacity: 1; }
+    65%  { transform: scaleY(0.04); filter: brightness(5) saturate(0); box-shadow: 0 0 120px rgba(255,255,255,0.9); }
+    100% { transform: scaleY(1);    filter: brightness(1); opacity: 1; }
+}
+
+/* [중요] 처음 접속 시 화면을 숨겨두기 위해 기존 .screen-container에 아래 두 줄을 추가하거나 덮어쓰세요 */
+.screen-container {
+    opacity: 0;             /* 처음엔 안 보이게 */
+    transform: scaleY(0);   /* 처음엔 납작하게 */
+    /* ... 기존 코드들 ... */
+    width: 100%; height: 100%;
+    position: relative;
+    border-radius: 60px / 40px;
+    overflow: hidden;
+    box-shadow: inset 0 0 80px rgba(0,0,0,0.9), inset 0 0 20px rgba(0,255,65,0.2);
+    z-index: 50;
+    background: #222222;
+    display: flex; flex-direction: column;
+}
+
 /* [컷 8] TV 꺼지는 애니메이션 */
 @keyframes tv-off {
     0%   { transform: scaleY(1);    filter: brightness(1); }
