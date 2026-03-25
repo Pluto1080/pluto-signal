@@ -381,7 +381,8 @@ function showFinalReport() {
 function startEnding() {
     playStory([
         { text: "엇! 나 지금 ㅜㅜ 연..ㄱㄹ..이 끈ㅎ기기 직전이야!!", glitch: true },
-        { text: "하지만 내가 너가 어디있는지 아니까! 내 친구들을 보내줄게!! 조금만 기다려!", glitch: true }
+        { text: "하지만 이제 너가 어디있는지 아니까! 금방 다시 볼 수 있을거야!", glitch: true }
+        { text: "조금만 기다려!", glitch: true }
     ], () => {
         triggerTVOff();
     });
