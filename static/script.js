@@ -78,6 +78,7 @@ function playStory(lines, callback) {
 }
 
 /* [컷 1] 인트로 스토리 — 8개 대사 */
+
 function initTerminal() {
     playStory([
         { text: "...",          glitch: true },
@@ -95,9 +96,16 @@ function initTerminal() {
     });
 }
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initTerminal);
+    document.addEventListener('DOMContentLoaded', () => {
+        // TV를 먼저 켜고, 다 켜지면(callback) 인트로 스토리를 시작합니다.
+        triggerTVOn(() => {
+            initTerminal();
+        });
+    });
 } else {
-    initTerminal();
+    triggerTVOn(() => {
+        initTerminal();
+    });
 }
 /* [2] 스토리 엔진 END */
 
@@ -386,6 +394,20 @@ function startEnding() {
     ], () => {
         triggerTVOff();
     });
+}
+
+/* script.js 파일 하단 triggerTVOff 근처에 추가 */
+function triggerTVOn(callback) {
+    const container = document.getElementById('container');
+    
+    // 켜지는 애니메이션 실행
+    container.style.transformOrigin = 'center center';
+    container.style.animation = 'tv-on 1.2s cubic-bezier(0.15, 0.85, 0.35, 1) forwards';
+    
+    // 애니메이션이 끝나는 시간(1.2초)에 맞춰 스토리 시작
+    setTimeout(() => {
+        if (callback) callback();
+    }, 1200);
 }
 
 /* [컷 8] 브라운관 TV 꺼지는 효과 */
