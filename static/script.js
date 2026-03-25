@@ -100,6 +100,41 @@ function initTerminal() {
 
 
 /* [3] 초기화 및 유틸리티 START */
+
+/* [3] 초기화 및 유틸리티 최적화 */
+
+// 전역 변수로 선언만 해둡니다.
+let map;
+let marker;
+
+// 지도 초기화 함수를 따로 만듭니다.
+function initMap() {
+    if (map) return; // 이미 초기화됐다면 중단
+    map = L.map('map', { zoomControl: false }).setView([selectedLat, selectedLon], 6);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+    marker = L.marker([selectedLat, selectedLon]).addTo(map);
+    map.on('click', (e) => { 
+        selectedLat = e.latlng.lat; 
+        selectedLon = e.latlng.lng; 
+        marker.setLatLng(e.latlng); 
+    });
+}
+
+// 앱 통합 시작점 (중복된 리스너들을 모두 지우고 이것 하나만 남기세요)
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. 초기 상태 설정
+    const content = document.getElementById('content');
+    if (content) content.style.visibility = 'hidden';
+
+    // 2. TV 켜기 실행
+    triggerTVOn(() => {
+        // 3. TV가 다 켜진 후 인트로 스토리 시작
+        initTerminal();
+        // 4. 지도는 사용자가 입력창에 도달하기 직전에 조용히 로딩 시작 (지연 로딩)
+        setTimeout(initMap, 1000); 
+    });
+});
+
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
         const content = document.getElementById('content');
