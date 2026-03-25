@@ -111,20 +111,26 @@ if (document.readyState === 'loading') {
 
 
 /* [3] 초기화 및 유틸리티 START */
-document.addEventListener('DOMContentLoaded', () => {
-    const noTimeBox = document.getElementById('noTime');
-    const timeInput = document.getElementById('birthTime');
-    if (noTimeBox && timeInput) {
-        noTimeBox.addEventListener('change', (e) => {
-            if (e.target.checked) {
-                timeInput.value = "";
-                timeInput.disabled = true;
-            } else {
-                timeInput.disabled = false;
-            }
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        // [추가] 초기화: 브라운관 void 상태를 유지하기 위해 내용물을 숨깁니다.
+        const content = document.getElementById('content');
+        if (content) content.style.visibility = 'hidden';
+
+        // TV를 먼저 켜고, 다 켜지면 인트로 스토리를 시작합니다.
+        triggerTVOn(() => {
+            initTerminal();
         });
-    }
-});
+    });
+} else {
+    // [추가] 초기화
+    const content = document.getElementById('content');
+    if (content) content.style.visibility = 'hidden';
+    
+    triggerTVOn(() => {
+        initTerminal();
+    });
+}
 
 const map = L.map('map', { zoomControl: false }).setView([selectedLat, selectedLon], 6);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
@@ -396,15 +402,24 @@ function startEnding() {
     });
 }
 
-/* script.js 파일 하단 triggerTVOff 근처에 추가 */
+/* script.js 파일 하단 triggerTVOn 함수 수정 */
 function triggerTVOn(callback) {
     const container = document.getElementById('container');
+    const content = document.getElementById('content');
     
-    // 켜지는 애니메이션 실행
+    // [추가] 켜지는 동안은 배경색 변수들을 완전 검은색으로 유지합니다.
+    setScreenColor('#000000', '#000000'); 
+    
+    // 애니메이션 실행
     container.style.transformOrigin = 'center center';
     container.style.animation = 'tv-on 1.2s cubic-bezier(0.15, 0.85, 0.35, 1) forwards';
     
-    // 애니메이션이 끝나는 시간(1.2초)에 맞춰 스토리 시작
+    // [핵심 추가] 애니메이션이 끝나갈 무렵(1s 뒤) 내용물 공개
+    setTimeout(() => {
+        if (content) content.style.visibility = 'visible';
+    }, 1000);
+
+    // 애니메이션이 완전히 끝나는 시간(1.2초)에 맞춰 스토리 시작
     setTimeout(() => {
         if (callback) callback();
     }, 1200);
