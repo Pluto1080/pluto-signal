@@ -50,11 +50,6 @@ function playStory(lines, callback) {
 
         storyText.innerHTML = textStr;
 
-        const hint = document.createElement('div');
-        hint.className = 'touch-hint';
-        hint.innerText = "[ 터치하여 계속 ]";
-        storyText.appendChild(hint);
-
         if (isGlitch) {
             storyText.classList.add('glitch-active');
             storyText.style.color = "#ff00ff";
