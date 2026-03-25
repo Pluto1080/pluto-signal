@@ -141,13 +141,21 @@ body {
 }
 
 .crt-overlay {
-    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    background:
-        linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.25) 50%),
-        radial-gradient(circle at center, rgba(0,0,0,0) 60%, rgba(0,0,0,0.6) 100%);
-    background-size: 100% 4px, 100% 100%;
-    pointer-events: none; z-index: 100;
-    opacity: 0.9; animation: flicker 0.15s infinite; overflow: hidden;
+    /* ... 생략 ... */
+    pointer-events: none;
+    z-index: 100;
+    
+    /* [수정] 처음엔 숨겨둡니다. (프레임보다 위에 나오지 않게) */
+    opacity: 0; 
+    transition: opacity 0.1s ease; /* 서서히 나타나게 */
+    
+    animation: flicker 0.15s infinite;
+    overflow: hidden;
+}
+
+/* [추가] 프레임이 다 열리면 글리치를 보여주는 클래스 */
+.monitor-frame.crt-active .crt-overlay {
+    opacity: 0.9;
 }
 .crt-overlay::after {
     content: ""; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
