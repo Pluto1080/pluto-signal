@@ -11,66 +11,65 @@ const rootStyle = document.documentElement.style;
 /* ==========================================
    [2] 페이드인/아웃 스토리 엔진 START
    ========================================== */
-function playStory(lines, callback) {
-    const storyText = document.getElementById('story-text');
-    const screen = document.getElementById('screen-story');
+  function playStory(lines, callback) {
+      const storyText = document.getElementById('story-text');
+      const screen = document.getElementById('screen-story');
 
-    storyText.innerHTML = '';
-    storyText.style.opacity = '0';
+      storyText.innerHTML = '';
+      storyText.style.opacity = '0';
 
-    switchScreen('screen-story');
+      switchScreen('screen-story');
 
-    let lineIndex = 0;
-    let isAnimating = false;
+      let lineIndex = 0;
+      let isAnimating = false;
 
-    const handleNext = () => {
-        if (isAnimating) return;
-        isAnimating = true;
+      const handleNext = () => {
+          if (isAnimating) return;
+          isAnimating = true;
 
-        storyText.style.transition = "all 0.3s ease";
-        storyText.style.opacity = "0";
-        storyText.style.transform = "translateY(-20px)";
+          storyText.style.transition = "all 0.3s ease";
+          storyText.style.opacity = "0";
+          storyText.style.transform = "translateY(-20px)";
 
-        setTimeout(() => {
-            lineIndex++;
-            showLine();
-        }, 300);
-    };
+          setTimeout(() => {
+              lineIndex++;
+              showLine();
+          }, 300);
+      };
 
-    function showLine() {
-        if (lineIndex >= lines.length) {
-            screen.removeEventListener('click', handleNext);
-            callback();
-            return;
-        }
+      function showLine() {
+          if (lineIndex >= lines.length) {
+              screen.removeEventListener('click', handleNext);
+              callback();
+              return;
+          }
 
-        let lineData = lines[lineIndex];
-        let textStr = typeof lineData === 'string' ? lineData : lineData.text;
-        let isGlitch = typeof lineData === 'object' && lineData.glitch;
+          let lineData = lines[lineIndex];
+          let textStr = typeof lineData === 'string' ? lineData : lineData.text;
+          let isGlitch = typeof lineData === 'object' && lineData.glitch;
 
-        // 1. 먼저 대사를 넣습니다.
-        storyText.innerHTML = textStr;
+          storyText.innerHTML = textStr;
 
-        // 2. [추가] 대사 바로 옆(오른쪽)에 붙는 커서를 만듭니다.
-        const hint = document.createElement('span'); // span을 써야 줄바꿈이 안 됩니다.
-        hint.style.marginLeft = "10px";              // 글자와 살짝 띄우기
-        hint.style.display = "inline-block";         // 애니메이션 적용을 위해 설정
-        hint.innerText = "▮";                        // 커서 모양
-        hint.className = "cursor-blink";             // 깜빡이는 효과 클래스명
-        storyText.appendChild(hint);                 // 대사 뒤에 붙이기
+          const hint = document.createElement('span');
+          hint.style.marginLeft = "10px";
+          hint.style.display = "inline-block";
+          hint.innerText = "▮";
+          hint.className = "cursor-blink";
+          storyText.appendChild(hint);
 
-        if (isGlitch) {
-            storyText.classList.add('glitch-active');
-            storyText.style.color = "#ff00ff";
-        } else {
-            storyText.classList.remove('glitch-active');
-            storyText.style.color = "#00ff41";
-        }
+          if (isGlitch) {
+              storyText.classList.add('glitch-active');
+              storyText.style.color = "#ff00ff";
+          } else {
+              storyText.classList.remove('glitch-active');
+              storyText.style.color = "#00ff41";
+          }
 
-        storyText.style.transition = "none";
-        storyText.style.transform = "translateY(20px)";
+          storyText.style.transition = "none";
+          storyText.style.transform = "translateY(20px)";
 
-        storyText.style.transition = "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)";
+          setTimeout(() => {
+              storyText.style.transition = "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)";
               storyText.style.opacity = "1";
               storyText.style.transform = "translateY(0)";
               isAnimating = false;
