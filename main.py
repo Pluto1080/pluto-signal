@@ -61,7 +61,16 @@ def get_house(degree, cusps):
         else:
             if degree >= c_start or degree < c_end: return i + 1
     return 0
-
+  
+def get_transits(jd):
+    """특정 시점(Julian Day)의 주요 외행성 위치를 계산합니다."""
+    res = {}
+    for p_name, p_code in zip(["Jupiter", "Saturn", "Uranus", "Pluto"],
+                               [swe.JUPITER, swe.SATURN, swe.URANUS, swe.PLUTO]):
+        pos = swe.calc_ut(jd, p_code)[0][0]
+        res[p_name] = ZODIAC_SIGNS[int(pos // 30)]
+    return res
+  
 def calculate_astrology(birth_date, birth_time, latitude, longitude, time_unknown=False):
     tz_name = tf.timezone_at(lng=longitude, lat=latitude) or 'UTC'
     timezone = pytz.timezone(tz_name)
