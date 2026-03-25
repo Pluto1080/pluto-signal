@@ -71,6 +71,18 @@ def get_transits(jd):
         res[p_name] = ZODIAC_SIGNS[int(pos // 30)]
     return res
   
+def get_animal_type(natal_data):
+    """태양 별자리를 기반으로 12가지 동물 중 하나를 고정 매핑합니다."""
+    # 만약 에러로 인해 Sun 데이터가 없으면 기본값으로 '양자리'를 줍니다.
+    sun_sign = natal_data.get('Sun', {}).get('sign', '양자리')
+    
+    if sun_sign in ZODIAC_SIGNS:
+        sign_index = ZODIAC_SIGNS.index(sun_sign)
+    else:
+        sign_index = 0
+        
+    return ANIMAL_TYPES[sign_index]
+    
 def calculate_astrology(birth_date, birth_time, latitude, longitude, time_unknown=False):
     tz_name = tf.timezone_at(lng=longitude, lat=latitude) or 'UTC'
     timezone = pytz.timezone(tz_name)
