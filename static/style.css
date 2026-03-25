@@ -150,9 +150,7 @@ body {
     90%  { transform: translate(4px, 0);     filter: brightness(3); }
     100% { transform: translate(0);          filter: none; }
 }
-.ending-glitch {
-    animation: ending-glitch-anim 0.08s infinite !important;
-}
+.ending-glitch { animation: ending-glitch-anim 0.08s infinite !important; }
 
 /* [컷 8] TV 꺼지는 애니메이션 */
 @keyframes tv-off {
@@ -275,6 +273,26 @@ button.cyber-btn,
     display: flex; flex-direction: column; gap: 15px;
 }
 
+/* story-text 는 flex 레이아웃에서 제외 — 커서가 텍스트 뒤에 인라인으로 붙도록 */
+#story-text {
+    display: block !important;
+    flex-direction: unset !important;
+    gap: unset !important;
+}
+
+/* 커서: CSS ::after 로만 처리 — 항상 텍스트 마지막 줄 바로 뒤에 인라인으로 붙음 */
+#story-text::after {
+    content: '▮';
+    display: inline;
+    margin-left: 6px;
+    vertical-align: baseline;
+    animation: blink-animation 1s steps(2, start) infinite;
+}
+
+@keyframes blink-animation {
+    to { visibility: hidden; }
+}
+
 input[type="text"], input[type="date"], input[type="time"], select {
     background: rgba(10,15,30,0.9) !important;
     border: 2px solid #00ffff !important;
@@ -321,7 +339,7 @@ input[type="text"], input[type="date"], input[type="time"], select {
 .theme-career      { --theme-color: #00ffff; }
 .theme-money       { --theme-color: #00ff41; }
 .theme-purple      { --theme-color: #bf00ff; }
-.theme-animal      { --theme-color: #ffaa00; }  /* 컷 4: 황금빛 */
+.theme-animal      { --theme-color: #ffaa00; }
 
 .theme-whisper { --theme-color: #ffffff; }
 .theme-whisper .result-content { color: #ffffff !important; }
@@ -401,36 +419,15 @@ button.cyber-btn:hover { background: #00ff41; color: #000; box-shadow: 0 0 30px 
 
 /* 타이핑 텍스트 */
 .typewriter-text {
-    display: block !important;
     color: #00ff41; font-size: 1.6rem;
     text-align: center; line-height: 1.8; font-weight: bold;
     text-shadow: 0 0 10px rgba(0,255,65,0.6);
     min-height: 120px; word-break: keep-all; width: 100%;
 }
-
-@keyframes cursor-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
-.typewriter-text div { animation: pulse 1.5s infinite; }
-@keyframes pulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.7; } }
-
-/* 커서가 깜빡거리게 만드는 애니메이션 */
-.cursor-blink {
-      animation: blink-animation 1s steps(2, start) infinite;
-      vertical-align: middle;
-  }
-
-@keyframes blink-animation {
-    to {
-        visibility: hidden;
-    }
-}
-
 /* [6] END */
 
 
-
 /* [7] 로딩 화면 — 별과 별똥별 */
-
-/* 반짝이는 작은 별 */
 .star {
     position: absolute;
     background: #ffffff;
@@ -443,7 +440,6 @@ button.cyber-btn:hover { background: #00ff41; color: #000; box-shadow: 0 0 30px 
     50%       { opacity: 1;    transform: scale(1.4); }
 }
 
-/* 별똥별 */
 .shooting-star {
     position: absolute;
     width: 100px; height: 2px;
@@ -454,7 +450,7 @@ button.cyber-btn:hover { background: #00ff41; color: #000; box-shadow: 0 0 30px 
     opacity: 0;
 }
 @keyframes shoot-star {
-    0%   { transform: translate(0, 0) rotate(-35deg);       opacity: 0; }
+    0%   { transform: translate(0, 0) rotate(-35deg);         opacity: 0; }
     8%   { opacity: 1; }
     75%  { opacity: 0.8; }
     100% { transform: translate(280px, 170px) rotate(-35deg); opacity: 0; }

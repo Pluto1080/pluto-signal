@@ -11,84 +11,68 @@ const rootStyle = document.documentElement.style;
 /* ==========================================
    [2] 페이드인/아웃 스토리 엔진 START
    ========================================== */
-  function playStory(lines, callback) {
-      const storyText = document.getElementById('story-text');
-      const screen = document.getElementById('screen-story');
+function playStory(lines, callback) {
+    const storyText = document.getElementById('story-text');
+    const screen = document.getElementById('screen-story');
 
-      storyText.innerHTML = '';
-      storyText.style.opacity = '0';
+    storyText.innerHTML = '';
+    storyText.style.opacity = '0';
 
-      switchScreen('screen-story');
+    switchScreen('screen-story');
 
-      let lineIndex = 0;
-      let isAnimating = false;
+    let lineIndex = 0;
+    let isAnimating = false;
 
-      const handleNext = () => {
-          if (isAnimating) return;
-          isAnimating = true;
+    const handleNext = () => {
+        if (isAnimating) return;
+        isAnimating = true;
 
-          storyText.style.transition = "all 0.3s ease";
-          storyText.style.opacity = "0";
-          storyText.style.transform = "translateY(-20px)";
+        storyText.style.transition = "all 0.3s ease";
+        storyText.style.opacity = "0";
+        storyText.style.transform = "translateY(-20px)";
 
-          setTimeout(() => {
-              lineIndex++;
-              showLine();
-          }, 300);
-      };
+        setTimeout(() => {
+            lineIndex++;
+            showLine();
+        }, 300);
+    };
 
-      function showLine() {
-          if (lineIndex >= lines.length) {
-              screen.removeEventListener('click', handleNext);
-              callback();
-              return;
-          }
+    function showLine() {
+        if (lineIndex >= lines.length) {
+            screen.removeEventListener('click', handleNext);
+            callback();
+            return;
+        }
 
-          let lineData = lines[lineIndex];
-          let textStr = typeof lineData === 'string' ? lineData : lineData.text;
-          let isGlitch = typeof lineData === 'object' && lineData.glitch;
-         
-               storyText.innerHTML = textStr;
-         
-                .typewriter-text {
-                     display: block !important;
-                     color: #00ff41; font-size: 1.6rem;
-                     text-align: center; line-height: 1.8; font-weight: bold;
-                     text-shadow: 0 0 10px rgba(0,255,65,0.6);
-                     min-height: 120px; word-break: keep-all; width: 100%;
-                 }
-               
-                 .typewriter-text::after {
-                     content: '▮';
-                     display: inline;
-                     margin-left: 8px;
-                     vertical-align: text-bottom;
-                     animation: blink-animation 1s steps(2, start) infinite;
-                 }
-         
+        let lineData = lines[lineIndex];
+        let textStr = typeof lineData === 'string' ? lineData : lineData.text;
+        let isGlitch = typeof lineData === 'object' && lineData.glitch;
 
-          if (isGlitch) {
-              storyText.classList.add('glitch-active');
-              storyText.style.color = "#ff00ff";
-          } else {
-              storyText.classList.remove('glitch-active');
-              storyText.style.color = "#00ff41";
-          }
+        // 텍스트만 넣고 커서는 CSS ::after 로 처리
+        storyText.innerHTML = textStr;
 
-          storyText.style.transition = "none";
-          storyText.style.transform = "translateY(20px)";
+        if (isGlitch) {
+            storyText.classList.add('glitch-active');
+            storyText.style.color = "#ff00ff";
+        } else {
+            storyText.classList.remove('glitch-active');
+            storyText.style.color = "#00ff41";
+        }
 
-          setTimeout(() => {
-              storyText.style.transition = "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)";
-              storyText.style.opacity = "1";
-              storyText.style.transform = "translateY(0)";
-              isAnimating = false;
-          }, 50);
-      }
+        storyText.style.transition = "none";
+        storyText.style.transform = "translateY(20px)";
 
-      screen.addEventListener('click', handleNext);
-      setTimeout(() => { showLine(); }, 600);
-  }
+        setTimeout(() => {
+            storyText.style.transition = "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)";
+            storyText.style.opacity = "1";
+            storyText.style.transform = "translateY(0)";
+            isAnimating = false;
+        }, 50);
+    }
+
+    screen.addEventListener('click', handleNext);
+    setTimeout(() => { showLine(); }, 600);
+}
 
 /* [컷 1] 인트로 스토리 — 8개 대사 */
 function initTerminal() {
@@ -201,7 +185,6 @@ function startAnalysis() {
 
         globalData = data;
 
-        // 성격 결과 미리 채우기 (애니메이션 준비)
         document.getElementById('res-personality').innerText = data.personality;
         document.getElementById('res-pros').innerText = data.pros;
         document.getElementById('res-cons').innerText = data.cons;
@@ -213,7 +196,6 @@ function startAnalysis() {
             box.style.transition = "none";
         });
 
-        // [컷 4] 동물 결과 화면으로 이동
         showAnimalResult(data);
     })
     .catch(err => {
@@ -224,13 +206,12 @@ function startAnalysis() {
     });
 }
 
-/* [컷 3] 로딩 애니메이션 — "별의 소리를 듣는중." + 별똥별 */
+/* [컷 3] 로딩 애니메이션 */
 function startLoadingAnimation() {
     switchScreen('screen-loading');
     setScreenColor('#08081a', '#020208');
     const screen = document.getElementById('content');
 
-    // 별똥별 생성
     for (let i = 0; i < 12; i++) {
         const star = document.createElement('div');
         star.className = 'shooting-star';
@@ -241,7 +222,6 @@ function startLoadingAnimation() {
         screen.appendChild(star);
     }
 
-    // 반짝이는 작은 별 생성
     for (let i = 0; i < 25; i++) {
         const star = document.createElement('div');
         star.className = 'star';
@@ -254,7 +234,6 @@ function startLoadingAnimation() {
         screen.appendChild(star);
     }
 
-    // "." 개수 1→2→3→1→... 순환
     let dots = 1;
     loadingInterval = setInterval(() => {
         dots = (dots % 3) + 1;
@@ -277,7 +256,6 @@ function stopLoadingAnimation() {
 function showAnimalResult(data) {
     const animal = data.animal;
     if (!animal) {
-        // 동물 데이터 없을 경우 성격 화면으로 바로 이동
         playStory(["내가 너의 성격과 장단점을 알아왔어!"], () => {
             switchScreen('screen-personality');
             const boxes = document.querySelectorAll('#screen-personality .result-box');
@@ -286,7 +264,6 @@ function showAnimalResult(data) {
         return;
     }
 
-    // 동물 결과 박스 채우기
     document.getElementById('animal-box-title').innerText  = `[TYPE] ${animal.name.toUpperCase()}_SIGNAL`;
     document.getElementById('animal-name').innerText        = animal.name;
     document.getElementById('animal-keyword').innerText     = `# ${animal.keyword}`;
@@ -354,10 +331,10 @@ function showFortune(type) {
     });
     setScreenColor(bgColors[type][0], bgColors[type][1]);
 
-    if      (type === 'love')   { box.classList.add('theme-love');   t.innerText = "2026_LOVE";   st.innerText = "[♥] LOVE_SIGNAL";    c.innerText = globalData.fortune_2026.love; }
-    else if (type === 'money')  { box.classList.add('theme-money');  t.innerText = "2026_MONEY";  st.innerText = "[$] WEALTH_STATUS";   c.innerText = globalData.fortune_2026.money; }
-    else if (type === 'career') { box.classList.add('theme-career'); t.innerText = "2026_CAREER"; st.innerText = "[!] CAREER_UPDATE";   c.innerText = globalData.fortune_2026.career; }
-    else if (type === 'health') { box.classList.add('theme-health'); t.innerText = "2026_HEALTH"; st.innerText = "[+] VITALITY_LOG";    c.innerText = globalData.fortune_2026.health; }
+    if      (type === 'love')   { box.classList.add('theme-love');   t.innerText = "2026_LOVE";   st.innerText = "[♥] LOVE_SIGNAL";  c.innerText = globalData.fortune_2026.love; }
+    else if (type === 'money')  { box.classList.add('theme-money');  t.innerText = "2026_MONEY";  st.innerText = "[$] WEALTH_STATUS"; c.innerText = globalData.fortune_2026.money; }
+    else if (type === 'career') { box.classList.add('theme-career'); t.innerText = "2026_CAREER"; st.innerText = "[!] CAREER_UPDATE"; c.innerText = globalData.fortune_2026.career; }
+    else if (type === 'health') { box.classList.add('theme-health'); t.innerText = "2026_HEALTH"; st.innerText = "[+] VITALITY_LOG";  c.innerText = globalData.fortune_2026.health; }
 
     switchScreen('screen-fortune-detail');
 
@@ -388,7 +365,7 @@ function showFinalReport() {
         const whisperBox = document.querySelector('#screen-final-advice .result-box:nth-child(3)');
         if (summaryBox) summaryBox.className = 'result-box theme-purple';
         if (whisperBox) whisperBox.className = 'result-box theme-whisper';
-        document.getElementById('res-summary').innerText     = globalData.fortune_2026.summary;
+        document.getElementById('res-summary').innerText      = globalData.fortune_2026.summary;
         document.getElementById('res-final-advice').innerText = globalData.fortune_2026.final_advice;
         switchScreen('screen-final-advice');
     });
@@ -410,17 +387,14 @@ function triggerTVOff() {
     const container  = document.getElementById('container');
     const endOverlay = document.getElementById('end-overlay');
 
-    // 1단계: 강렬한 글리치
     content.classList.add('ending-glitch');
 
     setTimeout(() => {
         content.classList.remove('ending-glitch');
-        // 2단계: TV 꺼지는 CSS 애니메이션 적용
         container.style.transformOrigin = 'center center';
         container.style.animation = 'tv-off 1.2s cubic-bezier(0.5, 0, 1, 0.5) forwards';
 
         setTimeout(() => {
-            // 3단계: 콘텐츠 숨기고 END 표시
             content.style.visibility = 'hidden';
             endOverlay.classList.add('active');
         }, 1200);
