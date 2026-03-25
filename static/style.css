@@ -1,8 +1,5 @@
-/* [1] 기본 설정: 초기화 및 정중앙 정렬 (수정됨) */
-/* [핵심] 모든 요소의 크기 계산을 테두리 포함으로 통일하여 쏠림 현상 원천 차단 */
-* {
-    box-sizing: border-box; 
-}
+/* [1] 기본 설정 */
+* { box-sizing: border-box; }
 
 :root {
     --screen-bg-center: #444444;
@@ -10,43 +7,36 @@
 }
 
 body {
-    background: #000000; /* 기본 배경은 블랙 */
+    background: #000000;
     margin: 0; padding: 0;
-    display: flex; flex-direction: column; 
-    align-items: center; justify-content: center; 
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
     height: 100vh; width: 100vw; overflow: hidden;
     font-family: 'DungGeunMo', monospace;
-
-    /* [수정] 별 효과 제거 및 '어두운 방' 분위기 연출 */
-    /* 중앙(모니터 뒤쪽)은 아주 약간 밝고, 외곽으로 갈수록 암전되는 효과 */
     background-image: radial-gradient(circle at center, #1a1a1a 0%, #050505 50%, #000000 100%);
-    
-    /* 기존 별 관련 설정 삭제 */
-    /* background-size, background-position 줄은 아예 지워주세요 */
 }
+/* [1] END */
 
-/* [1] 기본 설정 및 변수 END */
 
-
-/* [2] 모니터 프레임 & 외관 (유지) */
+/* [2] 모니터 프레임 & 외관 */
 .monitor-frame {
     width: 95vw; height: 75vh;
     max-width: 950px; max-height: 700px;
     display: flex; align-items: center; justify-content: center;
     position: relative; z-index: 3;
-    background: 
-        linear-gradient(135deg, #004d4d 0%, #002b2b 100%), /* 기본 명암 */
-        url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E"); /* 미세한 노이즈 패턴 */
-    padding: 40px;      
-    border: none; 
-    border-radius: 80px; 
-    box-shadow: 
+    background:
+        linear-gradient(135deg, #004d4d 0%, #002b2b 100%),
+        url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+    padding: 40px;
+    border: none;
+    border-radius: 80px;
+    box-shadow:
         inset 0 0 0 8px #004d4d,
         inset 0 0 60px rgba(0,0,0,0.9),
-        0 0 0 2px #008080, 
-        0 0 20px #00ffff,  
-        0 0 80px rgba(0, 255, 255, 0.4),  
-        0 0 150px rgba(255, 0, 255, 0.3); 
+        0 0 0 2px #008080,
+        0 0 20px #00ffff,
+        0 0 80px rgba(0,255,255,0.4),
+        0 0 150px rgba(255,0,255,0.3);
 }
 
 .monitor-neck {
@@ -64,415 +54,278 @@ body {
 }
 
 .screen-container {
-    width: 100%;
-    height: 100%;
+    width: 100%; height: 100%;
     position: relative;
     border-radius: 60px / 40px;
     overflow: hidden;
     box-shadow: inset 0 0 80px rgba(0,0,0,0.9), inset 0 0 20px rgba(0,255,65,0.2);
     z-index: 50;
     background: #222222;
-
-    /* 🔥 추가 */
-    display: flex;
-    flex-direction: column;
+    display: flex; flex-direction: column;
 }
 
 .screen-container::before {
     content: ""; position: absolute; top: 12%; left: 0; width: 100%; height: 100px;
-    background: repeating-linear-gradient(to bottom, rgba(0, 255, 255, 0.15) 0px, rgba(0, 255, 255, 0.15) 1px, transparent 1px, transparent 40px);
+    background: repeating-linear-gradient(to bottom, rgba(0,255,255,0.15) 0px, rgba(0,255,255,0.15) 1px, transparent 1px, transparent 40px);
     z-index: 5; pointer-events: none;
 }
 
 .screen-container::after {
     content: ""; position: absolute; bottom: 12%; left: 0; width: 100%; height: 100px;
-    background: repeating-linear-gradient(to top, rgba(0, 255, 255, 0.15) 0px, rgba(0, 255, 255, 0.15) 1px, transparent 1px, transparent 40px);
+    background: repeating-linear-gradient(to top, rgba(0,255,255,0.15) 0px, rgba(0,255,255,0.15) 1px, transparent 1px, transparent 40px);
     z-index: 5; pointer-events: none;
 }
-/* [2] 모니터 외관 및 받침대 END */
+/* [2] END */
 
 
-/* [3] CRT 특수 효과 애니메이션 (최종 최적화본) */
-
-/* 1. 글리치 효과: 전환 시 지지직거리는 느낌 복구 */
-/* 고성능 사이버 글리치 효과 */
+/* [3] CRT 특수 효과 */
 @keyframes cyber-glitch {
-    0% {
-        transform: translate(0);
-        clip-path: inset(0 0 0 0);
-    }
-    10% {
-        transform: translate(-5px, -2px);
-        clip-path: inset(10% 0 80% 0);
-        /* hue-rotate를 조절하여 빨간색을 피하고 하늘색/연두색 범위를 유지 */
-        filter: hue-rotate(-45deg) brightness(1.2); 
-    }
-    20% {
-        transform: translate(5px, 2px);
-        clip-path: inset(80% 0 5% 0);
-    }
-    30% {
-        transform: translate(-3px, 5px);
-        clip-path: inset(40% 0 40% 0);
-        /* [중요] 빨간색을 만드는 invert(1)을 제거하고 밝기만 조절 */
-        filter: brightness(1.5); 
-    }
-    40% {
-        transform: translate(0);
-        clip-path: inset(0 0 0 0);
-    }
+    0%  { transform: translate(0); clip-path: inset(0 0 0 0); }
+    10% { transform: translate(-5px, -2px); clip-path: inset(10% 0 80% 0); filter: hue-rotate(-45deg) brightness(1.2); }
+    20% { transform: translate(5px, 2px);  clip-path: inset(80% 0 5% 0); }
+    30% { transform: translate(-3px, 5px); clip-path: inset(40% 0 40% 0); filter: brightness(1.5); }
+    40% { transform: translate(0); clip-path: inset(0 0 0 0); }
 }
 
-/* RGB 스플릿 효과 (가상 요소 활용) */
 .glitch-active {
     position: relative;
     animation: cyber-glitch 0.25s linear infinite;
 }
-
-/* 글리치 공통 설정 */
-.glitch-active::before,
-.glitch-active::after {
-    content: "";
-    position: absolute;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: inherit;
-    opacity: 0.8;
-    pointer-events: none;
+.glitch-active::before, .glitch-active::after {
+    content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: inherit; opacity: 0.8; pointer-events: none;
 }
-
-/* 노란색 잔상 */
 .glitch-active::before {
-    left: 4px;
-    text-shadow: -2px 0 #ffff00; /* 노란색 */
+    left: 4px; text-shadow: -2px 0 #ffff00;
     clip-path: inset(20% 0 50% 0);
     animation: cyber-glitch 0.3s infinite reverse;
 }
-
-/* 흰색에 가까운 회색 잔상 */
 .glitch-active::after {
-    left: -4px;
-    text-shadow: 2px 0 #d1d1d1; /* 회색빛 흰색 */
+    left: -4px; text-shadow: 2px 0 #d1d1d1;
     clip-path: inset(60% 0 10% 0);
     animation: cyber-glitch 0.2s infinite;
 }
+.glitch-active { text-shadow: 0 0 5px #00ff41; }
 
-/* 기본 텍스트는 기존의 초록색(#00ff41)을 유지하여 세 가지 색상이 모두 나타나게 합니다 */
-.glitch-active {
-    text-shadow: 0 0 5px #00ff41; /* 초록색 광원 효과 유지 */
-}
-/* 화면 깜빡임(Flicker) 강화 */
 @keyframes intense-flicker {
-    0% { opacity: 0.7; }
-    5% { opacity: 0.3; }
-    10% { opacity: 0.9; }
+    0%   { opacity: 0.7; }
+    5%   { opacity: 0.3; }
+    10%  { opacity: 0.9; }
     100% { opacity: 0.8; }
 }
+.glitch-active .crt-overlay { animation: intense-flicker 0.05s infinite; background: rgba(0,255,65,0.1); }
 
-.glitch-active .crt-overlay {
-    animation: intense-flicker 0.05s infinite;
-    background: rgba(0, 255, 65, 0.1); /* 순간적으로 초록빛 노이즈 추가 */
+@keyframes flicker {
+    0%, 100% { opacity: 0.92; }
+    50%       { opacity: 1; }
 }
 
-/* 3. CRT 오버레이: 화면 유리에 효과 고정 */
 .crt-overlay {
-    position: absolute; 
-    top: 0; 
-    left: 0; 
-    width: 100%; 
-    height: 100%;
-    background: 
-        linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background:
+        linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.25) 50%),
         radial-gradient(circle at center, rgba(0,0,0,0) 60%, rgba(0,0,0,0.6) 100%);
     background-size: 100% 4px, 100% 100%;
-    pointer-events: none; 
-    z-index: 100; /* 콘텐츠보다 위에 고정 */
-    opacity: 0.9; 
-    animation: flicker 0.15s infinite;
-    overflow: hidden; /* 광선이 모니터 밖으로 나가지 않게 함 */
+    pointer-events: none; z-index: 100;
+    opacity: 0.9; animation: flicker 0.15s infinite; overflow: hidden;
 }
-
-/* 고정된 광선(Sweep) 효과 */
 .crt-overlay::after {
-    content: ""; 
-    position: absolute; 
-    top: 0; 
-    left: -100%; 
-    width: 100%; 
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
-    animation: screen-sweep 10s linear infinite;
-    pointer-events: none;
+    content: ""; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+    animation: screen-sweep 10s linear infinite; pointer-events: none;
 }
-
-/* 4. 내부 콘텐츠 영역: 스크롤은 되지만 바는 숨김 */
-.screen-content {
-    position: relative; 
-    z-index: 20; 
-    min-height: 0;
-    height: auto;
-    width: 100%;
-    padding: 0 !important; 
-    
-    overflow-y: auto !important; 
-    overflow-x: hidden !important;
-    scrollbar-width: none; 
-    -ms-overflow-style: none; 
-    
-    color: #00ff41;
-    text-shadow: 2px 0 1px rgba(255, 0, 0, 0.3), -2px 0 1px rgba(0, 0, 255, 0.3), 0 0 5px #00ff41;
-}
-
-.screen-content::-webkit-scrollbar {
-    display: none;
-}
-
-.crt-overlay::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(
-        90deg,
-        transparent,
-        rgba(255,255,255,0.05),
-        transparent
-    );
-    animation: screen-sweep 10s linear infinite;
-    pointer-events: none;
-}
-
 @keyframes screen-sweep { to { left: 200%; } }
-/* [3] CRT 특수 효과 애니메이션 END */
 
-/* [4] 섹션 레이아웃: 여백 확보 및 안정적인 중앙 정렬 */
+/* [컷 8] 강렬한 엔딩 글리치 */
+@keyframes ending-glitch-anim {
+    0%   { transform: translate(0);          filter: hue-rotate(0deg); }
+    10%  { transform: translate(-10px, 0);   filter: hue-rotate(90deg) brightness(2.5); }
+    20%  { transform: translate(10px, 0);    filter: hue-rotate(180deg) saturate(3); }
+    30%  { transform: translate(0, -6px);    filter: hue-rotate(270deg) brightness(3); }
+    40%  { transform: translate(0, 6px);     filter: hue-rotate(360deg); }
+    50%  { transform: translate(-6px, 3px);  filter: brightness(4) saturate(0); }
+    60%  { transform: translate(6px, -3px);  filter: hue-rotate(45deg) brightness(2); }
+    70%  { transform: translate(0);          filter: brightness(1); }
+    80%  { transform: translate(-4px, 0);    filter: hue-rotate(135deg) brightness(2); }
+    90%  { transform: translate(4px, 0);     filter: brightness(3); }
+    100% { transform: translate(0);          filter: none; }
+}
+.ending-glitch {
+    animation: ending-glitch-anim 0.08s infinite !important;
+}
+
+/* [컷 8] TV 꺼지는 애니메이션 */
+@keyframes tv-off {
+    0%   { transform: scaleY(1);    filter: brightness(1); }
+    35%  { transform: scaleY(0.04); filter: brightness(5) saturate(0); box-shadow: 0 0 120px rgba(255,255,255,0.9); }
+    55%  { transform: scaleY(0.02); filter: brightness(10); }
+    75%  { transform: scaleY(0.01); filter: brightness(3); opacity: 0.6; }
+    100% { transform: scaleY(0);    filter: brightness(0); opacity: 0; }
+}
+
+/* [컷 8] END 오버레이 */
+.end-overlay {
+    position: absolute; top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: #000000;
+    display: none;
+    align-items: center; justify-content: center;
+    z-index: 300;
+    border-radius: 60px / 40px;
+    font-family: 'Passion One', cursive;
+    font-size: 5rem;
+    letter-spacing: 12px;
+    color: #00ff41;
+    text-shadow: 0 0 30px #00ff41, 0 0 60px #00ff41;
+}
+.end-overlay.active {
+    display: flex;
+    animation: end-appear 0.6s ease forwards, end-glow-pulse 2s ease-in-out 0.6s infinite;
+}
+@keyframes end-appear {
+    0%   { opacity: 0; letter-spacing: 40px; }
+    100% { opacity: 1; letter-spacing: 12px; }
+}
+@keyframes end-glow-pulse {
+    0%, 100% { text-shadow: 0 0 20px #00ff41, 0 0 40px #00ff41; }
+    50%       { text-shadow: 0 0 50px #00ff41, 0 0 100px #00ff41, 0 0 160px #00ff41; }
+}
+/* [3] END */
+
+
+/* [4] 섹션 레이아웃 */
+.screen-content {
+    position: relative; z-index: 20;
+    min-height: 0; height: auto; width: 100%;
+    padding: 0 !important;
+    overflow-y: auto !important; overflow-x: hidden !important;
+    scrollbar-width: none; -ms-overflow-style: none;
+    color: #00ff41;
+    text-shadow: 2px 0 1px rgba(255,0,0,0.3), -2px 0 1px rgba(0,0,255,0.3), 0 0 5px #00ff41;
+}
+.screen-content::-webkit-scrollbar { display: none; }
+
 .screen {
-    position: relative;
-    width: 100%;
-    min-height: auto !important;
-    height: auto;
-    
-    /* 공간을 차지하지 않도록 수정 (기존 display: flex; 삭제) */
-    display: none; 
-    
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    padding: 60px 20px;
-    box-sizing: border-box;
-    text-align: center;
-
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-    z-index: 1;
-
-    overflow: hidden;
-    /* display가 변경될 경우 CSS opacity 애니메이션은 무시되지만, 
-       JavaScript 글리치 효과가 화면 전환을 덮어주므로 그대로 두어도 무방합니다. */
-    transition: opacity 0.15s ease-in-out; 
+    position: relative; width: 100%;
+    min-height: auto !important; height: auto;
+    display: none; flex-direction: column;
+    align-items: center; justify-content: flex-start;
+    padding: 60px 20px; box-sizing: border-box; text-align: center;
+    opacity: 0; visibility: hidden; pointer-events: none; z-index: 1;
+    overflow: hidden; transition: opacity 0.15s ease-in-out;
 }
-
 .screen.active {
-    /* 활성화 시에만 화면 공간을 차지하도록 flex 속성 부여 */
-    display: flex; 
-    
-    opacity: 1;
-    visibility: visible;
-    pointer-events: auto;
-    z-index: 10;
+    display: flex; opacity: 1; visibility: visible;
+    pointer-events: auto; z-index: 10;
 }
-
-/* [수정] 아래쪽(after) 힘을 훨씬 강하게 주어, 전체 내용을 화면 위쪽으로 번쩍 들어 올립니다! */
 .screen::before, .screen::after { display: none !important; }
 
 .content-wrapper {
-    width: 100%;
-    max-width: 480px;
+    width: 100%; max-width: 480px;
     margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    z-index: 10;
+    display: flex; flex-direction: column;
+    gap: 15px; z-index: 10;
 }
+.content-wrapper > *:last-child { margin-bottom: 0 !important; }
+/* [4] END */
 
-/* 불필요한 하단 스크롤 방지 핵심 코드 */
-.content-wrapper > *:last-child {
-    margin-bottom: 0 !important;
-}
 
-/* [최종] 보랏빛 메탈릭 크롬 & 하이-글로시 네온 디자인 */
+/* [5] 타이틀 */
 h1.shiny-title {
     font-family: 'Passion One', cursive;
-    font-size: 4.2rem;
-    font-weight: 900;
-    text-align: center;
-    margin: 0 0 15px 0 !important;
-    line-height: 1.0 !important;
-    text-transform: uppercase;
-    
-    /* 자간을 적정하게 조절하여 단단한 금속 느낌 부여 */
-    letter-spacing: 2px; 
-    display: inline-block;
+    font-size: 4.2rem; font-weight: 900;
+    text-align: center; margin: 0 0 15px 0 !important;
+    line-height: 1.0 !important; text-transform: uppercase;
+    letter-spacing: 2px; display: inline-block;
     transform: perspective(500px) rotateX(12deg) scaleX(1.15) scaleY(1.1);
-
-    /* [핵심 수정] 메탈릭하게 빛나는 보라색 크롬 그라데이션 */
-    background: linear-gradient(to bottom, 
-        #e1bee7 0%,     /* 상단: 밝은 라벤더 반사광 */
-        #ff00ff 40%,    /* 상부: 쨍한 마젠타 보라 */
-        #ffffff 50%,    /* 중앙: 강렬한 메탈릭 실버 하이라이트 (빛 반사) */
-        #4a148c 55%,    /* 중앙 하단: 깊은 그림자 대비 */
-        #ba68c8 100%    /* 하단: 반사되는 보라색 */
-    );
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-
-    /* [수정] 쨍하면서도 고급스러운 보라색 광원 효과 */
-    filter: drop-shadow(0 0 10px rgba(255, 0, 255, 0.7));
-
-    text-shadow: 
-        0 0 2px rgba(255, 255, 255, 0.8), /* 글자 테두리 하이라이트 */
-        1px 1px 0px #310062,              /* 입체감 레이어 1 */
-        2px 2px 0px #1a0033,              /* 입체감 레이어 2 */
-        0 8px 15px rgba(0, 0, 0, 0.6);   /* 하단 깊은 그림자 */
-
+    background: linear-gradient(to bottom,
+        #e1bee7 0%, #ff00ff 40%, #ffffff 50%, #4a148c 55%, #ba68c8 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    filter: drop-shadow(0 0 10px rgba(255,0,255,0.7));
+    text-shadow: 0 0 2px rgba(255,255,255,0.8), 1px 1px 0px #310062, 2px 2px 0px #1a0033, 0 8px 15px rgba(0,0,0,0.6);
     animation: navigator-float 3s ease-in-out infinite;
 }
-
-/* 애니메이션 비율 유지 */
 @keyframes navigator-float {
     0%, 100% { transform: perspective(500px) rotateX(12deg) scaleX(1.15) scaleY(1.1) translateY(0); }
-    50% { transform: perspective(500px) rotateX(12deg) scaleX(1.15) scaleY(1.1) translateY(-10px); }
+    50%       { transform: perspective(500px) rotateX(12deg) scaleX(1.15) scaleY(1.1) translateY(-10px); }
 }
-
-/* 네온이 미세하게 떨리는 효과 추가 (진짜 옛날 모니터 느낌) */
-@keyframes neon-flicker {
-    0%, 100% { opacity: 1; filter: drop-shadow(0 0 15px rgba(255, 0, 255, 0.8)); }
-    92% { opacity: 0.9; filter: drop-shadow(0 0 12px rgba(255, 0, 255, 0.6)); }
-    96% { opacity: 1; filter: drop-shadow(0 0 18px rgba(255, 0, 255, 1)); }
-}
-
-/* 마우스 호버 시 글리치 효과 */
-h1.shiny-title:hover {
-    animation: glitch-anim 0.3s infinite;
-    text-shadow: 2px 0 #ff00ff, -2px 0 #00ffff;
-}
-
+h1.shiny-title:hover { animation: glitch-anim 0.3s infinite; text-shadow: 2px 0 #ff00ff, -2px 0 #00ffff; }
 @keyframes glitch-anim {
-    0% { transform: translate(0) }
-    20% { transform: translate(-2px, 2px) }
-    40% { transform: translate(-2px, -2px) }
-    60% { transform: translate(2px, 2px) }
-    80% { transform: translate(2px, -2px) }
+    0%   { transform: translate(0) }
+    20%  { transform: translate(-2px, 2px) }
+    40%  { transform: translate(-2px, -2px) }
+    60%  { transform: translate(2px, 2px) }
+    80%  { transform: translate(2px, -2px) }
     100% { transform: translate(0) }
 }
-
-@keyframes shine-v { to { background-position: center 200%; } }
-
-/* [4] 섹션 레이아웃 및 텍스트 END */
+/* [5] END */
 
 
-/* [5] UI 요소 및 결과 박스 START */
-
-/* 1. 공통 너비 제한 및 중앙 정렬 */
-.content-wrapper, 
-.input-wrapper, 
-.date-time-container, 
-#map, 
-button.cyber-btn, 
+/* [6] UI 요소 및 결과 박스 */
+.content-wrapper,
+.input-wrapper,
+.date-time-container,
+#map,
+button.cyber-btn,
 .result-box,
 .content-wrapper > div {
-    width: 100%;
-    max-width: 480px; 
-    margin-left: auto !important;
-    margin-right: auto !important;
-    /* 강제 마진 제거하여 중앙 정렬 보존 */
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
-    display: flex; 
-    flex-direction: column;
-    gap: 15px; 
+    width: 100%; max-width: 480px;
+    margin-left: auto !important; margin-right: auto !important;
+    margin-top: 0 !important; margin-bottom: 0 !important;
+    display: flex; flex-direction: column; gap: 15px;
 }
 
-/* 2. 입력창 & 결과 박스 공통 스타일 */
-/* [수정 후] 콤마(,) 뒤에 있던 .result-box를 지워서 분리합니다 */
-input[type="text"],
-input[type="date"],
-input[type="time"],
-select {
-    background: rgba(10, 15, 30, 0.9) !important;
-    border: 2px solid #00ffff !important; 
-    border-radius: 4px !important; 
+input[type="text"], input[type="date"], input[type="time"], select {
+    background: rgba(10,15,30,0.9) !important;
+    border: 2px solid #00ffff !important;
+    border-radius: 4px !important;
     color: #00ffff !important;
-    text-shadow: 0 0 5px rgba(0, 255, 255, 0.5) !important;
-    box-shadow: inset 0 0 20px rgba(0, 255, 255, 0.2) !important;
-
-    height: 55px !important;
-    line-height: 55px !important; 
-    padding: 0 15px !important; 
-    font-family: 'DungGeunMo'; 
-    font-size: 1.2rem;
-    outline: none;
-    box-sizing: border-box; 
-    color-scheme: dark; 
+    text-shadow: 0 0 5px rgba(0,255,255,0.5) !important;
+    box-shadow: inset 0 0 20px rgba(0,255,255,0.2) !important;
+    height: 55px !important; line-height: 55px !important;
+    padding: 0 15px !important;
+    font-family: 'DungGeunMo'; font-size: 1.2rem;
+    outline: none; box-sizing: border-box; color-scheme: dark;
 }
 
-/* [공통] 터미널 로그 박스 디자인 */
 .result-box {
     background: #000000 !important;
     border: 2px solid var(--theme-color, #ff00ff) !important;
     padding: 0 !important;
-    display: flex;
-    flex-direction: column;
+    display: flex; flex-direction: column;
     margin-bottom: 20px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
     transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    /* [핵심 수정] 55px 고정 높이를 풀고 콘텐츠에 맞게 자동 조절되도록 변경 */
-    height: auto !important; 
+    height: auto !important;
 }
-
 .result-box h2 {
     background: var(--theme-color, #ff00ff) !important;
     color: #000000 !important;
-    margin: 0 !important;
-    padding: 10px 15px !important; /* 안정감을 위해 패딩 약간 증가 */
-    font-size: 1.1rem !important;
-    text-align: left !important;
-    justify-content: flex-start !important;
-    border-bottom: none !important;
-    transform: none !important;
-    
-    /* [핵심 수정] 헤더의 줄 간격 정상화 */
-    line-height: 1.2 !important; 
+    margin: 0 !important; padding: 10px 15px !important;
+    font-size: 1.1rem !important; text-align: left !important;
+    justify-content: flex-start !important; border-bottom: none !important;
+    transform: none !important; line-height: 1.2 !important;
 }
-
 .result-content {
-    padding: 15px !important;
-    color: #00ff41; 
-    text-align: left !important;
-    font-size: 1rem !important;
-    
-    /* [핵심 수정] 55px로 벌어져 있던 본문 줄 간격을 읽기 좋게 정상화 */
-    line-height: 1.6 !important; 
+    padding: 15px !important; color: #00ff41;
+    text-align: left !important; font-size: 1rem !important;
+    line-height: 1.6 !important;
 }
 
-/* [색상별 변수 설정] */
-.theme-personality { --theme-color: #ff00ff; } /* 핑크 유지 */
-.theme-blue { --theme-color: #0088ff; }        /* 장점: 파랑 */
-.theme-red { --theme-color: #ff3333; }         /* 단점: 빨강 */
-.theme-love { --theme-color: #ff00ff; }        /* 연애: 핑크 */
-.theme-health { --theme-color: #ffff00; }      /* 건강: 노랑 */
-.theme-career { --theme-color: #00ffff; }      /* 커리어: 하늘 */
-.theme-money { --theme-color: #00ff41; }       /* 재물: 초록 */
-.theme-purple { --theme-color: #bf00ff; }      /* 전체: 보라 */
+/* 색상 테마 변수 */
+.theme-personality { --theme-color: #ff00ff; }
+.theme-blue        { --theme-color: #0088ff; }
+.theme-red         { --theme-color: #ff3333; }
+.theme-love        { --theme-color: #ff00ff; }
+.theme-health      { --theme-color: #ffff00; }
+.theme-career      { --theme-color: #00ffff; }
+.theme-money       { --theme-color: #00ff41; }
+.theme-purple      { --theme-color: #bf00ff; }
+.theme-animal      { --theme-color: #ffaa00; }  /* 컷 4: 황금빛 */
 
-/* 플루토의 속삭임: 검은색 반전 (헤더 흰색, 본문 흰색) */
 .theme-whisper { --theme-color: #ffffff; }
 .theme-whisper .result-content { color: #ffffff !important; }
 
-/* 월별 운세: 무지개색 애니메이션 */
 .theme-rainbow {
     border-image: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet) 1 !important;
 }
@@ -480,255 +333,163 @@ select {
     background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet) !important;
     color: #ffffff !important;
 }
-
 @keyframes rainbow-text {
-    0% { color: #ff0000; } 20% { color: #ffff00; } 40% { color: #00ff00; }
-    60% { color: #00ffff; } 80% { color: #0000ff; } 100% { color: #ff0000; }
+    0%  { color: #ff0000; } 20% { color: #ffff00; } 40% { color: #00ff00; }
+    60% { color: #00ffff; } 80% { color: #0000ff; } 100%{ color: #ff0000; }
 }
-.theme-rainbow .result-content {
-    animation: rainbow-text 3s infinite linear;
+.theme-rainbow .result-content { animation: rainbow-text 3s infinite linear; }
+
+/* [컷 4] 동물 이름/키워드 표시 */
+.animal-name-display {
+    font-size: 2.4rem; font-weight: bold;
+    text-align: center; margin-bottom: 6px;
+    color: #ffaa00 !important;
+    text-shadow: 0 0 15px rgba(255,170,0,0.8);
+}
+.animal-keyword-display {
+    text-align: center; margin-bottom: 14px;
+    color: #ffff00 !important; font-size: 1.1rem;
+    text-shadow: 0 0 8px rgba(255,255,0,0.6);
+    letter-spacing: 2px;
 }
 
-/* 3. 라벨 스타일 및 높이 고정 */
-.input-group > label, 
-.time-header {
-    height: 25px !important; 
-    display: flex !important;
-    align-items: center !important; 
-    margin-bottom: 2px !important;
-    color: #ff00ff !important; 
-    text-shadow: 0 0 8px #ff00ff;
-    font-weight: bold; 
-    font-size: 0.9rem;
+/* 라벨 */
+.input-group > label, .time-header {
+    height: 25px !important; display: flex !important;
+    align-items: center !important; margin-bottom: 2px !important;
+    color: #ff00ff !important; text-shadow: 0 0 8px #ff00ff;
+    font-weight: bold; font-size: 0.9rem;
 }
 
-/* 4. 날짜/시간 영역 */
 .date-time-container {
-    flex-direction: row !important; 
-    justify-content: space-between;
-    gap: 8px; 
-    flex-wrap: wrap;
+    flex-direction: row !important;
+    justify-content: space-between; gap: 8px; flex-wrap: wrap;
     margin-bottom: 0px !important;
 }
+.input-group { flex: 1; min-width: 180px; display: flex; flex-direction: column; margin-bottom: 15px; vertical-align: top; }
+.time-header  { justify-content: space-between; width: 100%; }
 
-.input-group {
-    flex: 1; 
-    min-width: 180px; 
-    display: flex; 
-    flex-direction: column;
-    margin-bottom: 15px;
-    vertical-align: top;
-}
-
-/* 5. TIME 헤더 */
-.time-header {
-    justify-content: space-between; 
-    width: 100%;
-}
-
-/* 6. '시간 모름' 체크박스 스타일 */
 .unknown-check {
-    display: flex; 
-    align-items: center; 
-    gap: 5px;
-    color: #ffff00 !important; 
-    text-shadow: 0 0 5px #ffff00;
-    font-size: 0.8rem;
-    cursor: pointer;
-    white-space: nowrap;
+    display: flex; align-items: center; gap: 5px;
+    color: #ffff00 !important; text-shadow: 0 0 5px #ffff00;
+    font-size: 0.8rem; cursor: pointer; white-space: nowrap;
 }
-
 .unknown-check input[type="checkbox"] {
     appearance: none; -webkit-appearance: none;
-    width: 16px; height: 16px;
-    border: 2px solid #ffff00;
-    box-shadow: 0 0 5px #ffff00;
-    cursor: pointer;
-    position: relative;
-    margin: 0;
-    background: transparent !important;
+    width: 16px; height: 16px; border: 2px solid #ffff00;
+    box-shadow: 0 0 5px #ffff00; cursor: pointer;
+    position: relative; margin: 0; background: transparent !important;
 }
-
 .unknown-check input[type="checkbox"]:checked { background: #ffff00 !important; }
 .unknown-check input[type="checkbox"]:checked::after {
     content: '✔'; color: black; font-size: 12px;
     position: absolute; left: 2px; top: -2px;
 }
 
-/* 7. 버튼 스타일 */
 button.cyber-btn {
-    background: rgba(0, 255, 255, 0.1);
-    border: 2px solid #00ff41;
-    color: #00ff41;
-    padding: 16px; 
-    font-family: 'DungGeunMo'; font-weight: 900; font-size: 1.3rem; 
-    cursor: pointer; 
-    box-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
-    text-transform: uppercase;
-    transition: all 0.3s ease;
-    height: auto !important;
+    background: rgba(0,255,255,0.1);
+    border: 2px solid #00ff41; color: #00ff41;
+    padding: 16px; font-family: 'DungGeunMo'; font-weight: 900; font-size: 1.3rem;
+    cursor: pointer; box-shadow: 0 0 10px rgba(0,255,65,0.3);
+    text-transform: uppercase; transition: all 0.3s ease; height: auto !important;
 }
 button.cyber-btn:hover { background: #00ff41; color: #000; box-shadow: 0 0 30px #00ff41; }
 
-/* 8. 지도 및 기타 유틸리티 */
 #map { height: 140px; border: 3px solid #00ffff; filter: invert(100%) hue-rotate(180deg); margin-bottom: 15px; }
 .button-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
-.hidden-btn { display: none !important; }
+.hidden-btn  { display: none !important; }
 
+/* 타이핑 텍스트 */
 .typewriter-text {
-    color: #00ff41; /* 플루토의 시그니처 연두색 */
-    font-size: 1.6rem;
-    text-align: center;
-    line-height: 1.8;
-    font-weight: bold;
-    text-shadow: 0 0 10px rgba(0, 255, 65, 0.6);
-    min-height: 120px;
-    word-break: keep-all;
-    width: 100%;
+    color: #00ff41; font-size: 1.6rem;
+    text-align: center; line-height: 1.8; font-weight: bold;
+    text-shadow: 0 0 10px rgba(0,255,65,0.6);
+    min-height: 120px; word-break: keep-all; width: 100%;
 }
-
-/* 타이핑 커서 효과 (깜빡이는 블록) */
 .typewriter-text::after {
-    content: '█';
-    display: inline-block;
-    vertical-align: bottom;
+    content: '█'; display: inline-block; vertical-align: bottom;
     animation: cursor-blink 1s step-end infinite;
-    margin-left: 8px;
-    color: #00ff41;
+    margin-left: 8px; color: #00ff41;
+}
+@keyframes cursor-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+.typewriter-text div { animation: pulse 1.5s infinite; }
+@keyframes pulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.7; } }
+/* [6] END */
+
+
+/* [7] 로딩 화면 — 별과 별똥별 */
+
+/* 반짝이는 작은 별 */
+.star {
+    position: absolute;
+    background: #ffffff;
+    border-radius: 50%;
+    animation: twinkle ease-in-out infinite;
+    pointer-events: none;
+}
+@keyframes twinkle {
+    0%, 100% { opacity: 0.15; transform: scale(0.8); }
+    50%       { opacity: 1;    transform: scale(1.4); }
 }
 
-@keyframes cursor-blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0; }
+/* 별똥별 */
+.shooting-star {
+    position: absolute;
+    width: 100px; height: 2px;
+    background: linear-gradient(to right, transparent 0%, rgba(180,180,255,0.4) 30%, rgba(255,255,255,0.9) 80%, #fff 100%);
+    border-radius: 50px;
+    animation: shoot-star linear infinite;
+    pointer-events: none;
+    opacity: 0;
 }
-
-/* 터치 안내 문구에 깜빡이는 효과 추가 (선택) */
-.typewriter-text div {
-    animation: pulse 1.5s infinite;
+@keyframes shoot-star {
+    0%   { transform: translate(0, 0) rotate(-35deg);       opacity: 0; }
+    8%   { opacity: 1; }
+    75%  { opacity: 0.8; }
+    100% { transform: translate(280px, 170px) rotate(-35deg); opacity: 0; }
 }
+/* [7] END */
 
-@keyframes pulse {
-    0%, 100% { opacity: 0.3; }
-    50% { opacity: 0.7; }
-}
 
-/* [5] UI 요소 및 결과 박스 END */
-
-/* [6] 모바일 반응형 최종 보정 - 레이아웃 및 입력창 완전 최적화 */
+/* [8] 모바일 반응형 */
 @media screen and (max-width: 600px) {
-    /* 1. 모니터 프레임: 슬림 배젤 유지 */
     .monitor-frame {
-        width: 98vw; 
-        height: 94vh;
-        max-height: none;
-        padding: 10px !important; 
-        border-radius: 20px !important;
+        width: 98vw; height: 94vh; max-height: none;
+        padding: 10px !important; border-radius: 20px !important;
     }
-
     .screen-container { border-radius: 15px !important; }
 
-    /* [추가] 1-2. 메인 헤드라인 짤림 방지 */
     h1.shiny-title {
-        font-size: 2.2rem !important; /* 크기를 줄여서 한 화면에 들어오게 함 */
-        letter-spacing: -1px; 
+        font-size: 2.2rem !important; letter-spacing: -1px;
         margin-bottom: 15px !important;
-        
-        /* 입체 효과 각도를 조절하여 좌우 짤림 방지 */
         transform: perspective(500px) rotateX(15deg) scale(0.9) !important;
-        
-        white-space: normal;
-        word-break: keep-all;
-        line-height: 1.1;
+        white-space: normal; word-break: keep-all; line-height: 1.1;
     }
+    h2.shiny-title { font-size: 1.5rem !important; }
 
-    h2.shiny-title {
-        font-size: 1.5rem !important;
-    }
-
-    /* 2. [수정] 세로 중앙 정렬 해제 및 짤림 방지 */
     .content-wrapper {
-        margin: 0 auto !important; 
-        padding-top: 10px;
-        padding-bottom: 30px !important; 
-        display: flex;
-        flex-direction: column;
+        margin: 0 auto !important;
+        padding-top: 10px; padding-bottom: 30px !important;
+        display: flex; flex-direction: column;
     }
+    .screen-content { width: 100%; flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; position: relative; }
+    .screen { height: auto !important; min-height: 100%; justify-content: flex-start !important; padding: 20px 15px !important; }
 
-    /* 3. 스크롤 및 화면 구성 */
-    .screen-content {
-        width: 100%;
-        flex: 1;
-        min-height: 0;
-        overflow-y: auto;
-        overflow-x: hidden;
-        position: relative;
-    }
-
-    .screen {
-        height: auto !important;
-        min-height: 100%;
-        justify-content: flex-start !important;
-        padding: 20px 15px !important;
-    }
-
-    /* 4. [수정] 입력창 스타일 */
     input[type="text"], input[type="date"], input[type="time"], select {
-        appearance: none;
-        -webkit-appearance: none;
-        width: 100% !important;
-        height: 52px !important; 
-        background: rgba(10, 15, 30, 0.9) !important;
-        border: 2px solid #00ffff !important;
-        color: #00ffff !important;
-        font-size: 1.1rem !important;
-        padding: 0 15px !important;
-        margin-bottom: 12px !important;
-        border-radius: 4px !important;
+        appearance: none; -webkit-appearance: none;
+        width: 100% !important; height: 52px !important;
+        background: rgba(10,15,30,0.9) !important; border: 2px solid #00ffff !important;
+        color: #00ffff !important; font-size: 1.1rem !important;
+        padding: 0 15px !important; margin-bottom: 12px !important; border-radius: 4px !important;
     }
-
-    /* 5. [수정] 라벨 및 TIME 헤더 정렬 */
-    label {
-        font-size: 1.0rem !important;
-        margin-bottom: 6px !important;
-        display: block;
-        height: auto !important; 
-    }
-
-    .time-header {
-        display: flex;
-        flex-direction: column !important; 
-        align-items: flex-start !important;
-        height: auto !important;
-        gap: 5px;
-        margin-bottom: 8px !important;
-    }
-
-    /* 6. 날짜/시간 영역 세로 배치 */
-    .date-time-container {
-        flex-direction: column !important;
-        gap: 0 !important;
-    }
-
-    .input-group {
-        width: 100% !important;
-        margin-bottom: 5px !important;
-    }
-
-    /* 7. 기타 요소 보정 */
-    button.cyber-btn {
-        margin-bottom: 15px !important;
-        padding: 14px !important;
-    }
-    
-   /* ... 기타 모바일 설정들 생략 ... */
-    
-    .typewriter-text {
-        font-size: 1.2rem;
-        line-height: 1.6;
-    }
-
-    .monitor-neck, .monitor-base { 
-        display: none; 
-    }
-
-} /* <-- 전체 파일을 통틀어 맨 마지막 줄에는 닫는 괄호가 딱 한 개만 있어야 합니다! */
+    label { font-size: 1.0rem !important; margin-bottom: 6px !important; display: block; height: auto !important; }
+    .time-header { display: flex; flex-direction: column !important; align-items: flex-start !important; height: auto !important; gap: 5px; margin-bottom: 8px !important; }
+    .date-time-container { flex-direction: column !important; gap: 0 !important; }
+    .input-group { width: 100% !important; margin-bottom: 5px !important; }
+    button.cyber-btn { margin-bottom: 15px !important; padding: 14px !important; }
+    .typewriter-text { font-size: 1.2rem; line-height: 1.6; }
+    .monitor-neck, .monitor-base { display: none; }
+    .animal-name-display { font-size: 1.9rem !important; }
+    .end-overlay { font-size: 3.5rem !important; border-radius: 15px !important; }
+}
+/* [8] END */

@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>TERMINAL: PLUTO</title>
-    
+
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    
+
     <link href="https://fonts.googleapis.com/css2?family=Passion+One:wght@900&display=swap" rel="stylesheet">
-    
+
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
@@ -17,15 +17,20 @@
     <div class="monitor-frame">
         <div id="container" class="screen-container">
             <div class="crt-overlay"></div>
-            
+
+            <!-- 컷 8: TV 꺼지는 효과 후 END 텍스트 오버레이 -->
+            <div id="end-overlay" class="end-overlay">END</div>
+
             <div id="content" class="screen-content">
-                
+
+                <!-- 컷 1 / 컷 8 공용: 스토리 화면 -->
                 <section id="screen-story" class="screen active">
                     <div class="content-wrapper" style="justify-content: center; height: 100%; min-height: 50vh;">
                         <div id="story-text" class="typewriter-text"></div>
                     </div>
                 </section>
 
+                <!-- 컷 2: 입력창 -->
                 <section id="screen-input" class="screen">
                     <div class="content-wrapper">
                         <h1 class="shiny-title">ACCESS: PLUTO</h1>
@@ -62,16 +67,36 @@
                     </div>
                 </section>
 
+                <!-- 컷 3: 로딩 -->
                 <section id="screen-loading" class="screen">
-                    <div class="content-wrapper">
-                        <h2 id="loading-text" class="shiny-title" style="font-size: 1.5rem;">별의 소리를 관측하는 중...</h2>
+                    <div class="content-wrapper" style="justify-content: center; min-height: 50vh;">
+                        <h2 id="loading-text" class="shiny-title" style="font-size: 1.5rem;">별의 소리를 듣는중.</h2>
                     </div>
                 </section>
 
+                <!-- 컷 4: 동물 결과 -->
+                <section id="screen-animal" class="screen">
+                    <div class="content-wrapper">
+                        <h2 class="shiny-title" style="font-size:1.8rem;">SIGNAL_DETECTED</h2>
+
+                        <div class="result-box theme-animal">
+                            <h2 id="animal-box-title">[TYPE] ANIMAL_SIGNAL</h2>
+                            <div class="result-content">
+                                <div id="animal-name" class="animal-name-display"></div>
+                                <div id="animal-keyword" class="animal-keyword-display"></div>
+                                <div id="animal-description"></div>
+                            </div>
+                        </div>
+
+                        <button class="cyber-btn" onclick="goToPersonalityStory()">NEXT_SEQUENCE >></button>
+                    </div>
+                </section>
+
+                <!-- 컷 5: 상세 성격 -->
                 <section id="screen-personality" class="screen">
                     <div class="content-wrapper">
                         <h2 class="shiny-title" style="font-size:2rem;">ANALYSIS_COMPLETE</h2>
-                        
+
                         <div class="result-box theme-personality">
                             <h2>[DATA] PERSONALITY_CORE</h2>
                             <div id="res-personality" class="result-content"></div>
@@ -92,26 +117,29 @@
                     </div>
                 </section>
 
+                <!-- 컷 6: 2026 운세 선택 -->
                 <section id="screen-selection" class="screen">
                     <div class="content-wrapper">
                         <h1 class="shiny-title" style="font-size:2rem;">SELECT_TARGET</h1>
                         <p style="color:#00ff41; margin-bottom:20px; text-align:center;">관측할 미래 데이터를 선택하라.</p>
-                        
+
                         <div class="button-grid">
-                            <button id="btn-love" class="cyber-btn" onclick="showFortune('love')" style="border-color:#ff00ff; color:#ff00ff;">LOVE_SIGNAL</button>
-                            <button id="btn-money" class="cyber-btn" onclick="showFortune('money')" style="border-color:#00ff41; color:#00ff41;">WEALTH_FLOW</button>
+                            <button id="btn-love"   class="cyber-btn" onclick="showFortune('love')"   style="border-color:#ff00ff; color:#ff00ff;">LOVE_SIGNAL</button>
+                            <button id="btn-money"  class="cyber-btn" onclick="showFortune('money')"  style="border-color:#00ff41; color:#00ff41;">WEALTH_FLOW</button>
                             <button id="btn-career" class="cyber-btn" onclick="showFortune('career')" style="border-color:#00ffff; color:#00ffff;">CAREER_PATH</button>
                             <button id="btn-health" class="cyber-btn" onclick="showFortune('health')" style="border-color:#ffff00; color:#ffff00;">VITALITY_LOG</button>
                         </div>
 
-                        <button id="btn-final-report" class="cyber-btn hidden-btn" onclick="showFinalReport()" style="margin-top:20px; background:#fff; color:#000; border-color:#fff;">FINAL_REPORT >></button>
+                        <button id="btn-final-report" class="cyber-btn hidden-btn" onclick="showFinalReport()"
+                                style="margin-top:20px; background:#fff; color:#000; border-color:#fff;">FINAL_REPORT >></button>
                     </div>
                 </section>
 
+                <!-- 컷 6 상세: 운세 디테일 -->
                 <section id="screen-fortune-detail" class="screen">
                     <div class="content-wrapper">
                         <h1 id="fortune-title" class="shiny-title" style="font-size:2rem; margin-bottom:10px;">TITLE</h1>
-                        
+
                         <div id="fortune-box" class="result-box">
                             <h2 id="fortune-sub-title">SUB_TITLE</h2>
                             <div id="res-fortune-content" class="result-content"></div>
@@ -121,10 +149,11 @@
                     </div>
                 </section>
 
+                <!-- 컷 7: 플루토의 한마디 -->
                 <section id="screen-final-advice" class="screen">
                     <div class="content-wrapper">
-                        <h1 class="shiny-title" style="font-size:2rem;">SUMMARY_LOG</h1>
-                        
+                        <h1 class="shiny-title" style="font-size:2rem;">PLUTO'S_SIGNAL</h1>
+
                         <div class="result-box theme-purple">
                             <h2>TOTAL_SUMMARY</h2>
                             <div id="res-summary" class="result-content"></div>
@@ -135,26 +164,13 @@
                             <div id="res-final-advice" class="result-content" style="font-weight:bold;"></div>
                         </div>
 
-                        <button class="cyber-btn" onclick="goToMonthlyStory()">CHECK_THIS_MONTH >></button>
+                        <button class="cyber-btn" onclick="startEnding()" style="margin-top:10px;">SIGNAL_END >></button>
                     </div>
                 </section>
 
-                <section id="screen-monthly-final" class="screen">
-                    <div class="content-wrapper">
-                        <h1 class="shiny-title" style="font-size:2rem;">THIS_MONTH</h1>
-                        
-                        <div class="result-box theme-rainbow">
-                            <h2>MONTHLY_SIGNAL</h2>
-                            <div id="res-monthly-content" class="result-content"></div>
-                        </div>
-
-                        <button class="cyber-btn" onclick="location.reload()">SYSTEM_REBOOT</button>
-                    </div>
-                </section>
-
-            </div>
-        </div>
-    </div>
+            </div><!-- /#content -->
+        </div><!-- /#container -->
+    </div><!-- /.monitor-frame -->
 
     <div class="monitor-neck"></div>
     <div class="monitor-base"></div>
