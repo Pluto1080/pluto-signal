@@ -48,7 +48,16 @@ function playStory(lines, callback) {
         let textStr = typeof lineData === 'string' ? lineData : lineData.text;
         let isGlitch = typeof lineData === 'object' && lineData.glitch;
 
+        // 1. 먼저 대사를 넣습니다.
         storyText.innerHTML = textStr;
+
+        // 2. [추가] 대사 바로 옆(오른쪽)에 붙는 커서를 만듭니다.
+        const hint = document.createElement('span'); // span을 써야 줄바꿈이 안 됩니다.
+        hint.style.marginLeft = "10px";              // 글자와 살짝 띄우기
+        hint.style.display = "inline-block";         // 애니메이션 적용을 위해 설정
+        hint.innerText = "▮";                        // 커서 모양
+        hint.className = "cursor-blink";             // 깜빡이는 효과 클래스명
+        storyText.appendChild(hint);                 // 대사 뒤에 붙이기
 
         if (isGlitch) {
             storyText.classList.add('glitch-active');
@@ -68,13 +77,6 @@ function playStory(lines, callback) {
             isAnimating = false;
         }, 50);
     }
-
-    screen.addEventListener('click', handleNext);
-
-    setTimeout(() => {
-        showLine();
-    }, 600);
-}
 
 /* [컷 1] 인트로 스토리 — 8개 대사 */
 function initTerminal() {
@@ -290,6 +292,7 @@ function goToPersonalityStory() {
     playStory([
         "하지만 동물이 전부는 아니야",
         "사자도 어떤 사자는 소심할 수 있잖아?",
+        "어떤 고양이도 개냥이일 수 있고!",
         "너는 어떤 성격인지 알려줄게"
     ], () => {
         switchScreen('screen-personality');
