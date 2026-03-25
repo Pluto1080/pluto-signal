@@ -48,8 +48,11 @@ function playStory(lines, callback) {
         let textStr = typeof lineData === 'string' ? lineData : lineData.text;
         let isGlitch = typeof lineData === 'object' && lineData.glitch;
 
-        // 텍스트만 넣고 커서는 CSS ::after 로 처리
-        storyText.innerHTML = textStr + '<span class="cursor-blink">▮</span>';
+         let words = textStr.split(' '); // 대사를 띄어쓰기 기준으로 나눕니다.
+        let lastWord = words.pop();     // 가장 마지막 단어만 쏙 뽑아냅니다 (예: "행운인걸?").
+        
+        // 마지막 단어와 커서를 <span style="white-space: nowrap;">으로 묶어서 절대 줄바꿈이 일어나지 않게 용접합니다.
+        storyText.innerHTML = words.join(' ') + ' <span style="white-space: nowrap;">' + lastWord + '<span class="cursor-blink">▮</span></span>';
        
         if (isGlitch) {
             storyText.classList.add('glitch-active');
@@ -79,7 +82,7 @@ function initTerminal() {
     playStory([
         { text: "...",          glitch: true },
         { text: ".....지직",    glitch: true },
-        { text: "...ㅇ..!!",   glitch: true },
+        { text: "...ㅇ..어 됐다!!!",   glitch: true },
         "안녕!! 나는 저 먼 플루라는 행성에서 지금 시그널을 보내고있는 플루토라해",
         "나를 만났다니... 너 정말 행운인걸?",
         "나는 너의 미래를 아주 조금! 볼 수 있거든!",
