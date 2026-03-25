@@ -280,14 +280,12 @@ button.cyber-btn,
     gap: unset !important;
 }
 
-/* 커서: CSS ::after 로만 처리 — 항상 텍스트 마지막 줄 바로 뒤에 인라인으로 붙음 */
-#story-text::after {
-    content: '▮';
-    display: inline-block; /* inline-block으로 바꿔야 위치 조절이 먹힙니다 */
+.cursor-blink {
+    display: inline-block;
     margin-left: 6px;
-    vertical-align: middle; /* baseline 대신 middle 사용 */
+    vertical-align: middle;
     position: relative;
-    top: -3px; /* 마이너스 값을 주어 커서를 위로 살짝 당겨 올립니다 */
+    top: -3px; /* 아까 맞춘 완벽한 높이 */
     animation: blink-animation 1s steps(2, start) infinite;
 }
 
