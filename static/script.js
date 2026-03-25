@@ -272,7 +272,7 @@ function showAnimalResult(data) {
 
     playStory([
         `오 너는...`,
-        `${animal.name}과(와) 같은 느낌이야!`
+        `${animal.name}이구나!`
     ], () => {
         switchScreen('screen-animal');
     });
