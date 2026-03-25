@@ -552,11 +552,15 @@ button.cyber-btn:hover { background: #00ff41; color: #000; box-shadow: 0 0 30px 
     h2.shiny-title { font-size: 1.5rem !important; }
 
     .content-wrapper {
-        margin: 0 auto !important;
-        padding-top: 10px; padding-bottom: 30px !important;
-        display: flex; flex-direction: column;
+    width: 100%; max-width: 480px;
+    
+    /* [핵심] 상하 마진을 auto로 설정하면 공간이 남을 때 수직 중앙으로 배치됩니다. */
+    /* 내용이 화면보다 길어지면 자연스럽게 위쪽(padding 지점)부터 시작합니다. */
+    margin: auto auto !important; 
+    
+    display: flex; flex-direction: column;
+    gap: 15px; z-index: 10;
     }
-
     .screen-content { 
         width: 100%; flex: 1; min-height: 0; 
         overflow-y: auto !important; overflow-x: hidden; position: relative; 
@@ -564,9 +568,11 @@ button.cyber-btn:hover { background: #00ff41; color: #000; box-shadow: 0 0 30px 
 
     .screen { 
         height: auto !important; min-height: 100%; 
-        justify-content: flex-start !important; padding: 20px 15px !important; 
-    }
-
+        /* [수정] 상하 여백을 조금 줄여서 중앙 정렬 시 더 균형 잡히게 합니다. */
+    padding: 60px 20px; 
+    
+    justify-content: flex-start; /* margin: auto가 작동하려면 flex-start여야 합니다. */
+}
     /* [4] 모바일 입력창 및 UI 최적화 */
     input[type="text"], input[type="date"], input[type="time"], select {
         appearance: none; -webkit-appearance: none;
