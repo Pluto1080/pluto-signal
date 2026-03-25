@@ -1,15 +1,127 @@
-/* [1] 전역 변수 설정 START */
-let selectedLat = 37.5665; let selectedLon = 126.9780;
+/* ==========================================
+   [1] 전역 변수 설정
+   ========================================== */
+let selectedLat = 37.5665; 
+let selectedLon = 126.9780;
 let globalData = null;
 let viewedFortunes = { love: false, money: false, career: false, health: false };
 let isSwitching = false;
 let loadingInterval;
 const rootStyle = document.documentElement.style;
-/* [1] 전역 변수 설정 END */
 
+let map;
+let marker;
 
 /* ==========================================
-   [2] 페이드인/아웃 스토리 엔진 START
+   [2] 앱 시작 및 초기화
+   ========================================== */
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. 처음엔 내용물(텍스트 등) 숨김
+    const content = document.getElementById('content');
+    if (content) content.style.visibility = 'hidden';
+
+    // 2. 브라운관 TV 켜기 연출 실행
+    triggerTVOn(() => {
+        // 3. 화면이 다 켜지면 인트로 대사 시작
+        initTerminal();
+        // 4. 애니메이션이 버벅이지 않도록 지도는 1초 뒤에 조용히 로딩
+        setTimeout(initMap, 1000); 
+    });
+});
+
+function initMap() {
+    if (map) return;
+    map = L.map('map', { zoomControl: false }).setView([selectedLat, selectedLon], 6);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+    marker = L.marker([selectedLat, selectedLon]).addTo(map);
+    map.on('click', (e) => { 
+        selectedLat = e.latlng.lat; 
+        selectedLon = e.latlng.lng; 
+        marker.setLatLng(e.latlng); 
+    });
+}
+
+/* ==========================================
+   [3] 화면 제어 및 TV 특수효과
+   ========================================== */
+function setScreenColor(center, edge) {
+    rootStyle.setProperty('--screen-bg-center', center);
+    rootStyle.setProperty('--screen-bg-edge', edge);
+}
+
+function triggerTVOn(callback) {
+    const container = document.getElementById('container');
+    const content = document.getElementById('content');
+    const monitorFrame = document.querySelector('.monitor-frame');
+
+    if (content) content.style.visibility = 'hidden';
+    
+    // 처음엔 무조건 암전 (검은색)
+    setScreenColor('#000000', '#000000'); 
+
+    // 애니메이션 실행
+    container.style.animation = 'tv-on 1.2s cubic-bezier(0.15, 0.85, 0.35, 1) forwards';
+    
+    setTimeout(() => {
+        // 1.2초 뒤 원래의 회색 배경으로 부드럽게 복구
+        setScreenColor('#444444', '#111111'); 
+        if (monitorFrame) monitorFrame.classList.add('crt-active');
+        if (content) content.style.visibility = 'visible';
+        
+        // 콜백(initTerminal) 실행
+        if (callback) callback(); 
+    }, 1200);
+}
+
+function triggerTVOff() {
+    const content = document.getElementById('content');
+    const container = document.getElementById('container');
+    const endOverlay = document.getElementById('end-overlay');
+
+    content.classList.add('ending-glitch');
+
+    setTimeout(() => {
+        content.classList.remove('ending-glitch');
+        container.style.transformOrigin = 'center center';
+        container.style.animation = 'tv-off 1.2s cubic-bezier(0.5, 0, 1, 0.5) forwards';
+
+        setTimeout(() => {
+            content.style.visibility = 'hidden';
+            endOverlay.classList.add('active');
+        }, 1200);
+    }, 900);
+}
+
+function switchScreen(id) {
+    if (isSwitching) return;
+    isSwitching = true;
+
+    const content = document.getElementById('content');
+    const container = document.getElementById('container');
+
+    content.classList.add('glitch-active');
+    if (container) container.classList.add('warping-bg');
+    content.classList.add('warping-content');
+
+    content.scrollTop = 0;
+
+    setTimeout(() => {
+        const screens = document.querySelectorAll('.screen');
+        screens.forEach(s => s.classList.remove('active'));
+
+        const target = document.getElementById(id);
+        if (target) target.classList.add('active');
+    }, 150);
+
+    setTimeout(() => {
+        content.classList.remove('glitch-active', 'warping-content');
+        if (container) container.classList.remove('warping-bg');
+        isSwitching = false;
+    }, 450);
+}
+
+/* ==========================================
+   [4] 타이핑 애니메이션 스토리 엔진
    ========================================== */
 function playStory(lines, callback) {
     const storyText = document.getElementById('story-text');
@@ -17,7 +129,6 @@ function playStory(lines, callback) {
 
     storyText.innerHTML = '';
     storyText.style.opacity = '0';
-
     switchScreen('screen-story');
 
     let lineIndex = 0;
@@ -48,10 +159,9 @@ function playStory(lines, callback) {
         let textStr = typeof lineData === 'string' ? lineData : lineData.text;
         let isGlitch = typeof lineData === 'object' && lineData.glitch;
 
-         let words = textStr.split(' '); // 대사를 띄어쓰기 기준으로 나눕니다.
-        let lastWord = words.pop();     // 가장 마지막 단어만 쏙 뽑아냅니다 (예: "행운인걸?").
+        let words = textStr.split(' ');
+        let lastWord = words.pop(); 
         
-        // 마지막 단어와 커서를 <span style="white-space: nowrap;">으로 묶어서 절대 줄바꿈이 일어나지 않게 용접합니다.
         storyText.innerHTML = words.join(' ') + ' <span style="white-space: nowrap;">' + lastWord + '<span class="cursor-blink">▮</span></span>';
        
         if (isGlitch) {
@@ -77,118 +187,9 @@ function playStory(lines, callback) {
     setTimeout(() => { showLine(); }, 600);
 }
 
-/* [컷 1] 인트로 스토리 — 8개 대사 */
-
-function initTerminal() {
-    playStory([
-        { text: "...",          glitch: true },
-        { text: ".....지직",    glitch: true },
-        { text: "...ㅇ..어 됐다!!!",   glitch: true },
-        "안녕!",
-        "나는 저 먼 플루라는 행성에서 지금 시그널을 보내고있는 플루토라해",
-        "나를 만났다니... 너 정말 행운인걸?",
-        "왜냐면 난 별을 측정하면서, 너의 미래를 조금 볼 수 있거든!",
-        "너랑 나랑 이렇게 닿은 건 운명이니까!<br/>한번 내가 봐줄게!",
-        { text: "너의 탄생을 확인해 보자!",   glitch: true } 
-    ], () => {
-        switchScreen('screen-input');
-        setTimeout(() => { map.invalidateSize(); }, 500);
-    });
-}
-
-/* [2] 스토리 엔진 END */
-
-
-/* [3] 초기화 및 유틸리티 START */
-
-/* [3] 초기화 및 유틸리티 최적화 */
-
-// 전역 변수로 선언만 해둡니다.
-let map;
-let marker;
-
-// 지도 초기화 함수를 따로 만듭니다.
-function initMap() {
-    if (map) return; // 이미 초기화됐다면 중단
-    map = L.map('map', { zoomControl: false }).setView([selectedLat, selectedLon], 6);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-    marker = L.marker([selectedLat, selectedLon]).addTo(map);
-    map.on('click', (e) => { 
-        selectedLat = e.latlng.lat; 
-        selectedLon = e.latlng.lng; 
-        marker.setLatLng(e.latlng); 
-    });
-}
-
-// 앱 통합 시작점 (중복된 리스너들을 모두 지우고 이것 하나만 남기세요)
-document.addEventListener('DOMContentLoaded', () => {
-    // 1. 초기 상태 설정
-    const content = document.getElementById('content');
-    if (content) content.style.visibility = 'hidden';
-
-    // 2. TV 켜기 실행
-    triggerTVOn(() => {
-        // 3. TV가 다 켜진 후 인트로 스토리 시작
-        initTerminal();
-        // 4. 지도는 사용자가 입력창에 도달하기 직전에 조용히 로딩 시작 (지연 로딩)
-        setTimeout(initMap, 1000); 
-    });
-});
-
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-        const content = document.getElementById('content');
-        if (content) content.style.visibility = 'hidden';
-        triggerTVOn(() => { initTerminal(); });
-    });
-} else {
-    const content = document.getElementById('content');
-    if (content) content.style.visibility = 'hidden';
-    triggerTVOn(() => { initTerminal(); });
-}
-
-const map = L.map('map', { zoomControl: false }).setView([selectedLat, selectedLon], 6);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-let marker = L.marker([selectedLat, selectedLon]).addTo(map);
-map.on('click', (e) => { selectedLat = e.latlng.lat; selectedLon = e.latlng.lng; marker.setLatLng(e.latlng); });
-setTimeout(() => { map.invalidateSize(); }, 500);
-
-function setScreenColor(center, edge) {
-    rootStyle.setProperty('--screen-bg-center', center);
-    rootStyle.setProperty('--screen-bg-edge', edge);
-}
-
-function switchScreen(id) {
-    if (isSwitching) return;
-    isSwitching = true;
-
-    const content = document.getElementById('content');
-    const container = document.getElementById('container');
-
-    content.classList.add('glitch-active');
-    if (container) container.classList.add('warping-bg');
-    content.classList.add('warping-content');
-
-    content.scrollTop = 0;
-
-    setTimeout(() => {
-        const screens = document.querySelectorAll('.screen');
-        screens.forEach(s => s.classList.remove('active'));
-
-        const target = document.getElementById(id);
-        if (target) target.classList.add('active');
-    }, 150);
-
-    setTimeout(() => {
-        content.classList.remove('glitch-active', 'warping-content');
-        if (container) container.classList.remove('warping-bg');
-        isSwitching = false;
-    }, 450);
-}
-/* [3] 초기화 및 유틸리티 END */
-
-
-/* [4] 데이터 통신 및 로딩 애니메이션 START */
+/* ==========================================
+   [5] 데이터 통신 및 로딩
+   ========================================== */
 function startAnalysis() {
     const name = document.getElementById('userName').value;
     const date = document.getElementById('birthDate').value;
@@ -209,7 +210,6 @@ function startAnalysis() {
     })
     .then(data => {
         stopLoadingAnimation();
-
         if (data.error) {
             alert(data.error);
             switchScreen('screen-input');
@@ -239,7 +239,6 @@ function startAnalysis() {
     });
 }
 
-/* [컷 3] 로딩 애니메이션 */
 function startLoadingAnimation() {
     switchScreen('screen-loading');
     setScreenColor('#08081a', '#020208');
@@ -280,20 +279,31 @@ function stopLoadingAnimation() {
     document.querySelectorAll('.star, .shooting-star').forEach(s => s.remove());
     isSwitching = false;
 }
-/* [4] 데이터 통신 및 로딩 애니메이션 END */
 
+/* ==========================================
+   [6] 컷별 스토리 시퀀스 함수들
+   ========================================== */
+function initTerminal() {
+    playStory([
+        { text: "...",          glitch: true },
+        { text: ".....지직",    glitch: true },
+        { text: "...ㅇ..어 됐다!!!",   glitch: true },
+        "안녕!",
+        "나는 저 먼 플루라는 행성에서 지금 시그널을 보내고있는 플루토라해",
+        "나를 만났다니... 너 정말 행운인걸?",
+        "왜냐면 난 별을 측정하면서, 너의 미래를 조금 볼 수 있거든!",
+        "너랑 나랑 이렇게 닿은 건 운명이니까!<br/>한번 내가 봐줄게!",
+        { text: "너의 탄생을 확인해 보자!",   glitch: true } 
+    ], () => {
+        switchScreen('screen-input');
+        if(map) setTimeout(() => { map.invalidateSize(); }, 500);
+    });
+}
 
-/* [5] 컷별 스토리 전환 및 화면 제어 START */
-
-/* [컷 4] 동물 결과 표시 */
 function showAnimalResult(data) {
     const animal = data.animal;
-    if (!animal) {
-        // ... (생략)
-        return;
-    }
+    if (!animal) return;
 
-    // 화면에는 수식어 없이 기본 동물만 출력
     document.getElementById('animal-box-title').innerText  = `[TYPE] ${animal.name.toUpperCase()}_SIGNAL`;
     document.getElementById('animal-name').innerText        = animal.name;
     document.getElementById('animal-keyword').innerText     = `# ${animal.keyword}`;
@@ -307,9 +317,7 @@ function showAnimalResult(data) {
     });
 }
 
-/* [컷 5] 동물 → 상세 성격 스토리 (수식어 공개!) */
 function goToPersonalityStory() {
-    // AI가 만들어둔 수식어 가져오기
     const modifier = globalData.animal_modifier ? globalData.animal_modifier : "특별한";
     const animalName = globalData.animal.name;
 
@@ -337,7 +345,6 @@ async function displayResultsSequentially(boxes) {
     }
 }
 
-/* [컷 6] 성격 → 운세 선택 스토리 */
 function goToSelectionStory() {
     playStory([
         "어때 좀 맞는거같아?",
@@ -346,7 +353,6 @@ function goToSelectionStory() {
     ], () => { switchScreen('screen-selection'); });
 }
 
-/* [컷 6] 운세 상세 표시 */
 function showFortune(type) {
     const bgColors = {
         'love':   ['#3a0d2e', '#1a0515'],
@@ -390,7 +396,6 @@ function returnToSelection() {
     switchScreen('screen-selection');
 }
 
-/* [컷 7] 최종 리포트 전 스토리 */
 function showFinalReport() {
     playStory([
         "어때? 올해 좀 설레는 일이 있었으면 좋겠다!",
@@ -406,55 +411,12 @@ function showFinalReport() {
     });
 }
 
-/* [컷 8] 엔딩 시퀀스 */
 function startEnding() {
     playStory([
         { text: "엇! 나 지금 ㅜㅜ 연..ㄱㄹ..이 끈ㅎ기기 직전이야!!", glitch: true },
-        { text: "하지만 이제 너가 어디있는지 아니까! 금방 다시 볼 수 있을거야!", glitch: true }, // <-- 여기 쉼표 추가!
+        { text: "하지만 이제 너가 어디있는지 아니까! 금방 다시 볼 수 있을거야!", glitch: true },
         { text: "조금만 기다려!", glitch: true }
     ], () => {
         triggerTVOff();
     });
 }
-
-/* script.js 하단의 triggerTVOn 함수를 이 코드로 덮어씌우세요 */
-function triggerTVOn(callback) {
-    const container = document.getElementById('container'); 
-    const content = document.getElementById('content');     
-    const monitorFrame = document.querySelector('.monitor-frame'); 
-
-    if (content) content.style.visibility = 'hidden';
-
-    // 프레임 열리는 애니메이션(tv-on) 실행
-    container.style.animation = 'tv-on 1.2s cubic-bezier(0.15, 0.85, 0.35, 1) forwards';
-    
-    setTimeout(() => {
-        if (monitorFrame) monitorFrame.classList.add('crt-active');
-        if (content) content.style.visibility = 'visible';
-        
-        // [수정 완료] 자바스크립트를 멈추게 했던 에러 코드를 삭제했습니다!
-        
-        if (callback) callback(); // 정상적으로 텍스트(initTerminal) 실행!
-    }, 1200);
-}
-
-/* [컷 8] 브라운관 TV 꺼지는 효과 */
-function triggerTVOff() {
-    const content    = document.getElementById('content');
-    const container  = document.getElementById('container');
-    const endOverlay = document.getElementById('end-overlay');
-
-    content.classList.add('ending-glitch');
-
-    setTimeout(() => {
-        content.classList.remove('ending-glitch');
-        container.style.transformOrigin = 'center center';
-        container.style.animation = 'tv-off 1.2s cubic-bezier(0.5, 0, 1, 0.5) forwards';
-
-        setTimeout(() => {
-            content.style.visibility = 'hidden';
-            endOverlay.classList.add('active');
-        }, 1200);
-    }, 900);
-}
-/* [5] 컷별 스토리 전환 및 화면 제어 END */
