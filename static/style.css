@@ -401,7 +401,7 @@ button.cyber-btn:hover { background: #00ff41; color: #000; box-shadow: 0 0 30px 
 
 /* 타이핑 텍스트 */
 .typewriter-text {
-    display: block; 
+    display: block !important;
     color: #00ff41; font-size: 1.6rem;
     text-align: center; line-height: 1.8; font-weight: bold;
     text-shadow: 0 0 10px rgba(0,255,65,0.6);
