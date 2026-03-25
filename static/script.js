@@ -95,41 +95,21 @@ function initTerminal() {
         setTimeout(() => { map.invalidateSize(); }, 500);
     });
 }
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-        // TV를 먼저 켜고, 다 켜지면(callback) 인트로 스토리를 시작합니다.
-        triggerTVOn(() => {
-            initTerminal();
-        });
-    });
-} else {
-    triggerTVOn(() => {
-        initTerminal();
-    });
-}
+
 /* [2] 스토리 엔진 END */
 
 
 /* [3] 초기화 및 유틸리티 START */
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
-        // [추가] 초기화: 브라운관 void 상태를 유지하기 위해 내용물을 숨깁니다.
         const content = document.getElementById('content');
         if (content) content.style.visibility = 'hidden';
-
-        // TV를 먼저 켜고, 다 켜지면 인트로 스토리를 시작합니다.
-        triggerTVOn(() => {
-            initTerminal();
-        });
+        triggerTVOn(() => { initTerminal(); });
     });
 } else {
-    // [추가] 초기화
     const content = document.getElementById('content');
     if (content) content.style.visibility = 'hidden';
-    
-    triggerTVOn(() => {
-        initTerminal();
-    });
+    triggerTVOn(() => { initTerminal(); });
 }
 
 const map = L.map('map', { zoomControl: false }).setView([selectedLat, selectedLon], 6);
