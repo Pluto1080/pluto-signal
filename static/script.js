@@ -402,32 +402,25 @@ function startEnding() {
     });
 }
 
-/* script.js 하단의 triggerTVOn 함수 수정 */
+/* script.js 하단의 triggerTVOn 함수를 이 코드로 덮어씌우세요 */
 function triggerTVOn(callback) {
-    const container = document.getElementById('container'); // .screen-container (프레임)
-    const content = document.getElementById('content');     // #content (내용물)
-    const monitorFrame = document.querySelector('.monitor-frame'); // 가장 바깥 프레임
+    const container = document.getElementById('container'); 
+    const content = document.getElementById('content');     
+    const monitorFrame = document.querySelector('.monitor-frame'); 
 
-    // 초기화: 내용물 숨김
-    content.style.visibility = 'hidden';
+    if (content) content.style.visibility = 'hidden';
 
-    // 1. 프레임 열리는 애니메이션(tv-on) 실행
+    // 프레임 열리는 애니메이션(tv-on) 실행
     container.style.animation = 'tv-on 1.2s cubic-bezier(0.15, 0.85, 0.35, 1) forwards';
     
-    // 2. 애니메이션이 완전히 끝나는 시간(1.2초)에 맞춘 로직
     setTimeout(() => {
-        // [핵심 1] 프레임이 다 열렸으니 이제 글리치 효과(crt-overlay)를 켭니다.
         if (monitorFrame) monitorFrame.classList.add('crt-active');
+        if (content) content.style.visibility = 'visible';
         
-        // [핵심 2] 내용물(#content)을 보여주고 뚝딱거리는 flicker 애니메이션 시작
-        content.style.visibility = 'visible';
-        content.style.animation = 'content-on 0.6s ease-out forwards';
+        // [수정 완료] 자바스크립트를 멈추게 했던 에러 코드를 삭제했습니다!
         
-        // 데이터 업데이트 등 기존 로직...
-        setTerminalTime();
-        
-        if (callback) callback(); // initTerminal 실행
-    }, 1200); // tv-on 애니메이션 1.2초와 동일하게 맞춤
+        if (callback) callback(); // 정상적으로 텍스트(initTerminal) 실행!
+    }, 1200);
 }
 
 /* [컷 8] 브라운관 TV 꺼지는 효과 */
