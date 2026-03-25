@@ -402,26 +402,19 @@ function startEnding() {
     });
 }
 
-/* script.js의 triggerTVOn 함수를 이 내용으로 교체하세요 */
+/* script.js 하단의 triggerTVOn 함수를 이 내용으로 교체하세요 */
 function triggerTVOn(callback) {
-    const container = document.getElementById('container');
-    const content = document.getElementById('content');
+    const container = document.getElementById('container'); // 검은색 배경 (고정)
+    const content = document.getElementById('content');     // 회색 내용물 (확장)
     
-    // 1. 시작할 때는 화면을 검은색으로 강제 설정
-    setScreenColor('#000000', '#000000'); 
+    // 1. 초기화: 내용물을 보이게 하고 애니메이션을 입힙니다.
+    content.style.visibility = 'visible';
+    content.style.animation = 'tv-on 1.2s cubic-bezier(0.15, 0.85, 0.35, 1) forwards';
     
-    // 2. 켜지는 애니메이션(tv-on) 실행
-    container.style.transformOrigin = 'center center';
-    container.style.animation = 'tv-on 1.2s cubic-bezier(0.15, 0.85, 0.35, 1) forwards';
-    
-    // 3. 애니메이션 중간에 숨겨놨던 내용물(#content)을 가시화
+    // 2. 애니메이션이 끝날 때 배경색을 회색 테마로 부드럽게 연결
     setTimeout(() => {
-        if (content) content.style.visibility = 'visible';
-    }, 1000);
-
-    // 4. [중요] 애니메이션이 끝나는 시점에 원래의 모니터 회색으로 복구
-    setTimeout(() => {
-        setScreenColor('#444444', '#111111'); // 원래의 배경색 변수값
+        // container의 배경을 회색 그라데이션으로 변경하여 자연스럽게 연결
+        setScreenColor('#444444', '#111111');
         if (callback) callback();
     }, 1200);
 }
