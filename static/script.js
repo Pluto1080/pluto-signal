@@ -287,7 +287,7 @@ function goToPersonalityStory() {
     playStory([
         "하지만 이런 진부한 동물 이야기를 하려고 너랑 말하는게 아니라구~",
         `너는 그냥 평범한 ${animalName}이(가) 아니라...`,
-        `바로 [ ${modifier} ${animalName} ] 타입이야!`,
+        `바로 [ ${modifier} ] 타입이야!`,
         "너의 진짜 성격을 알려줄게"
     ], () => {
         switchScreen('screen-personality');
