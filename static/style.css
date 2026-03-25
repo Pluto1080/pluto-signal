@@ -565,11 +565,16 @@ button.cyber-btn:hover { background: #00ff41; color: #000; box-shadow: 0 0 30px 
 }
 /* [8] END */
 
-/* [9] 인트로 화면 전용: 수직 중앙 정렬 강제 */
+/* [9] 인트로 화면 전용: 완벽한 수직 중앙 정렬 강제 */
 #screen-story {
+    /* 다른 화면에 들어간 상하 100px 여백을 지워서 텍스트가 짓눌리지 않게 합니다. */
+    padding: 0 20px !important; 
     justify-content: center !important;
 }
+
 #screen-story .content-wrapper {
-    margin-top: auto;
-    margin-bottom: auto;
+    /* HTML에 직접 적혀있는 방해 요소(50vh)들을 강제로 무력화합니다. */
+    height: auto !important;      
+    min-height: 0 !important;     
+    margin: 0 auto !important;
 }
