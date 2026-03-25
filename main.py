@@ -39,38 +39,97 @@ ANIMAL_TYPES = [
 
 
 # [SECTION 2: 점성술 계산 엔진 START]
-def calculate_astrology(birth_date, birth_time, latitude, longitude):
+# [SECTION 2: 점성술 계산 엔진 업그레이드 START]
+
+# 각도(Aspect) 타입 정의
+ASPECT_TYPES = [
+    (0, "Conjunction"), (60, "Sextile"), (90, "Square"), 
+    (120, "Trine"), (180, "Opposition")
+]
+
+def get_sign_only(lon):
+    """경도를 넣으면 별자리 이름만 반환합니다."""
+    return ZODIAC_SIGNS[int(lon // 30)]
+
+def get_house(degree, cusps):
+    """특정 행성이 몇 번 하우스에 있는지 계산합니다."""
+    for i in range(12):
+        c_start = cusps[i]
+        c_end = cusps[(i+1) % 12]
+        if c_start < c_end:
+            if c_start <= degree < c_end: return i + 1
+        else:
+            if degree >= c_start or degree < c_end: return i + 1
+    return 0
+
+def calculate_astrology(birth_date, birth_time, latitude, longitude, time_unknown=False):
     tz_name = tf.timezone_at(lng=longitude, lat=latitude) or 'UTC'
     timezone = pytz.timezone(tz_name)
-    dt = datetime.strptime(f"{birth_date} {birth_time}", "%Y-%m-%d %H:%M")
+    
+    # 시간 모름일 경우 정오(12:00)로 계산
+    calc_time = "12:00" if time_unknown else birth_time
+    dt = datetime.strptime(f"{birth_date} {calc_time}", "%Y-%m-%d %H:%M")
     local_dt = timezone.localize(dt)
     utc_offset = local_dt.utcoffset().total_seconds() / 3600.0
     jd = swe.julday(dt.year, dt.month, dt.day, dt.hour - utc_offset + dt.minute / 60.0)
 
-    planets = {'Sun': swe.SUN, 'Moon': swe.MOON, 'Mercury': swe.MERCURY, 'Venus': swe.VENUS,
-               'Mars': swe.MARS, 'Jupiter': swe.JUPITER, 'Saturn': swe.SATURN,
-               'Uranus': swe.URANUS, 'Neptune': swe.NEPTUNE, 'Pluto': swe.PLUTO}
+    # 1. 행성 위치 계산
+    planets = {
+        'Sun': swe.SUN, 'Moon': swe.MOON, 'Mercury': swe.MERCURY, 
+        'Venus': swe.VENUS, 'Mars': swe.MARS, 'Jupiter': swe.JUPITER, 
+        'Saturn': swe.SATURN, 'Uranus': swe.URANUS, 'Neptune': swe.NEPTUNE, 'Pluto': swe.PLUTO
+    }
 
     results = {}
+    planet_positions = {}
+
     for name, pid in planets.items():
         lon = swe.calc_ut(jd, pid)[0][0]
-        results[name] = {"sign": ZODIAC_SIGNS[int(lon // 30)]}
+        planet_positions[name] = lon
+        results[name] = {
+            "sign": get_sign_only(lon),
+            "degree": round(lon, 2)
+        }
+
+    # 2. 하우스 및 ASC 계산 (시간을 알 때만 정확함)
+    if not time_unknown:
+        # 하우스 커스프와 ASC/MC 계산
+        cusps, ascmc = swe.houses(jd, latitude, longitude)
+        asc = ascmc[0]
+        planet_positions["ASC"] = asc
+        results["ASC"] = {"sign": get_sign_only(asc), "degree": round(asc, 2)}
+        
+        # 각 행성이 몇 번 하우스에 있는지 추가
+        for name in results:
+            if "degree" in results[name]:
+                results[name]["house"] = get_house(results[name]["degree"], cusps)
+        
+        # 포춘(Fortune) 계산
+        sun_lon = planet_positions['Sun']
+        moon_lon = planet_positions['Moon']
+        pf = (asc + moon_lon - sun_lon) % 360
+        results["Fortune"] = {"sign": get_sign_only(pf), "degree": round(pf, 2)}
+    else:
+        results["_note"] = "시간 미상으로 인해 하우스와 상승궁 데이터가 제외되었습니다."
+
+    # 3. 행성 간 각도(Aspect) 계산 (오차 5도 이내로 확장)
+    aspect_results = []
+    points = list(planet_positions.keys())
+    for i in range(len(points)):
+        for j in range(i + 1, len(points)):
+            p1, p2 = points[i], points[j]
+            d1, d2 = planet_positions[p1], planet_positions[p2]
+            diff = abs(d1 - d2)
+            angle = min(diff, 360 - diff)
+            
+            for asp_deg, asp_name in ASPECT_TYPES:
+                orb = abs(angle - asp_deg)
+                if orb <= 5.0: # AI 분석용이므로 5도까지 넓게 잡습니다.
+                    aspect_results.append(f"{p1}-{p2}: {asp_name}")
+
+    results["Aspects_Summary"] = aspect_results
     return results
 
-def get_transits(jd):
-    res = {}
-    for p_name, p_code in zip(["Jupiter", "Saturn", "Uranus", "Pluto"],
-                               [swe.JUPITER, swe.SATURN, swe.URANUS, swe.PLUTO]):
-        pos = swe.calc_ut(jd, p_code)[0][0]
-        res[p_name] = ZODIAC_SIGNS[int(pos // 30)]
-    return res
-
-def get_animal_type(natal_data):
-    """태양 별자리 인덱스를 기반으로 12가지 동물 중 하나를 고정 매핑.
-    동일 입력 → 항상 동일 동물 보장."""
-    sun_sign = natal_data.get('Sun', {}).get('sign', '양자리')
-    sign_index = ZODIAC_SIGNS.index(sun_sign) if sun_sign in ZODIAC_SIGNS else 0
-    return ANIMAL_TYPES[sign_index]
 # [SECTION 2: 점성술 계산 엔진 END]
 
 
