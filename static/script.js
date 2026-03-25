@@ -49,8 +49,8 @@ function playStory(lines, callback) {
         let isGlitch = typeof lineData === 'object' && lineData.glitch;
 
         // 텍스트만 넣고 커서는 CSS ::after 로 처리
-        storyText.innerHTML = textStr;
-
+        storyText.innerHTML = textStr + '<span class="cursor-blink">▮</span>';
+       
         if (isGlitch) {
             storyText.classList.add('glitch-active');
             storyText.style.color = "#ff00ff";
