@@ -39,6 +39,16 @@ body {
         0 0 150px rgba(255,0,255,0.3);
 }
 
+/* [핵심] 컨테이너가 축소될 때 뒤에 보일 영구적인 검은 화면 */
+.monitor-frame::after {
+    content: "";
+    position: absolute;
+    top: 40px; left: 40px; right: 40px; bottom: 40px;
+    background: #000000;
+    border-radius: 60px / 40px;
+    z-index: 10; /* screen-container(50)의 바로 뒤에 검은색 고정 */
+}
+
 .monitor-neck {
     width: 140px; height: 35px;
     background: linear-gradient(to bottom, #005555 0%, #002222 100%);
@@ -73,21 +83,18 @@ body {
 /* 켜지는 애니메이션 (더 밝은 빛줄기 효과) */
 /* style.css 하단 @keyframes tv-on 수정 */
 @keyframes tv-on {
-    0%   { transform: scaleY(0) scaleX(0);    background: #ffffff; filter: brightness(20); opacity: 0; }
-    45%  { transform: scaleY(0.005) scaleX(1); background: #ffffff; filter: brightness(20); opacity: 1; box-shadow: 0 0 100px 20px #ffffff; }
-    
-    /* [핵심 수정] 위아래로 펼쳐지기 시작할 때(65%) 회색을 미리 넣어줍니다. */
+    0%   { transform: scaleY(0.002) scaleX(0); background: #ffffff; filter: brightness(20); opacity: 0; }
+    40%  { transform: scaleY(0.005) scaleX(1); background: #ffffff; filter: brightness(20); opacity: 1; box-shadow: 0 0 100px 20px #ffffff; }
     65%  { 
         transform: scaleY(0.04) scaleX(1);   
-        background: var(--screen-bg-center); /* 이때 회색으로 변경 */
-        filter: brightness(5) saturate(0);  /* 하지만 여전히 밝고 흑백 상태 */
+        background: var(--screen-bg-center); 
+        filter: brightness(5) saturate(0); 
         box-shadow: 0 0 120px rgba(255,255,255,0.9); 
     }
-    
     100% { 
         transform: scaleY(1) scaleX(1);       
-        background: var(--screen-bg-center); 
-        filter: brightness(1) saturate(1);   /* 정상 밝기, 정상 색상 */
+        background: radial-gradient(circle at center, var(--screen-bg-center) 0%, var(--screen-bg-edge) 100%);
+        filter: brightness(1) saturate(1); 
     }
 }
 
