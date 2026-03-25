@@ -48,14 +48,7 @@ const rootStyle = document.documentElement.style;
           let textStr = typeof lineData === 'string' ? lineData : lineData.text;
           let isGlitch = typeof lineData === 'object' && lineData.glitch;
 
-      storyText.innerHTML = textStr;
-
-        const hint = document.createElement('span');
-        hint.style.marginLeft = "10px";
-        hint.style.display = "inline-block";
-        hint.innerText = "▮";
-        hint.className = "cursor-blink";
-        storyText.appendChild(hint);
+      storyText.innerHTML = textStr + '<span class="cursor-blink" style="margin-left:8px;">▮</span>';
 
           if (isGlitch) {
               storyText.classList.add('glitch-active');
