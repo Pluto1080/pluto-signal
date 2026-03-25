@@ -47,24 +47,25 @@ const rootStyle = document.documentElement.style;
           let lineData = lines[lineIndex];
           let textStr = typeof lineData === 'string' ? lineData : lineData.text;
           let isGlitch = typeof lineData === 'object' && lineData.glitch;
-           storyText.innerHTML = textStr;
          
-           style.css — .typewriter-text 블록에 ::after 추가:
-           .typewriter-text {
-               display: block !important;
-               color: #00ff41; font-size: 1.6rem;
-               text-align: center; line-height: 1.8; font-weight: bold;
-               text-shadow: 0 0 10px rgba(0,255,65,0.6);
-               min-height: 120px; word-break: keep-all; width: 100%;
-           }
+               storyText.innerHTML = textStr;
          
-           .typewriter-text::after {
-               content: '▮';
-               display: inline;
-               margin-left: 8px;
-               vertical-align: text-bottom;
-               animation: blink-animation 1s steps(2, start) infinite;
-           }
+                .typewriter-text {
+                     display: block !important;
+                     color: #00ff41; font-size: 1.6rem;
+                     text-align: center; line-height: 1.8; font-weight: bold;
+                     text-shadow: 0 0 10px rgba(0,255,65,0.6);
+                     min-height: 120px; word-break: keep-all; width: 100%;
+                 }
+               
+                 .typewriter-text::after {
+                     content: '▮';
+                     display: inline;
+                     margin-left: 8px;
+                     vertical-align: text-bottom;
+                     animation: blink-animation 1s steps(2, start) infinite;
+                 }
+         
 
           if (isGlitch) {
               storyText.classList.add('glitch-active');
