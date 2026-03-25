@@ -87,7 +87,7 @@ function initTerminal() {
         "나를 만났다니... 너 정말 행운인걸?",
         "나는 별을 사용해서 너의 미래를 조금 볼 수 있거든!",
         "너랑 나랑 이렇게 닿은 건 운명이니까!<br/>한번 내가 봐줄게!",
-        { text: "너의 탄생을 확인해 보자!",   glitch: true },"
+        { text: "너의 탄생을 확인해 보자!",   glitch: true } 
     ], () => {
         switchScreen('screen-input');
         setTimeout(() => { map.invalidateSize(); }, 500);
@@ -267,14 +267,17 @@ function showAnimalResult(data) {
         return;
     }
 
+    // AI가 만들어준 수식어(animal_modifier)가 있으면 붙이고, 없으면 기본 이름만 출력
+    const fullAnimalName = data.animal_modifier ? `${data.animal_modifier} ${animal.name}` : animal.name;
+
     document.getElementById('animal-box-title').innerText  = `[TYPE] ${animal.name.toUpperCase()}_SIGNAL`;
-    document.getElementById('animal-name').innerText        = animal.name;
+    document.getElementById('animal-name').innerText        = fullAnimalName; // 수식어 + 이름 출력
     document.getElementById('animal-keyword').innerText     = `# ${animal.keyword}`;
     document.getElementById('animal-description').innerText = animal.description;
 
     playStory([
-        `오 너는...`
-         `${animal.name}과 같은 느낌이야!`
+        `오 너는...`,
+        `${fullAnimalName}과(와) 같은 느낌이야!`
     ], () => {
         switchScreen('screen-animal');
     });
