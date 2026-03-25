@@ -158,7 +158,18 @@ def analyze():
         user_lang = data.get('language', 'ko-KR')
         lat, lon = float(data.get('lat')), float(data.get('lon'))
 
-        natal_data = calculate_astrology(data.get('date'), data.get('time'), lat, lon)
+        # [수정 1] 사용자가 '시간 모름'을 체크했는지 확인합니다.
+        is_time_unknown = data.get('noTime') is True or not data.get('time')
+
+        # [수정 2] 업그레이드된 함수에 맞게 인자 5개를 전달합니다.
+        natal_data = calculate_astrology(
+            data.get('date'), 
+            data.get('time', '12:00'), 
+            lat, 
+            lon, 
+            time_unknown=is_time_unknown
+        )
+
         tz_name = tf.timezone_at(lng=lon, lat=lat) or 'UTC'
         timezone = pytz.timezone(tz_name)
         now = datetime.now(timezone)
@@ -169,20 +180,28 @@ def analyze():
         transit_year = get_transits(jd_year)
         transit_now = get_transits(jd_now)
 
-        # 동물 유형 결정 (태양 별자리 기반, 항상 동일 결과 보장)
+        # 동물 유형 결정 (태양 별자리 기반 고정)
         animal = get_animal_type(natal_data)
 
+        # [수정 3] AI 프롬프트 업그레이드 (하우스, 각도 데이터 활용 지시)
         prompt = f"""
-        너는 먼 우주에서온 쪽집게 점성술사 플루토야. 반드시 '{user_lang}' 언어로, 반말 스타일로 대답해.
+        너는 우주 점성술사 플루토야. 반드시 '{user_lang}' 언어로, 반말 스타일로 대답해.
+        
         [데이터]
         - 이름: {clean_name}
-        - 탄생 차트: {json.dumps(natal_data, ensure_ascii=False)}
+        - 기본 동물: {animal['name']}
+        - 탄생 차트(상세): {json.dumps(natal_data, ensure_ascii=False)}
         - 2026년 행성 흐름: {json.dumps(transit_year, ensure_ascii=False)}
-        - 현재 시점({now.year}년 {now.month}월) 흐름: {json.dumps(transit_now, ensure_ascii=False)}
 
-        위 데이터를 비교해서 분석 결과를 반드시 아래 JSON 형식으로만 응답해:
+        [요구사항]
+        1. 제공된 '탄생 차트'의 하우스(house)와 행성 간 각도(Aspects_Summary)를 분석해.
+        2. 기본 동물인 '{animal['name']}' 앞에 붙을 '창의적인 수식어'를 10자 이내로 지어줘. (예: 발에 불이 붙은, 달빛 아래 잠든, 엔진을 장착한 등)
+        3. 'personality' 섹션에는 왜 그런 수식어가 붙었는지 차트의 근거(예: 화성이 1번 하우스에 있다 등)를 들어 설명해줘.
+
+        결과는 반드시 아래 JSON 형식으로만 응답해:
         {{
-            "personality": "성격 요약",
+            "animal_modifier": "지어낸 수식어 (예: 발에 불이 붙은)",
+            "personality": "수식어의 근거가 포함된 성격 요약",
             "pros": "핵심 장점",
             "cons": "주의할 점",
             "current_month": "{now.year}.{now.month:02d}",
@@ -192,7 +211,7 @@ def analyze():
                 "career": "올해 직업운",
                 "health": "올해 건강운",
                 "summary": "올해 전체 요약",
-                "final_advice": "플루토의 한마디 (잘될 점과 주의할 점을 모두 포함해서 따뜻하게)"
+                "final_advice": "플루토의 따뜻한 조언"
             }}
         }}
         """
@@ -211,17 +230,18 @@ def analyze():
                 if "503" in str(e) and attempt < max_retries - 1:
                     time.sleep(2)
                     continue
-                else:
-                    raise e
+                else: raise e
 
         if not response or not response.text:
             return jsonify({"error": "별과의 연결이 불안정해. 다시 시도해줘!"}), 200
 
         result = json.loads(response.text)
-        result['animal'] = animal  # 동물 데이터 응답에 추가
+        result['animal'] = animal  
         return jsonify(result)
 
     except Exception as e:
+        # 에러 로그 출력 (Railway logs에서 확인 가능)
+        print(f"Server Error: {str(e)}")
         return jsonify({"error": f"분석 중 오류 발생: {str(e)}"}), 200
 # [SECTION 4: 데이터 분석 로직 END]
 
