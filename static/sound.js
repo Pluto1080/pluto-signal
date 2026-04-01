@@ -218,7 +218,26 @@ const sfx = (() => {
         src.start(); src.stop(t + 0.5);
     }
 
-    return { glitch, textAppear, transition, reveal, click, startLoading, stopLoading, tvOff };
+    /* ── AudioContext 잠금 해제 ── */
+    function unlock() {
+        if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+        if (ctx.state === 'suspended') ctx.resume();
+    }
+
+    return { glitch, textAppear, transition, reveal, click, startLoading, stopLoading, tvOff, unlock };
+})();
+
+/* ── 첫 번째 유저 인터랙션에서 AudioContext 활성화 ── */
+(function () {
+    const unlock = () => {
+        sfx.unlock();
+        document.removeEventListener('click',      unlock);
+        document.removeEventListener('touchstart', unlock);
+        document.removeEventListener('keydown',    unlock);
+    };
+    document.addEventListener('click',      unlock);
+    document.addEventListener('touchstart', unlock);
+    document.addEventListener('keydown',    unlock);
 })();
 
 /* ── 전역 버튼 클릭 사운드 ── */

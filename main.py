@@ -231,8 +231,24 @@ def analyze():
 {fortune_year}년차트: {sr_compact}
 주요각도: {' / '.join(aspects)}
 
-위 데이터 분석 후 JSON 응답:
-{{"personality":"성격요약","pros":"장점","cons":"단점","current_month":"{now.year}.{now.month:02d}","fortune_year":{fortune_year},"fortune":{{"love":"애정운","money":"재물운","career":"직업운","health":"건강운","summary":"올해요약","final_advice":"한마디"}}}}"""
+위 데이터를 분석해서 아래 JSON 형식으로 응답해.
+각 운세 필드(love·money·career·health)는 반드시 4~5문장 이상으로 자세하게 써.
+
+{{
+  "personality": "성격을 3문장으로 요약",
+  "pros": "핵심 장점 2~3가지를 구체적으로",
+  "cons": "주의할 점 2~3가지를 구체적으로",
+  "current_month": "{now.year}.{now.month:02d}",
+  "fortune_year": {fortune_year},
+  "fortune": {{
+    "love": "올해 연애 흐름 전반 + 어떤 분위기의 사람에게 끌릴지 + 관계 변화 가능성 + 주의할 상황을 4~5문장으로",
+    "money": "올해 재물 흐름 전반 + 돈이 들어오거나 나가는 시기나 상황 + 조심해야 할 소비 패턴을 4~5문장으로",
+    "career": "올해 직업·커리어 흐름 + 기회가 생기는 상황 + 갈등이나 어려움이 올 수 있는 상황을 4~5문장으로",
+    "health": "올해 건강 전반 흐름 + 특히 신경써야 할 부분 + 에너지 관리 팁을 4~5문장으로",
+    "summary": "올해 전체를 2~3문장으로 솔직하게 요약",
+    "final_advice": "플루토가 이 사람에게 해주고 싶은 진심 어린 말 2~3문장"
+  }}
+}}"""
 
         max_retries = 3
         response = None
@@ -254,6 +270,7 @@ def analyze():
                             '근거 없는 막연한 격려는 금지.'
                         ),
                         'temperature': 0.7,
+                        'max_output_tokens': 2048,
                     }
                 )
                 break

@@ -211,7 +211,7 @@ function startAnalysis() {
 function startLoadingAnimation() {
     switchScreen('screen-loading');
     setScreenColor('#08081a', '#020208');
-    const screen = document.getElementById('content');
+    const screen = document.getElementById('screen-loading');
 
     for (let i = 0; i < 12; i++) {
         const star = document.createElement('div');
