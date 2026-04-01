@@ -390,6 +390,12 @@ function returnToSelection() {
             else btn.classList.remove('hidden-btn');
         }
     });
+    const allViewed = viewedFortunes.love && viewedFortunes.money && viewedFortunes.career && viewedFortunes.health;
+    const finalBtn = document.getElementById('btn-final-report');
+    if (finalBtn) {
+        if (allViewed) finalBtn.classList.remove('hidden-btn');
+        else finalBtn.classList.add('hidden-btn');
+    }
     switchScreen('screen-selection');
 }
 

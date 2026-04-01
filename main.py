@@ -215,7 +215,6 @@ def analyze():
         if not clean_name or len(clean_name) > 20:
             return jsonify({"error": "유효하지 않은 이름이야! 특수문자를 제외하고 1~20자 이내로 입력해줘."}), 200
 
-        user_lang = data.get('language', 'ko-KR')
         lat, lon = float(data.get('lat')), float(data.get('lon'))
 
         natal_data = calculate_astrology(data.get('date'), data.get('time'), lat, lon)
