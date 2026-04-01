@@ -81,13 +81,6 @@ def calculate_astrology(birth_date, birth_time, latitude, longitude):
         }
     return results
 
-def get_transits(jd):
-    res = {}
-    for p_name, p_code in zip(["Jupiter", "Saturn", "Uranus", "Pluto"],
-                               [swe.JUPITER, swe.SATURN, swe.URANUS, swe.PLUTO]):
-        pos = swe.calc_ut(jd, p_code)[0][0]
-        res[p_name] = ZODIAC_SIGNS[int(pos // 30)]
-    return res
 
 def get_dominant_planet(natal_data):
     """탄생 차트에서 가장 강한 행성을 찾아 동물 유형 결정.
@@ -224,11 +217,8 @@ def analyze():
         now = datetime.now(timezone)
         fortune_year = now.year
 
-        # 소라 리턴 계산
-        natal_sun_lon = swe.calc_ut(
-            swe.julday(*[int(x) for x in data.get('date').split('-')], 12.0),
-            swe.SUN
-        )[0][0]
+        # 소라 리턴 계산 (실제 출생 시간의 태양 위치 사용)
+        natal_sun_lon = natal_data['Sun']['degree']
         solar_return = calculate_solar_return(natal_sun_lon, fortune_year, lat, lon)
         aspects = calculate_aspects(natal_data, solar_return)
 
@@ -267,7 +257,7 @@ def analyze():
         for attempt in range(max_retries):
             try:
                 response = client.models.generate_content(
-                    model='gemini-flash-latest',
+                    model='gemini-3.0-flash',
                     contents=prompt,
                     config={
                         'response_mime_type': 'application/json',

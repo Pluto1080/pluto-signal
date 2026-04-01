@@ -35,7 +35,7 @@ const sfx = (() => {
         filt.frequency.value = 1800;
         filt.Q.value = 0.4;
         const g = ac.createGain();
-        g.gain.setValueAtTime(0.7, t);
+        g.gain.setValueAtTime(0.25, t);
         g.gain.exponentialRampToValueAtTime(0.001, t + dur);
         src.connect(filt); filt.connect(g); g.connect(ac.destination);
         src.start(); src.stop(t + dur);
@@ -45,7 +45,7 @@ const sfx = (() => {
         osc.type  = 'sawtooth';
         osc.frequency.setValueAtTime(300, t);
         osc.frequency.exponentialRampToValueAtTime(40, t + dur);
-        og.gain.setValueAtTime(0.2, t);
+        og.gain.setValueAtTime(0.08, t);
         og.gain.exponentialRampToValueAtTime(0.001, t + dur);
         osc.connect(og); og.connect(ac.destination);
         osc.start(); osc.stop(t + dur);
@@ -60,7 +60,7 @@ const sfx = (() => {
         osc.type  = 'square';
         osc.frequency.setValueAtTime(900, t);
         osc.frequency.exponentialRampToValueAtTime(450, t + 0.08);
-        g.gain.setValueAtTime(0.15, t);
+        g.gain.setValueAtTime(0.06, t);
         g.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
         osc.connect(g); g.connect(ac.destination);
         osc.start(); osc.stop(t + 0.08);
@@ -78,7 +78,7 @@ const sfx = (() => {
         filt.frequency.setValueAtTime(300, t);
         filt.frequency.exponentialRampToValueAtTime(9000, t + 0.18);
         const g = ac.createGain();
-        g.gain.setValueAtTime(0.45, t);
+        g.gain.setValueAtTime(0.15, t);
         g.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
         src.connect(filt); filt.connect(g); g.connect(ac.destination);
         src.start(); src.stop(t + 0.3);
@@ -88,7 +88,7 @@ const sfx = (() => {
         osc.type  = 'sawtooth';
         osc.frequency.setValueAtTime(250, t);
         osc.frequency.exponentialRampToValueAtTime(30, t + 0.22);
-        og.gain.setValueAtTime(0.2, t);
+        og.gain.setValueAtTime(0.08, t);
         og.gain.exponentialRampToValueAtTime(0.001, t + 0.22);
         osc.connect(og); og.connect(ac.destination);
         osc.start(); osc.stop(t + 0.22);
@@ -103,7 +103,7 @@ const sfx = (() => {
         osc.type  = 'sine';
         osc.frequency.setValueAtTime(380, t);
         osc.frequency.linearRampToValueAtTime(760, t + 0.15);
-        g.gain.setValueAtTime(0.25, t);
+        g.gain.setValueAtTime(0.1, t);
         g.gain.exponentialRampToValueAtTime(0.001, t + 0.2);
         osc.connect(g); g.connect(ac.destination);
         osc.start(); osc.stop(t + 0.2);
@@ -118,7 +118,7 @@ const sfx = (() => {
         osc.type  = 'square';
         osc.frequency.setValueAtTime(700, t);
         osc.frequency.exponentialRampToValueAtTime(180, t + 0.08);
-        g.gain.setValueAtTime(0.18, t);
+        g.gain.setValueAtTime(0.07, t);
         g.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
         osc.connect(g); g.connect(ac.destination);
         osc.start(); osc.stop(t + 0.08);
@@ -136,7 +136,7 @@ const sfx = (() => {
         drone.type  = 'sine';
         drone.frequency.value = 55;
         dg.gain.setValueAtTime(0, t);
-        dg.gain.linearRampToValueAtTime(0.2, t + 0.8);
+        dg.gain.linearRampToValueAtTime(0.06, t + 0.8);
         drone.connect(dg); dg.connect(ac.destination);
         drone.start();
         loadingOscs.push(drone); loadingGains.push(dg);
@@ -147,12 +147,12 @@ const sfx = (() => {
         mid.type  = 'sine';
         mid.frequency.value = 220;
         mg.gain.setValueAtTime(0, t);
-        mg.gain.linearRampToValueAtTime(0.1, t + 0.8);
+        mg.gain.linearRampToValueAtTime(0.03, t + 0.8);
 
         const lfo = ac.createOscillator();
         const lg  = ac.createGain();
         lfo.frequency.value = 0.7;
-        lg.gain.value = 0.06;
+        lg.gain.value = 0.02;
         lfo.connect(lg); lg.connect(mg.gain);
         lfo.start();
 
@@ -166,7 +166,7 @@ const sfx = (() => {
         hi.type  = 'sine';
         hi.frequency.value = 1100;
         hg.gain.setValueAtTime(0, t);
-        hg.gain.linearRampToValueAtTime(0.04, t + 1.5);
+        hg.gain.linearRampToValueAtTime(0.012, t + 1.5);
         hi.connect(hg); hg.connect(ac.destination);
         hi.start();
         loadingOscs.push(hi); loadingGains.push(hg);
@@ -202,7 +202,7 @@ const sfx = (() => {
         osc.frequency.exponentialRampToValueAtTime(200, t + 0.6);
         osc.frequency.exponentialRampToValueAtTime(80, t + 1.2);
         g.gain.setValueAtTime(0, t);
-        g.gain.linearRampToValueAtTime(0.25, t + 0.3);
+        g.gain.linearRampToValueAtTime(0.1, t + 0.3);
         g.gain.exponentialRampToValueAtTime(0.001, t + 1.4);
         osc.connect(g); g.connect(ac.destination);
         osc.start(); osc.stop(t + 1.4);
@@ -211,7 +211,7 @@ const sfx = (() => {
         const src  = ac.createBufferSource();
         src.buffer = noise(0.15);
         const ng   = ac.createGain();
-        ng.gain.setValueAtTime(0.4, t + 0.05);
+        ng.gain.setValueAtTime(0.15, t + 0.05);
         ng.gain.exponentialRampToValueAtTime(0.001, t + 0.2);
         src.connect(ng); ng.connect(ac.destination);
         src.start(t + 0.05); src.stop(t + 0.2);
@@ -227,7 +227,7 @@ const sfx = (() => {
         osc.type  = 'sawtooth';
         osc.frequency.setValueAtTime(14000, t);
         osc.frequency.exponentialRampToValueAtTime(18, t + 1.6);
-        g.gain.setValueAtTime(0.3, t);
+        g.gain.setValueAtTime(0.12, t);
         g.gain.exponentialRampToValueAtTime(0.001, t + 1.6);
         osc.connect(g); g.connect(ac.destination);
         osc.start(); osc.stop(t + 1.6);
@@ -235,7 +235,7 @@ const sfx = (() => {
         const src  = ac.createBufferSource();
         src.buffer = noise(0.5);
         const ng   = ac.createGain();
-        ng.gain.setValueAtTime(0.5, t);
+        ng.gain.setValueAtTime(0.2, t);
         ng.gain.exponentialRampToValueAtTime(0.001, t + 0.5);
         src.connect(ng); ng.connect(ac.destination);
         src.start(); src.stop(t + 0.5);
