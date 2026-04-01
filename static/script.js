@@ -54,9 +54,11 @@ function playStory(lines, callback) {
         if (isGlitch) {
             storyText.classList.add('glitch-active');
             storyText.style.color = "#ff00ff";
+            sfx.glitch();
         } else {
             storyText.classList.remove('glitch-active');
             storyText.style.color = "#00ff41";
+            sfx.textAppear();
         }
 
         storyText.style.transition = "none";
@@ -135,6 +137,7 @@ function switchScreen(id) {
     content.classList.add('glitch-active');
     if (container) container.classList.add('warping-bg');
     content.classList.add('warping-content');
+    sfx.transition();
 
     content.scrollTop = 0;
 
@@ -164,6 +167,7 @@ function startAnalysis() {
     if (!name || !date) { showError("데이터를 입력하라."); return; }
 
     startLoadingAnimation();
+    sfx.startLoading();
 
     fetch('/analyze', {
         method: 'POST',
@@ -243,6 +247,7 @@ function stopLoadingAnimation() {
     setScreenColor('#444444', '#111111');
     document.querySelectorAll('.star, .shooting-star').forEach(s => s.remove());
     isSwitching = false;
+    sfx.stopLoading();
 }
 
 function showError(msg) {
@@ -306,6 +311,7 @@ async function displayResultsSequentially(boxes) {
         box.style.transition = "all 0.4s ease";
         box.style.opacity = "1";
         box.style.transform = "translateY(0)";
+        sfx.reveal();
         setTimeout(() => { box.classList.remove('glitch-active'); }, 400);
     }
 }
@@ -400,6 +406,7 @@ function triggerTVOff() {
     const endOverlay = document.getElementById('end-overlay');
 
     content.classList.add('ending-glitch');
+    sfx.tvOff();
 
     setTimeout(() => {
         content.classList.remove('ending-glitch');
