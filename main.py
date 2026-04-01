@@ -257,7 +257,7 @@ def analyze():
         for attempt in range(max_retries):
             try:
                 response = client.models.generate_content(
-                    model='gemini-3-flash-latest',
+                    model='gemini-2.5-flash-preview-04-17',
                     contents=prompt,
                     config={
                         'response_mime_type': 'application/json',
