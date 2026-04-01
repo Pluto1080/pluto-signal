@@ -416,6 +416,14 @@ button.cyber-btn:hover { background: #00ff41; color: #000; box-shadow: 0 0 30px 
 #map { height: 140px; border: 3px solid #00ffff; filter: invert(100%) hue-rotate(180deg); margin-bottom: 15px; }
 .button-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
 .hidden-btn  { display: none !important; }
+
+.compat-list { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 8px; }
+.compat-tag  {
+    padding: 6px 16px; border-radius: 4px;
+    font-size: 1rem; font-weight: bold; letter-spacing: 1px;
+}
+.compat-good { border: 2px solid #00ff41; color: #00ff41; background: rgba(0,255,65,0.08); }
+.compat-bad  { border: 2px solid #ff4444; color: #ff4444; background: rgba(255,68,68,0.08); }
 .hidden      { display: none !important; }
 .error-display {
     color: #ff4444; border: 1px solid #ff4444; background: rgba(255,68,68,0.1);
@@ -435,9 +443,14 @@ button.cyber-btn:hover { background: #00ff41; color: #000; box-shadow: 0 0 30px 
 
 /* [7] 로딩 화면 — 별과 별똥별 */
 #screen-loading {
+    position: absolute !important;
+    top: 0; left: 0;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: unset !important;
     justify-content: center !important;
     align-items: center !important;
-    min-height: 100% !important;
+    z-index: 15;
 }
 #screen-loading .content-wrapper {
     display: flex !important;
@@ -445,8 +458,8 @@ button.cyber-btn:hover { background: #00ff41; color: #000; box-shadow: 0 0 30px 
     align-items: center !important;
     justify-content: center !important;
     text-align: center !important;
-    min-height: unset !important;
-    width: 100%;
+    position: relative;
+    z-index: 20;
 }
 
 .star {
@@ -455,6 +468,7 @@ button.cyber-btn:hover { background: #00ff41; color: #000; box-shadow: 0 0 30px 
     border-radius: 50%;
     animation: twinkle ease-in-out infinite;
     pointer-events: none;
+    z-index: 12;
 }
 @keyframes twinkle {
     0%, 100% { opacity: 0.15; transform: scale(0.8); }
@@ -463,6 +477,7 @@ button.cyber-btn:hover { background: #00ff41; color: #000; box-shadow: 0 0 30px 
 
 .shooting-star {
     position: absolute;
+    z-index: 12;
     width: 100px; height: 2px;
     background: linear-gradient(to right, transparent 0%, rgba(180,180,255,0.4) 30%, rgba(255,255,255,0.9) 80%, #fff 100%);
     border-radius: 50px;

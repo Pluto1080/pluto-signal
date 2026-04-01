@@ -1,11 +1,11 @@
 /* =============================================
    PLUTO SIGNAL — Web Audio Synthesizer
-   외부 파일 없이 Web Audio API로 모든 효과음 생성
    ============================================= */
 
 const sfx = (() => {
     let ctx = null;
-    let loadingNodes = [];
+    let loadingOscs  = [];
+    let loadingGains = [];
 
     function getCtx() {
         if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -14,211 +14,206 @@ const sfx = (() => {
     }
 
     function noise(duration) {
-        const ac = getCtx();
+        const ac  = getCtx();
         const len = Math.ceil(ac.sampleRate * duration);
         const buf = ac.createBuffer(1, len, ac.sampleRate);
-        const d = buf.getChannelData(0);
+        const d   = buf.getChannelData(0);
         for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
         return buf;
     }
 
-    /* ── 1. 지직 글리치 노이즈 ── */
+    /* ── 1. 지직 글리치 ── */
     function glitch() {
-        const ac = getCtx();
-        const dur = 0.18;
+        const ac  = getCtx();
+        const dur = 0.2;
+        const t   = ac.currentTime;
 
-        const src = ac.createBufferSource();
+        const src  = ac.createBufferSource();
         src.buffer = noise(dur);
-
         const filt = ac.createBiquadFilter();
-        filt.type = 'bandpass';
+        filt.type  = 'bandpass';
         filt.frequency.value = 1800;
         filt.Q.value = 0.4;
-
         const g = ac.createGain();
-        g.gain.setValueAtTime(0.35, ac.currentTime);
-        g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + dur);
-
+        g.gain.setValueAtTime(0.7, t);
+        g.gain.exponentialRampToValueAtTime(0.001, t + dur);
         src.connect(filt); filt.connect(g); g.connect(ac.destination);
-        src.start(); src.stop(ac.currentTime + dur);
+        src.start(); src.stop(t + dur);
 
-        // 낮은 피치 드롭 추가
         const osc = ac.createOscillator();
-        const og = ac.createGain();
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(300, ac.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(40, ac.currentTime + dur);
-        og.gain.setValueAtTime(0.08, ac.currentTime);
-        og.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + dur);
+        const og  = ac.createGain();
+        osc.type  = 'sawtooth';
+        osc.frequency.setValueAtTime(300, t);
+        osc.frequency.exponentialRampToValueAtTime(40, t + dur);
+        og.gain.setValueAtTime(0.2, t);
+        og.gain.exponentialRampToValueAtTime(0.001, t + dur);
         osc.connect(og); og.connect(ac.destination);
-        osc.start(); osc.stop(ac.currentTime + dur);
+        osc.start(); osc.stop(t + dur);
     }
 
-    /* ── 2. 텍스트 등장음 (짧은 전자 비프) ── */
+    /* ── 2. 텍스트 등장 ── */
     function textAppear() {
         const ac = getCtx();
+        const t  = ac.currentTime;
         const osc = ac.createOscillator();
-        const g = ac.createGain();
-        osc.type = 'square';
-        osc.frequency.setValueAtTime(900, ac.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(450, ac.currentTime + 0.07);
-        g.gain.setValueAtTime(0.05, ac.currentTime);
-        g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.07);
+        const g   = ac.createGain();
+        osc.type  = 'square';
+        osc.frequency.setValueAtTime(900, t);
+        osc.frequency.exponentialRampToValueAtTime(450, t + 0.08);
+        g.gain.setValueAtTime(0.15, t);
+        g.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
         osc.connect(g); g.connect(ac.destination);
-        osc.start(); osc.stop(ac.currentTime + 0.07);
+        osc.start(); osc.stop(t + 0.08);
     }
 
-    /* ── 3. 화면 전환 (글리치 스윕) ── */
+    /* ── 3. 화면 전환 ── */
     function transition() {
         const ac = getCtx();
-        const t = ac.currentTime;
+        const t  = ac.currentTime;
 
-        // 노이즈 하이패스 스윕
-        const src = ac.createBufferSource();
+        const src  = ac.createBufferSource();
         src.buffer = noise(0.3);
         const filt = ac.createBiquadFilter();
-        filt.type = 'highpass';
+        filt.type  = 'highpass';
         filt.frequency.setValueAtTime(300, t);
         filt.frequency.exponentialRampToValueAtTime(9000, t + 0.18);
         const g = ac.createGain();
-        g.gain.setValueAtTime(0.18, t);
+        g.gain.setValueAtTime(0.45, t);
         g.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
         src.connect(filt); filt.connect(g); g.connect(ac.destination);
         src.start(); src.stop(t + 0.3);
 
-        // 피치 다운 sweep
         const osc = ac.createOscillator();
-        const og = ac.createGain();
-        osc.type = 'sawtooth';
+        const og  = ac.createGain();
+        osc.type  = 'sawtooth';
         osc.frequency.setValueAtTime(250, t);
         osc.frequency.exponentialRampToValueAtTime(30, t + 0.22);
-        og.gain.setValueAtTime(0.06, t);
+        og.gain.setValueAtTime(0.2, t);
         og.gain.exponentialRampToValueAtTime(0.001, t + 0.22);
         osc.connect(og); og.connect(ac.destination);
         osc.start(); osc.stop(t + 0.22);
     }
 
-    /* ── 4. 결과창 등장 (스캔 비프) ── */
+    /* ── 4. 결과창 스캔 비프 ── */
     function reveal() {
         const ac = getCtx();
-        const t = ac.currentTime;
+        const t  = ac.currentTime;
         const osc = ac.createOscillator();
-        const g = ac.createGain();
-        osc.type = 'sine';
+        const g   = ac.createGain();
+        osc.type  = 'sine';
         osc.frequency.setValueAtTime(380, t);
-        osc.frequency.linearRampToValueAtTime(760, t + 0.12);
-        g.gain.setValueAtTime(0.09, t);
-        g.gain.exponentialRampToValueAtTime(0.001, t + 0.18);
+        osc.frequency.linearRampToValueAtTime(760, t + 0.15);
+        g.gain.setValueAtTime(0.25, t);
+        g.gain.exponentialRampToValueAtTime(0.001, t + 0.2);
         osc.connect(g); g.connect(ac.destination);
-        osc.start(); osc.stop(t + 0.18);
+        osc.start(); osc.stop(t + 0.2);
     }
 
     /* ── 5. 버튼 클릭 ── */
     function click() {
         const ac = getCtx();
-        const t = ac.currentTime;
+        const t  = ac.currentTime;
         const osc = ac.createOscillator();
-        const g = ac.createGain();
-        osc.type = 'square';
+        const g   = ac.createGain();
+        osc.type  = 'square';
         osc.frequency.setValueAtTime(700, t);
-        osc.frequency.exponentialRampToValueAtTime(180, t + 0.07);
-        g.gain.setValueAtTime(0.07, t);
-        g.gain.exponentialRampToValueAtTime(0.001, t + 0.07);
+        osc.frequency.exponentialRampToValueAtTime(180, t + 0.08);
+        g.gain.setValueAtTime(0.18, t);
+        g.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
         osc.connect(g); g.connect(ac.destination);
-        osc.start(); osc.stop(t + 0.07);
+        osc.start(); osc.stop(t + 0.08);
     }
 
-    /* ── 6. 로딩 앰비언트 (우주 드론) ── */
+    /* ── 6. 로딩 앰비언트 ── */
     function startLoading() {
         stopLoading();
         const ac = getCtx();
-        const t = ac.currentTime;
+        const t  = ac.currentTime;
 
         // 저음 드론
         const drone = ac.createOscillator();
-        const dg = ac.createGain();
-        drone.type = 'sine';
+        const dg    = ac.createGain();
+        drone.type  = 'sine';
         drone.frequency.value = 55;
         dg.gain.setValueAtTime(0, t);
-        dg.gain.linearRampToValueAtTime(0.09, t + 0.8);
+        dg.gain.linearRampToValueAtTime(0.2, t + 0.8);
         drone.connect(dg); dg.connect(ac.destination);
         drone.start();
-        loadingNodes.push(drone, dg);
+        loadingOscs.push(drone); loadingGains.push(dg);
 
-        // 중음 펄스
+        // 중음 펄스 + LFO
         const mid = ac.createOscillator();
-        const mg = ac.createGain();
-        mid.type = 'sine';
+        const mg  = ac.createGain();
+        mid.type  = 'sine';
         mid.frequency.value = 220;
         mg.gain.setValueAtTime(0, t);
-        mg.gain.linearRampToValueAtTime(0.035, t + 0.8);
+        mg.gain.linearRampToValueAtTime(0.1, t + 0.8);
 
         const lfo = ac.createOscillator();
-        const lg = ac.createGain();
+        const lg  = ac.createGain();
         lfo.frequency.value = 0.7;
-        lg.gain.value = 0.025;
+        lg.gain.value = 0.06;
         lfo.connect(lg); lg.connect(mg.gain);
         lfo.start();
 
         mid.connect(mg); mg.connect(ac.destination);
         mid.start();
-        loadingNodes.push(mid, mg, lfo, lg);
+        loadingOscs.push(mid, lfo); loadingGains.push(mg);
 
         // 고음 시머
         const hi = ac.createOscillator();
         const hg = ac.createGain();
-        hi.type = 'sine';
+        hi.type  = 'sine';
         hi.frequency.value = 1100;
         hg.gain.setValueAtTime(0, t);
-        hg.gain.linearRampToValueAtTime(0.012, t + 1.5);
+        hg.gain.linearRampToValueAtTime(0.04, t + 1.5);
         hi.connect(hg); hg.connect(ac.destination);
         hi.start();
-        loadingNodes.push(hi, hg);
+        loadingOscs.push(hi); loadingGains.push(hg);
     }
 
     function stopLoading() {
         if (!ctx) return;
         const t = ctx.currentTime;
-        loadingNodes.forEach(n => {
+        loadingGains.forEach(g => {
             try {
-                if (n instanceof GainNode) {
-                    n.gain.setValueAtTime(n.gain.value, t);
-                    n.gain.linearRampToValueAtTime(0, t + 0.4);
-                } else {
-                    n.stop(t + 0.4);
-                }
+                g.gain.cancelScheduledValues(t);
+                g.gain.setValueAtTime(g.gain.value, t);
+                g.gain.linearRampToValueAtTime(0, t + 0.4);
             } catch (_) {}
         });
-        loadingNodes = [];
+        loadingOscs.forEach(o => {
+            try { o.stop(t + 0.5); } catch (_) {}
+        });
+        loadingOscs  = [];
+        loadingGains = [];
     }
 
-    /* ── 7. TV 꺼짐 (CRT 파워다운) ── */
+    /* ── 7. TV 꺼짐 ── */
     function tvOff() {
         const ac = getCtx();
-        const t = ac.currentTime;
+        const t  = ac.currentTime;
 
-        // CRT 고주파 하강
         const osc = ac.createOscillator();
-        const g = ac.createGain();
-        osc.type = 'sawtooth';
+        const g   = ac.createGain();
+        osc.type  = 'sawtooth';
         osc.frequency.setValueAtTime(14000, t);
         osc.frequency.exponentialRampToValueAtTime(18, t + 1.6);
-        g.gain.setValueAtTime(0.1, t);
+        g.gain.setValueAtTime(0.3, t);
         g.gain.exponentialRampToValueAtTime(0.001, t + 1.6);
         osc.connect(g); g.connect(ac.destination);
         osc.start(); osc.stop(t + 1.6);
 
-        // 노이즈 크래클
-        const src = ac.createBufferSource();
+        const src  = ac.createBufferSource();
         src.buffer = noise(0.5);
-        const ng = ac.createGain();
-        ng.gain.setValueAtTime(0.22, t);
+        const ng   = ac.createGain();
+        ng.gain.setValueAtTime(0.5, t);
         ng.gain.exponentialRampToValueAtTime(0.001, t + 0.5);
         src.connect(ng); ng.connect(ac.destination);
         src.start(); src.stop(t + 0.5);
     }
 
-    /* ── AudioContext 잠금 해제 ── */
+    /* ── unlock ── */
     function unlock() {
         if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
         if (ctx.state === 'suspended') ctx.resume();
@@ -227,20 +222,12 @@ const sfx = (() => {
     return { glitch, textAppear, transition, reveal, click, startLoading, stopLoading, tvOff, unlock };
 })();
 
-/* ── 첫 번째 유저 인터랙션에서 AudioContext 활성화 ── */
-(function () {
-    const unlock = () => {
-        sfx.unlock();
-        document.removeEventListener('click',      unlock);
-        document.removeEventListener('touchstart', unlock);
-        document.removeEventListener('keydown',    unlock);
-    };
-    document.addEventListener('click',      unlock);
-    document.addEventListener('touchstart', unlock);
-    document.addEventListener('keydown',    unlock);
-})();
+/* ── AudioContext 활성화 — 매 인터랙션마다 resume 시도 ── */
+['click', 'touchstart', 'keydown'].forEach(evt => {
+    document.addEventListener(evt, () => sfx.unlock(), { passive: true });
+});
 
-/* ── 전역 버튼 클릭 사운드 ── */
+/* ── 전역 버튼 클릭음 ── */
 document.addEventListener('click', e => {
     if (e.target.closest('.cyber-btn')) sfx.click();
 });

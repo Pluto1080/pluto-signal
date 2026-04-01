@@ -211,7 +211,7 @@ function startAnalysis() {
 function startLoadingAnimation() {
     switchScreen('screen-loading');
     setScreenColor('#08081a', '#020208');
-    const screen = document.getElementById('screen-loading');
+    const screen = document.getElementById('container');
 
     for (let i = 0; i < 12; i++) {
         const star = document.createElement('div');
@@ -389,7 +389,7 @@ function showFinalReport() {
     });
 }
 
-/* [컷 8] 엔딩 시퀀스 */
+/* [컷 8] 엔딩 — 지직 후 TV 꺼짐 */
 function startEnding() {
     playStory([
         { text: "엇! 나 지금 ㅜㅜ 연..ㄱㄹ..이 끈ㅎ기기 직전이야!!", glitch: true },
@@ -397,6 +397,46 @@ function startEnding() {
     ], () => {
         triggerTVOff();
     });
+}
+
+function showCompatScreen() {
+    const compat = globalData.compatibility || { good: [], bad: [] };
+
+    const goodEl = document.getElementById('compat-good');
+    const badEl  = document.getElementById('compat-bad');
+
+    goodEl.innerHTML = compat.good.map(a =>
+        `<span class="compat-tag compat-good">${a}</span>`
+    ).join('');
+    badEl.innerHTML = compat.bad.map(a =>
+        `<span class="compat-tag compat-bad">${a}</span>`
+    ).join('');
+
+    switchScreen('screen-compat');
+}
+
+async function shareResult() {
+    const animal  = globalData.animal?.name || '?';
+    const keyword = globalData.animal?.keyword || '';
+    const fortune = globalData.fortune || globalData.fortune_2026 || {};
+    const summary = fortune.summary || '';
+    const good    = (globalData.compatibility?.good || []).join(', ');
+
+    const text = `✦ PLUTO SIGNAL ✦\n나의 수호동물: ${animal} (${keyword})\n\n${summary}\n\n잘 맞는 동물: ${good}\n\n나의 운세 보러가기 →`;
+
+    if (navigator.share) {
+        try {
+            await navigator.share({ title: 'PLUTO SIGNAL', text, url: window.location.href });
+        } catch (_) {}
+    } else {
+        try {
+            await navigator.clipboard.writeText(`${text} ${window.location.href}`);
+            const btn = document.querySelector('#screen-compat .cyber-btn');
+            const orig = btn.innerText;
+            btn.innerText = 'COPIED ✓';
+            setTimeout(() => { btn.innerText = orig; }, 2000);
+        } catch (_) {}
+    }
 }
 
 /* [컷 8] 브라운관 TV 꺼지는 효과 */

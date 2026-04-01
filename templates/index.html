@@ -165,7 +165,27 @@
                             <div id="res-final-advice" class="result-content" style="font-weight:bold;"></div>
                         </div>
 
-                        <button class="cyber-btn" onclick="startEnding()" style="margin-top:10px;">SIGNAL_END >></button>
+                        <button class="cyber-btn" onclick="showCompatScreen()" style="margin-top:10px;">NEXT_SIGNAL >></button>
+                    </div>
+                </section>
+
+                <!-- 컷 8: 궁합 화면 -->
+                <section id="screen-compat" class="screen">
+                    <div class="content-wrapper">
+                        <h1 class="shiny-title" style="font-size:2rem;">COMPATIBILITY_DATA</h1>
+
+                        <div class="result-box theme-animal">
+                            <h2>[SYNC] 잘 맞는 동물</h2>
+                            <div id="compat-good" class="compat-list"></div>
+                        </div>
+
+                        <div class="result-box theme-red">
+                            <h2>[ASYNC] 안 맞는 동물</h2>
+                            <div id="compat-bad" class="compat-list"></div>
+                        </div>
+
+                        <button class="cyber-btn" onclick="shareResult()" style="border-color:#00ffff; color:#00ffff;">SHARE_SIGNAL ↗</button>
+                        <button class="cyber-btn" onclick="triggerTVOff()" style="margin-top:8px;">SIGNAL_END >></button>
                     </div>
                 </section>
 

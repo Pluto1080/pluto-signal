@@ -32,6 +32,18 @@ PLANET_ANIMAL_MAP = {
     'Neptune': {"name": "말",      "keyword": "활력",    "description": "넘치는 활력과 열정으로 어디든 달려가는 타입. 자유롭고 개방적인 성격이야."},
     'Pluto':   {"name": "여우",    "keyword": "전략",    "description": "영리하고 전략적인 사고를 가진 타입. 상황을 빠르게 읽고 최선의 선택을 해."},
 }
+ANIMAL_COMPATIBILITY = {
+    '사자':    {'good': ['코끼리', '독수리', '공작'],    'bad': ['나무늘보', '개미', '여우']},
+    '나무늘보': {'good': ['공작', '말', '돌고래'],       'bad': ['늑대', '독수리', '사자']},
+    '돌고래':  {'good': ['사자', '공작', '말'],          'bad': ['개미', '여우', '늑대']},
+    '공작':    {'good': ['나무늘보', '돌고래', '말'],    'bad': ['늑대', '여우', '독수리']},
+    '늑대':    {'good': ['사자', '독수리', '여우'],      'bad': ['나무늘보', '공작', '말']},
+    '코끼리':  {'good': ['사자', '개미', '말'],          'bad': ['돌고래', '독수리', '여우']},
+    '개미':    {'good': ['코끼리', '여우', '나무늘보'],  'bad': ['돌고래', '말', '사자']},
+    '독수리':  {'good': ['사자', '늑대', '돌고래'],      'bad': ['나무늘보', '공작', '코끼리']},
+    '말':      {'good': ['나무늘보', '공작', '돌고래'],  'bad': ['개미', '여우', '늑대']},
+    '여우':    {'good': ['늑대', '개미', '독수리'],      'bad': ['나무늘보', '말', '돌고래']},
+}
 # [SECTION 1: 서버 설정 및 환경 변수 END]
 
 
@@ -286,7 +298,7 @@ def analyze():
 
         result = json.loads(response.text)
         result['animal'] = animal
-        # 구버전 키 호환성 유지
+        result['compatibility'] = ANIMAL_COMPATIBILITY.get(animal['name'], {'good': [], 'bad': []})
         if 'fortune' in result and 'fortune_2026' not in result:
             result['fortune_2026'] = result['fortune']
         return jsonify(result)
