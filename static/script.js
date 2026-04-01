@@ -212,8 +212,8 @@ function startLoadingAnimation() {
     for (let i = 0; i < 12; i++) {
         const star = document.createElement('div');
         star.className = 'shooting-star';
-        star.style.left  = `${Math.random() * 55 + 5}%`;
-        star.style.top   = `${Math.random() * 55 + 5}%`;
+        star.style.left  = `${Math.random() * 85}%`;
+        star.style.top   = `${Math.random() * 80}%`;
         star.style.animationDuration  = `${Math.random() * 1.5 + 1.2}s`;
         star.style.animationDelay     = `${Math.random() * 4}s`;
         screen.appendChild(star);
@@ -224,8 +224,8 @@ function startLoadingAnimation() {
         star.className = 'star';
         const size = Math.random() * 3 + 1;
         star.style.width  = star.style.height = `${size}px`;
-        star.style.left   = `${Math.random() * 88 + 6}%`;
-        star.style.top    = `${Math.random() * 88 + 6}%`;
+        star.style.left   = `${Math.random() * 95}%`;
+        star.style.top    = `${Math.random() * 95}%`;
         star.style.animationDuration = `${Math.random() * 1.8 + 0.8}s`;
         star.style.animationDelay    = `${Math.random() * 2}s`;
         screen.appendChild(star);
