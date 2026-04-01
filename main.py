@@ -19,22 +19,19 @@ client = genai.Client(api_key=api_key) if api_key else None
 ZODIAC_SIGNS = ["양자리", "황소자리", "쌍둥이자리", "게자리", "사자자리", "처녀자리",
                 "천칭자리", "전갈자리", "사수자리", "염소자리", "물병자리", "물고기자리"]
 
-# 12가지 동물 유형 — 태양 별자리 인덱스(0~11)와 1:1 고정 매핑
-# 같은 생년월일시 입력 시 항상 동일한 동물이 나옴을 보장
-ANIMAL_TYPES = [
-    {"name": "늑대",    "keyword": "원칙",    "description": "강한 의지와 원칙을 가진 리더. 자신의 신념을 굽히지 않으며 집단을 이끄는 힘이 있어."},
-    {"name": "코끼리",  "keyword": "안정",    "description": "든든하고 신뢰할 수 있는 존재. 천천히 하지만 확실하게 목표를 향해 나아가는 타입이야."},
-    {"name": "돌고래",  "keyword": "사교",    "description": "어디서든 친구를 만드는 사교의 달인. 밝은 에너지로 주변을 행복하게 만들어."},
-    {"name": "나무늘보","keyword": "평화",    "description": "평화를 사랑하고 자기만의 속도를 지키는 타입. 느긋해 보여도 내면이 깊어."},
-    {"name": "사자",    "keyword": "주도",    "description": "타고난 카리스마로 어디서든 중심이 되는 타입. 자신감이 넘치고 도전을 두려워하지 않아."},
-    {"name": "올빼미",  "keyword": "분석",    "description": "날카로운 관찰력과 분석력으로 본질을 꿰뚫는 타입. 혼자만의 시간을 중요하게 여겨."},
-    {"name": "공작",    "keyword": "자기표현","description": "자신만의 개성과 아름다움을 표현하는 걸 즐기는 타입. 예술적 감각이 뛰어나."},
-    {"name": "여우",    "keyword": "전략",    "description": "영리하고 전략적인 사고를 가진 타입. 상황을 빠르게 읽고 최선의 선택을 해."},
-    {"name": "독수리",  "keyword": "이상",    "description": "높은 이상과 자유를 추구하는 타입. 넓은 시야로 멀리 바라보며 꿈을 향해 날아가."},
-    {"name": "개미",    "keyword": "현실",    "description": "성실하고 꼼꼼한 현실주의자. 작은 것부터 차근차근 쌓아올리는 힘이 있어."},
-    {"name": "고양이",  "keyword": "개인",    "description": "독립적이고 자유로운 영혼. 자기만의 세계가 뚜렷하고 직관이 예리해."},
-    {"name": "말",      "keyword": "활력",    "description": "넘치는 활력과 열정으로 어디든 달려가는 타입. 자유롭고 개방적인 성격이야."},
-]
+# 행성별 동물 유형 — 탄생 차트에서 가장 강한 행성으로 결정
+PLANET_ANIMAL_MAP = {
+    'Sun':     {"name": "사자",    "keyword": "주도",    "description": "타고난 카리스마로 어디서든 중심이 되는 타입. 자신감이 넘치고 도전을 두려워하지 않아."},
+    'Moon':    {"name": "나무늘보","keyword": "평화",    "description": "평화를 사랑하고 자기만의 속도를 지키는 타입. 느긋해 보여도 내면이 깊어."},
+    'Mercury': {"name": "돌고래",  "keyword": "사교",    "description": "어디서든 친구를 만드는 사교의 달인. 밝은 에너지로 주변을 행복하게 만들어."},
+    'Venus':   {"name": "공작",    "keyword": "자기표현","description": "자신만의 개성과 아름다움을 표현하는 걸 즐기는 타입. 예술적 감각이 뛰어나."},
+    'Mars':    {"name": "늑대",    "keyword": "원칙",    "description": "강한 의지와 원칙을 가진 리더. 자신의 신념을 굽히지 않으며 집단을 이끄는 힘이 있어."},
+    'Jupiter': {"name": "코끼리", "keyword": "안정",    "description": "든든하고 신뢰할 수 있는 존재. 천천히 하지만 확실하게 목표를 향해 나아가는 타입이야."},
+    'Saturn':  {"name": "개미",    "keyword": "현실",    "description": "성실하고 꼼꼼한 현실주의자. 작은 것부터 차근차근 쌓아올리는 힘이 있어."},
+    'Uranus':  {"name": "독수리",  "keyword": "이상",    "description": "높은 이상과 자유를 추구하는 타입. 넓은 시야로 멀리 바라보며 꿈을 향해 날아가."},
+    'Neptune': {"name": "말",      "keyword": "활력",    "description": "넘치는 활력과 열정으로 어디든 달려가는 타입. 자유롭고 개방적인 성격이야."},
+    'Pluto':   {"name": "여우",    "keyword": "전략",    "description": "영리하고 전략적인 사고를 가진 타입. 상황을 빠르게 읽고 최선의 선택을 해."},
+}
 # [SECTION 1: 서버 설정 및 환경 변수 END]
 
 
@@ -51,10 +48,25 @@ def calculate_astrology(birth_date, birth_time, latitude, longitude):
                'Mars': swe.MARS, 'Jupiter': swe.JUPITER, 'Saturn': swe.SATURN,
                'Uranus': swe.URANUS, 'Neptune': swe.NEPTUNE, 'Pluto': swe.PLUTO}
 
+    houses, _ = swe.houses(jd, latitude, longitude, b'P')
+
+    def get_house(p_lon):
+        for h in range(12):
+            s, e = houses[h], houses[(h + 1) % 12]
+            if s <= e:
+                if s <= p_lon < e: return h + 1
+            else:
+                if p_lon >= s or p_lon < e: return h + 1
+        return 12
+
     results = {}
     for name, pid in planets.items():
         lon = swe.calc_ut(jd, pid)[0][0]
-        results[name] = {"sign": ZODIAC_SIGNS[int(lon // 30)]}
+        results[name] = {
+            "degree": round(lon, 2),
+            "sign": ZODIAC_SIGNS[int(lon // 30)],
+            "house": get_house(lon)
+        }
     return results
 
 def get_transits(jd):
@@ -65,12 +77,21 @@ def get_transits(jd):
         res[p_name] = ZODIAC_SIGNS[int(pos // 30)]
     return res
 
-def get_animal_type(natal_data):
-    """태양 별자리 인덱스를 기반으로 12가지 동물 중 하나를 고정 매핑.
-    동일 입력 → 항상 동일 동물 보장."""
-    sun_sign = natal_data.get('Sun', {}).get('sign', '양자리')
-    sign_index = ZODIAC_SIGNS.index(sun_sign) if sun_sign in ZODIAC_SIGNS else 0
-    return ANIMAL_TYPES[sign_index]
+def get_dominant_planet(natal_data):
+    """탄생 차트에서 가장 강한 행성을 찾아 동물 유형 결정.
+    각도 하우스(1·4·7·10) 우선, 태양·달 가중치 추가."""
+    ANGULAR   = {1, 4, 7, 10}
+    SUCCEDENT = {2, 5, 8, 11}
+    BONUS     = {'Sun': 2, 'Moon': 1}
+
+    scores = {}
+    for planet, info in natal_data.items():
+        h = info['house']
+        score = 3 if h in ANGULAR else (2 if h in SUCCEDENT else 1)
+        scores[planet] = score + BONUS.get(planet, 0)
+
+    dominant = max(scores, key=lambda p: scores[p])
+    return PLANET_ANIMAL_MAP.get(dominant, PLANET_ANIMAL_MAP['Sun'])
 
 def _bisect_solar_return(target_lon, jd_start, jd_end):
     """이진 탐색으로 태양이 target_lon에 도달하는 JD를 찾음"""
@@ -124,6 +145,39 @@ def calculate_solar_return(natal_sun_lon, target_year, lat, lon):
             "house": get_house(p_lon)
         }
     return results
+
+def compress_chart(chart_data):
+    """AI 프롬프트용 압축 포맷: 'Sun:물고기2H Moon:처녀6H ...'"""
+    return ' '.join(f"{p}:{v['sign'][:2]}{v['house']}H" for p, v in chart_data.items())
+
+def calculate_aspects(natal_data, solar_return):
+    """소라 리턴 행성 ↔ 탄생 차트 행성 간 주요 어스펙트 계산"""
+    ASPECTS = {
+        0:   ('합(Conjunction)', 8, 'powerful'),
+        60:  ('육분(Sextile)',   6, 'easy'),
+        90:  ('사분(Square)',    8, 'hard'),
+        120: ('삼분(Trine)',     8, 'easy'),
+        180: ('대립(Opposition)',8, 'hard'),
+    }
+
+    results = []
+    for sr_planet, sr_info in solar_return.items():
+        for natal_planet, natal_info in natal_data.items():
+            diff = abs(sr_info['degree'] - natal_info['degree'])
+            if diff > 180: diff = 360 - diff
+            for angle, (name, orb, quality) in ASPECTS.items():
+                if abs(diff - angle) <= orb:
+                    results.append({
+                        "aspect": name,
+                        "sr_planet": sr_planet,
+                        "natal_planet": natal_planet,
+                        "quality": quality,
+                        "orb": round(abs(diff - angle), 2)
+                    })
+    results.sort(key=lambda x: x['orb'])
+    # 상위 6개만, 압축 포맷으로 변환
+    top = results[:6]
+    return [f"SR{r['sr_planet']}-{r['aspect']}-N{r['natal_planet']}({'어려움' if r['quality']=='hard' else '순조'})" for r in top]
 # [SECTION 2: 점성술 계산 엔진 END]
 
 
@@ -158,51 +212,27 @@ def analyze():
         now = datetime.now(timezone)
         fortune_year = now.year
 
-        jd_now = swe.julday(now.year, now.month, now.day, now.hour)
-        transit_now = get_transits(jd_now)
-
         # 소라 리턴 계산
         natal_sun_lon = swe.calc_ut(
             swe.julday(*[int(x) for x in data.get('date').split('-')], 12.0),
             swe.SUN
         )[0][0]
         solar_return = calculate_solar_return(natal_sun_lon, fortune_year, lat, lon)
+        aspects = calculate_aspects(natal_data, solar_return)
 
-        # 동물 유형 결정 (태양 별자리 기반, 항상 동일 결과 보장)
-        animal = get_animal_type(natal_data)
+        # 동물 유형 결정 (가장 강한 행성 기반)
+        animal = get_dominant_planet(natal_data)
 
-        prompt = f"""
-        너는 먼 우주에서온 쪽집게 점성술사 플루토야. 반드시 '{user_lang}' 언어로, 반말 스타일로 대답해.
+        natal_compact = compress_chart(natal_data)
+        sr_compact    = compress_chart(solar_return)
 
-        [중요 지침]
-        - 운세는 무조건 좋게만 말하지 마. 소라 리턴 데이터를 실제로 분석해서 어려운 점, 주의할 점도 솔직하게 말해줘.
-        - 예를 들어 토성이 2하우스에 있으면 재물 면에서 제약이 있을 수 있고, 화성이 1하우스에 있으면 에너지는 넘치지만 충동적 행동 주의가 필요해.
-        - 각 하우스와 행성의 의미를 실제로 적용해서 현실적인 운세를 줘.
-        - 좋은 점 1~2개, 주의할 점 1~2개를 균형 있게 포함해.
+        prompt = f"""이름: {clean_name}
+탄생차트: {natal_compact}
+{fortune_year}년차트: {sr_compact}
+주요각도: {' / '.join(aspects)}
 
-        [데이터]
-        - 이름: {clean_name}
-        - 탄생 차트: {json.dumps(natal_data, ensure_ascii=False)}
-        - 현재 시점({now.year}년 {now.month}월) 행성 흐름: {json.dumps(transit_now, ensure_ascii=False)}
-        - {fortune_year}년 소라 리턴 (각 행성의 위치·하우스): {json.dumps(solar_return, ensure_ascii=False)}
-
-        소라 리턴 데이터와 탄생 차트를 비교해서 분석 결과를 반드시 아래 JSON 형식으로만 응답해:
-        {{
-            "personality": "성격 요약",
-            "pros": "핵심 장점",
-            "cons": "주의할 점",
-            "current_month": "{now.year}.{now.month:02d}",
-            "fortune_year": {fortune_year},
-            "fortune": {{
-                "love": "올해 애정운 (좋은 점과 주의할 점 모두 포함)",
-                "money": "올해 재물운 (좋은 점과 주의할 점 모두 포함)",
-                "career": "올해 직업운 (좋은 점과 주의할 점 모두 포함)",
-                "health": "올해 건강운 (좋은 점과 주의할 점 모두 포함)",
-                "summary": "올해 전체 요약 (현실적으로)",
-                "final_advice": "플루토의 한마디 (잘될 점과 주의할 점을 모두 포함해서 따뜻하게)"
-            }}
-        }}
-        """
+위 데이터 분석 후 JSON 응답:
+{{"personality":"성격요약","pros":"장점","cons":"단점","current_month":"{now.year}.{now.month:02d}","fortune_year":{fortune_year},"fortune":{{"love":"애정운","money":"재물운","career":"직업운","health":"건강운","summary":"올해요약","final_advice":"한마디"}}}}"""
 
         max_retries = 3
         response = None
@@ -211,7 +241,16 @@ def analyze():
                 response = client.models.generate_content(
                     model='gemini-flash-latest',
                     contents=prompt,
-                    config={'response_mime_type': 'application/json'}
+                    config={
+                        'response_mime_type': 'application/json',
+                        'system_instruction': (
+                            '너는 점성술 전문가야. 반말로, 일반인도 바로 이해할 수 있는 쉬운 말로만 써. '
+                            '사분각·트라인·소라리턴·하우스 같은 점성술 용어는 절대 출력에 쓰지 마. '
+                            '대신 "이 시기엔 돈 씀씀이를 줄여야 해", "새로운 인연이 생길 수 있어" 같이 구체적으로 표현해. '
+                            '각 운세는 긍정 1문장 + 주의 1문장 구조로 써. 근거 없는 막연한 격려는 금지.'
+                        ),
+                        'temperature': 0.7,
+                    }
                 )
                 break
             except Exception as e:
