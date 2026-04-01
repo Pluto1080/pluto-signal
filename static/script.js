@@ -92,10 +92,30 @@ function initTerminal() {
         setTimeout(() => { map.invalidateSize(); }, 500);
     });
 }
+function bootScreen() {
+    const container = document.getElementById('container');
+    const content   = document.getElementById('content');
+
+    const onDone = () => {
+        content.style.visibility = 'visible';
+        initTerminal();
+    };
+
+    container.style.animation = 'tv-on 1.4s cubic-bezier(0.23, 1, 0.32, 1) forwards';
+    try { sfx.tvOn(); } catch (_) {}
+
+    // animationend 안 오면 1.6초 후 강제 실행
+    const fallback = setTimeout(onDone, 1600);
+    container.addEventListener('animationend', () => {
+        clearTimeout(fallback);
+        onDone();
+    }, { once: true });
+}
+
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initTerminal);
+    document.addEventListener('DOMContentLoaded', bootScreen);
 } else {
-    initTerminal();
+    bootScreen();
 }
 /* [2] 스토리 엔진 END */
 

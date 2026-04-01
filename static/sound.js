@@ -189,7 +189,35 @@ const sfx = (() => {
         loadingGains = [];
     }
 
-    /* ── 7. TV 꺼짐 ── */
+    /* ── 7. TV 켜짐 ── */
+    function tvOn() {
+        const ac = getCtx();
+        const t  = ac.currentTime;
+
+        // 저주파 웜업 험
+        const osc = ac.createOscillator();
+        const g   = ac.createGain();
+        osc.type  = 'sawtooth';
+        osc.frequency.setValueAtTime(20, t);
+        osc.frequency.exponentialRampToValueAtTime(200, t + 0.6);
+        osc.frequency.exponentialRampToValueAtTime(80, t + 1.2);
+        g.gain.setValueAtTime(0, t);
+        g.gain.linearRampToValueAtTime(0.25, t + 0.3);
+        g.gain.exponentialRampToValueAtTime(0.001, t + 1.4);
+        osc.connect(g); g.connect(ac.destination);
+        osc.start(); osc.stop(t + 1.4);
+
+        // 화이트 노이즈 플래시
+        const src  = ac.createBufferSource();
+        src.buffer = noise(0.15);
+        const ng   = ac.createGain();
+        ng.gain.setValueAtTime(0.4, t + 0.05);
+        ng.gain.exponentialRampToValueAtTime(0.001, t + 0.2);
+        src.connect(ng); ng.connect(ac.destination);
+        src.start(t + 0.05); src.stop(t + 0.2);
+    }
+
+    /* ── 8. TV 꺼짐 ── */
     function tvOff() {
         const ac = getCtx();
         const t  = ac.currentTime;
@@ -219,7 +247,7 @@ const sfx = (() => {
         if (ctx.state === 'suspended') ctx.resume();
     }
 
-    return { glitch, textAppear, transition, reveal, click, startLoading, stopLoading, tvOff, unlock };
+    return { glitch, textAppear, transition, reveal, click, startLoading, stopLoading, tvOn, tvOff, unlock };
 })();
 
 /* ── AudioContext 활성화 — 매 인터랙션마다 resume 시도 ── */
