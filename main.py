@@ -194,6 +194,13 @@ def index():
 
 
 # [SECTION 4: 데이터 분석 로직 START]
+@app.route('/models')
+def list_models():
+    if not client:
+        return jsonify({"error": "API 키 없음"})
+    models = [m.name for m in client.models.list()]
+    return jsonify(models)
+
 @app.route('/analyze', methods=['POST'])
 def analyze():
     if not client:
