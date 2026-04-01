@@ -51,19 +51,35 @@ const sfx = (() => {
         osc.start(); osc.stop(t + dur);
     }
 
-    /* ── 2. 텍스트 등장 ── */
+    /* ── 2. 텍스트 등장 — 아이폰 알림 같은 저음 우웅~ ── */
     function textAppear() {
-        const ac = getCtx();
-        const t  = ac.currentTime;
+        const ac  = getCtx();
+        const t   = ac.currentTime;
+        const dur = 0.18;
+
+        // 저음 메인 버즈
         const osc = ac.createOscillator();
         const g   = ac.createGain();
-        osc.type  = 'square';
-        osc.frequency.setValueAtTime(900, t);
-        osc.frequency.exponentialRampToValueAtTime(450, t + 0.08);
-        g.gain.setValueAtTime(0.06, t);
-        g.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
+        osc.type  = 'sine';
+        osc.frequency.setValueAtTime(80, t);
+        osc.frequency.linearRampToValueAtTime(120, t + 0.05);
+        osc.frequency.linearRampToValueAtTime(60, t + dur);
+        g.gain.setValueAtTime(0, t);
+        g.gain.linearRampToValueAtTime(0.12, t + 0.03);
+        g.gain.exponentialRampToValueAtTime(0.001, t + dur);
         osc.connect(g); g.connect(ac.destination);
-        osc.start(); osc.stop(t + 0.08);
+        osc.start(); osc.stop(t + dur);
+
+        // 고음 얇은 레이어 (공기감)
+        const hi  = ac.createOscillator();
+        const hg  = ac.createGain();
+        hi.type   = 'sine';
+        hi.frequency.setValueAtTime(520, t);
+        hi.frequency.exponentialRampToValueAtTime(380, t + dur);
+        hg.gain.setValueAtTime(0.03, t);
+        hg.gain.exponentialRampToValueAtTime(0.001, t + dur);
+        hi.connect(hg); hg.connect(ac.destination);
+        hi.start(); hi.stop(t + dur);
     }
 
     /* ── 3. 화면 전환 ── */

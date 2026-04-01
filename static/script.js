@@ -97,6 +97,7 @@ function bootScreen() {
     const content   = document.getElementById('content');
 
     const onDone = () => {
+        setScreenColor('#2a2a2a', '#111111');
         content.style.visibility = 'visible';
         initTerminal();
     };
