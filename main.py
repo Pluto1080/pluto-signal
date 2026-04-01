@@ -71,6 +71,59 @@ def get_animal_type(natal_data):
     sun_sign = natal_data.get('Sun', {}).get('sign', '양자리')
     sign_index = ZODIAC_SIGNS.index(sun_sign) if sun_sign in ZODIAC_SIGNS else 0
     return ANIMAL_TYPES[sign_index]
+
+def _bisect_solar_return(target_lon, jd_start, jd_end):
+    """이진 탐색으로 태양이 target_lon에 도달하는 JD를 찾음"""
+    for _ in range(60):
+        jd_mid = (jd_start + jd_end) / 2
+        sun_lon = swe.calc_ut(jd_mid, swe.SUN)[0][0]
+        diff = target_lon - sun_lon
+        if diff > 180: diff -= 360
+        if diff < -180: diff += 360
+        if abs(diff) < 0.0001:
+            return jd_mid
+        if diff > 0:
+            jd_start = jd_mid
+        else:
+            jd_end = jd_mid
+    return jd_mid
+
+def calculate_solar_return(natal_sun_lon, target_year, lat, lon):
+    """소라 리턴: 태양이 탄생 위치로 돌아오는 순간의 행성 위치 + 하우스"""
+    jd_start = swe.julday(target_year, 1, 1, 0)
+    jd_end   = swe.julday(target_year, 12, 31, 23)
+    try:
+        jd_sr = swe.solcross_ut(natal_sun_lon, jd_start, swe.FLG_SWIEPH)
+        if not (jd_start <= jd_sr <= jd_end):
+            raise ValueError("out of range")
+    except Exception:
+        jd_sr = _bisect_solar_return(natal_sun_lon, jd_start, jd_end)
+
+    planets = {'Sun': swe.SUN, 'Moon': swe.MOON, 'Mercury': swe.MERCURY,
+               'Venus': swe.VENUS, 'Mars': swe.MARS, 'Jupiter': swe.JUPITER,
+               'Saturn': swe.SATURN, 'Uranus': swe.URANUS, 'Neptune': swe.NEPTUNE,
+               'Pluto': swe.PLUTO}
+
+    houses, _ = swe.houses(jd_sr, lat, lon, b'P')
+
+    def get_house(p_lon):
+        for h in range(12):
+            s, e = houses[h], houses[(h + 1) % 12]
+            if s <= e:
+                if s <= p_lon < e: return h + 1
+            else:
+                if p_lon >= s or p_lon < e: return h + 1
+        return 12
+
+    results = {}
+    for name, pid in planets.items():
+        p_lon = swe.calc_ut(jd_sr, pid)[0][0]
+        results[name] = {
+            "degree": round(p_lon, 2),
+            "sign": ZODIAC_SIGNS[int(p_lon // 30)],
+            "house": get_house(p_lon)
+        }
+    return results
 # [SECTION 2: 점성술 계산 엔진 END]
 
 
@@ -103,36 +156,49 @@ def analyze():
         tz_name = tf.timezone_at(lng=lon, lat=lat) or 'UTC'
         timezone = pytz.timezone(tz_name)
         now = datetime.now(timezone)
+        fortune_year = now.year
 
-        jd_year = swe.julday(2026, 7, 1, 12.0)
         jd_now = swe.julday(now.year, now.month, now.day, now.hour)
-
-        transit_year = get_transits(jd_year)
         transit_now = get_transits(jd_now)
+
+        # 소라 리턴 계산
+        natal_sun_lon = swe.calc_ut(
+            swe.julday(*[int(x) for x in data.get('date').split('-')], 12.0),
+            swe.SUN
+        )[0][0]
+        solar_return = calculate_solar_return(natal_sun_lon, fortune_year, lat, lon)
 
         # 동물 유형 결정 (태양 별자리 기반, 항상 동일 결과 보장)
         animal = get_animal_type(natal_data)
 
         prompt = f"""
         너는 먼 우주에서온 쪽집게 점성술사 플루토야. 반드시 '{user_lang}' 언어로, 반말 스타일로 대답해.
+
+        [중요 지침]
+        - 운세는 무조건 좋게만 말하지 마. 소라 리턴 데이터를 실제로 분석해서 어려운 점, 주의할 점도 솔직하게 말해줘.
+        - 예를 들어 토성이 2하우스에 있으면 재물 면에서 제약이 있을 수 있고, 화성이 1하우스에 있으면 에너지는 넘치지만 충동적 행동 주의가 필요해.
+        - 각 하우스와 행성의 의미를 실제로 적용해서 현실적인 운세를 줘.
+        - 좋은 점 1~2개, 주의할 점 1~2개를 균형 있게 포함해.
+
         [데이터]
         - 이름: {clean_name}
         - 탄생 차트: {json.dumps(natal_data, ensure_ascii=False)}
-        - 2026년 행성 흐름: {json.dumps(transit_year, ensure_ascii=False)}
-        - 현재 시점({now.year}년 {now.month}월) 흐름: {json.dumps(transit_now, ensure_ascii=False)}
+        - 현재 시점({now.year}년 {now.month}월) 행성 흐름: {json.dumps(transit_now, ensure_ascii=False)}
+        - {fortune_year}년 소라 리턴 (각 행성의 위치·하우스): {json.dumps(solar_return, ensure_ascii=False)}
 
-        위 데이터를 비교해서 분석 결과를 반드시 아래 JSON 형식으로만 응답해:
+        소라 리턴 데이터와 탄생 차트를 비교해서 분석 결과를 반드시 아래 JSON 형식으로만 응답해:
         {{
             "personality": "성격 요약",
             "pros": "핵심 장점",
             "cons": "주의할 점",
             "current_month": "{now.year}.{now.month:02d}",
-            "fortune_2026": {{
-                "love": "올해 애정운",
-                "money": "올해 재물운",
-                "career": "올해 직업운",
-                "health": "올해 건강운",
-                "summary": "올해 전체 요약",
+            "fortune_year": {fortune_year},
+            "fortune": {{
+                "love": "올해 애정운 (좋은 점과 주의할 점 모두 포함)",
+                "money": "올해 재물운 (좋은 점과 주의할 점 모두 포함)",
+                "career": "올해 직업운 (좋은 점과 주의할 점 모두 포함)",
+                "health": "올해 건강운 (좋은 점과 주의할 점 모두 포함)",
+                "summary": "올해 전체 요약 (현실적으로)",
                 "final_advice": "플루토의 한마디 (잘될 점과 주의할 점을 모두 포함해서 따뜻하게)"
             }}
         }}
@@ -159,7 +225,10 @@ def analyze():
             return jsonify({"error": "별과의 연결이 불안정해. 다시 시도해줘!"}), 200
 
         result = json.loads(response.text)
-        result['animal'] = animal  # 동물 데이터 응답에 추가
+        result['animal'] = animal
+        # 구버전 키 호환성 유지
+        if 'fortune' in result and 'fortune_2026' not in result:
+            result['fortune_2026'] = result['fortune']
         return jsonify(result)
 
     except Exception as e:

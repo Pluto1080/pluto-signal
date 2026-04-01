@@ -161,7 +161,7 @@ function startAnalysis() {
     const date = document.getElementById('birthDate').value;
     const time = document.getElementById('birthTime').value || "12:00";
 
-    if (!name || !date) { alert("데이터를 입력하라."); return; }
+    if (!name || !date) { showError("데이터를 입력하라."); return; }
 
     startLoadingAnimation();
 
@@ -178,8 +178,7 @@ function startAnalysis() {
         stopLoadingAnimation();
 
         if (data.error) {
-            alert(data.error);
-            switchScreen('screen-input');
+            showError(data.error);
             return;
         }
 
@@ -199,10 +198,8 @@ function startAnalysis() {
         showAnimalResult(data);
     })
     .catch(err => {
-        stopLoadingAnimation();
         console.error("Analysis Error:", err);
-        alert("별과의 연결이 불안정하거나 서버 응답이 없습니다.");
-        switchScreen('screen-input');
+        showError("별과의 연결이 불안정하거나 서버 응답이 없습니다.");
     });
 }
 
@@ -246,6 +243,17 @@ function stopLoadingAnimation() {
     setScreenColor('#444444', '#111111');
     document.querySelectorAll('.star, .shooting-star').forEach(s => s.remove());
     isSwitching = false;
+}
+
+function showError(msg) {
+    stopLoadingAnimation();
+    const el = document.getElementById('error-msg');
+    if (el) {
+        el.textContent = '⚠ ' + msg;
+        el.classList.remove('hidden');
+        setTimeout(() => el.classList.add('hidden'), 6000);
+    }
+    switchScreen('screen-input');
 }
 /* [4] 데이터 통신 및 로딩 애니메이션 END */
 
@@ -304,10 +312,11 @@ async function displayResultsSequentially(boxes) {
 
 /* [컷 6] 성격 → 운세 선택 스토리 */
 function goToSelectionStory() {
+    const yr = (globalData && globalData.fortune_year) ? globalData.fortune_year : new Date().getFullYear();
     playStory([
         "어때 좀 맞는거같아?",
         "이번엔 너가 궁금해할만한걸 가져왔어!",
-        "2026년 올해의 운세지!"
+        `${yr}년 올해의 운세지!`
     ], () => { switchScreen('screen-selection'); });
 }
 
@@ -331,10 +340,12 @@ function showFortune(type) {
     });
     setScreenColor(bgColors[type][0], bgColors[type][1]);
 
-    if      (type === 'love')   { box.classList.add('theme-love');   t.innerText = "2026_LOVE";   st.innerText = "[♥] LOVE_SIGNAL";  c.innerText = globalData.fortune_2026.love; }
-    else if (type === 'money')  { box.classList.add('theme-money');  t.innerText = "2026_MONEY";  st.innerText = "[$] WEALTH_STATUS"; c.innerText = globalData.fortune_2026.money; }
-    else if (type === 'career') { box.classList.add('theme-career'); t.innerText = "2026_CAREER"; st.innerText = "[!] CAREER_UPDATE"; c.innerText = globalData.fortune_2026.career; }
-    else if (type === 'health') { box.classList.add('theme-health'); t.innerText = "2026_HEALTH"; st.innerText = "[+] VITALITY_LOG";  c.innerText = globalData.fortune_2026.health; }
+    const yr = globalData.fortune_year || new Date().getFullYear();
+    const f  = globalData.fortune || globalData.fortune_2026 || {};
+    if      (type === 'love')   { box.classList.add('theme-love');   t.innerText = `${yr}_LOVE`;   st.innerText = "[♥] LOVE_SIGNAL";  c.innerText = f.love; }
+    else if (type === 'money')  { box.classList.add('theme-money');  t.innerText = `${yr}_MONEY`;  st.innerText = "[$] WEALTH_STATUS"; c.innerText = f.money; }
+    else if (type === 'career') { box.classList.add('theme-career'); t.innerText = `${yr}_CAREER`; st.innerText = "[!] CAREER_UPDATE"; c.innerText = f.career; }
+    else if (type === 'health') { box.classList.add('theme-health'); t.innerText = `${yr}_HEALTH`; st.innerText = "[+] VITALITY_LOG";  c.innerText = f.health; }
 
     switchScreen('screen-fortune-detail');
 
@@ -365,8 +376,9 @@ function showFinalReport() {
         const whisperBox = document.querySelector('#screen-final-advice .result-box:nth-child(3)');
         if (summaryBox) summaryBox.className = 'result-box theme-purple';
         if (whisperBox) whisperBox.className = 'result-box theme-whisper';
-        document.getElementById('res-summary').innerText      = globalData.fortune_2026.summary;
-        document.getElementById('res-final-advice').innerText = globalData.fortune_2026.final_advice;
+        const f = globalData.fortune || globalData.fortune_2026 || {};
+        document.getElementById('res-summary').innerText      = f.summary;
+        document.getElementById('res-final-advice').innerText = f.final_advice;
         switchScreen('screen-final-advice');
     });
 }
