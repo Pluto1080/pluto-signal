@@ -300,30 +300,49 @@ function showAnimalResult(data) {
     }
 
     const fullName = animal.modifier ? `${animal.modifier} ${animal.name}` : animal.name;
+    const animalBtn = document.querySelector('#screen-animal .cyber-btn');
 
+    // 처음엔 베이스 이름만 표시
     document.getElementById('animal-box-title').innerText  = `[TYPE] ${animal.name.toUpperCase()}_SIGNAL`;
-    document.getElementById('animal-name').innerText        = fullName;
+    document.getElementById('animal-name').innerText        = animal.name;
     document.getElementById('animal-keyword').innerText     = `# ${animal.keyword}`;
     document.getElementById('animal-description').innerText = animal.description;
 
-    const storyLines = [`오 너는 ${animal.name}과 같은 느낌이야`];
     if (animal.modifier) {
-        storyLines.push(`근데 있잖아..`);
-        storyLines.push(`${animal.name}이면 ${animal.name}인데`);
-        storyLines.push(`넌 ${animal.name} 중에 어떤 ${animal.name}일까?`);
+        // NEXT 버튼 → 수식어 스토리로
+        animalBtn.onclick = () => goToModifierStory(animal.name, fullName);
+    } else {
+        animalBtn.onclick = goToPersonalityStory;
     }
 
-    playStory(storyLines, () => {
+    playStory([`오 너는!`], () => {
+        switchScreen('screen-animal');
+    });
+}
+
+/* [컷 4-5] 수식어 스토리 → 동물화면 풀네임 공개 */
+function goToModifierStory(baseName, fullName) {
+    const animalBtn = document.querySelector('#screen-animal .cyber-btn');
+
+    playStory([
+        `근데 있잖아..`,
+        `${baseName}이면 ${baseName}인데`,
+        `넌 ${baseName} 중에 어떤 ${baseName}일까?`
+    ], () => {
+        // 풀네임으로 업데이트하고 동물화면 다시 표시
+        document.getElementById('animal-name').innerText = fullName;
+        animalBtn.onclick = goToPersonalityStory;
         switchScreen('screen-animal');
     });
 }
 
 /* [컷 5] 동물 → 상세 성격 스토리 */
 function goToPersonalityStory() {
+    const animal = globalData?.animal;
+    const name   = animal?.name || '동물';
     playStory([
         "하지만 동물이 전부는 아니야",
-        "사자도 어떤 사자는 소심할 수 있잖아?",
-        "어떤 고양이도 개냥이일 수 있고!",
+        `${name}도 어떤 ${name}은 소심할 수 있잖아?`,
         "너는 어떤 성격인지 알려줄게"
     ], () => {
         switchScreen('screen-personality');
