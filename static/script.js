@@ -299,13 +299,15 @@ function showAnimalResult(data) {
         return;
     }
 
+    const fullName = animal.modifier ? `${animal.modifier} ${animal.name}` : animal.name;
+
     document.getElementById('animal-box-title').innerText  = `[TYPE] ${animal.name.toUpperCase()}_SIGNAL`;
-    document.getElementById('animal-name').innerText        = animal.name;
+    document.getElementById('animal-name').innerText        = fullName;
     document.getElementById('animal-keyword').innerText     = `# ${animal.keyword}`;
     document.getElementById('animal-description').innerText = animal.description;
 
     playStory([
-        `오 너는 ${animal.name}과 같은 느낌이야`
+        `오 너는 ${fullName}과 같은 느낌이야`
     ], () => {
         switchScreen('screen-animal');
     });

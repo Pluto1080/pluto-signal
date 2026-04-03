@@ -352,12 +352,14 @@ def analyze():
 탄생차트: {natal_compact}
 {fortune_year}년차트: {sr_compact}
 주요각도: {' / '.join(aspects)}
+동물유형: {animal['name']}
 
 위 데이터를 분석해서 아래 JSON 형식으로 응답해.
 각 운세 필드(love·money·career·health)는 반드시 4~5문장 이상으로 자세하게 써.
 
 {{
-  "personality": "성격을 3문장으로 요약",
+  "animal_modifier": "탄생차트에서 가장 두드러지는 특이한 배치 하나를 골라서, 그걸 딱 표현하는 수식어구 (형용사 또는 짧은 명사구, 2~4글자). 흔한 단어(세심한·대담한·따뜻한) 금지. 차트를 실제로 읽은 사람만 뽑을 수 있는 표현으로. 예: '달이 흐린', '경계선 위의', '혼자만 아는', '이중 파장의', '새벽 3시의', '역행 중인' 등 분위기.",
+  "personality": "첫 문장에서 왜 '{animal['name']}'에 그 수식어가 붙었는지 차트 근거로 자연스럽게 설명하고, 이어서 전체 성격을 3~4문장으로 요약",
   "pros": "핵심 장점 2~3가지를 구체적으로",
   "cons": "주의할 점 2~3가지를 구체적으로",
   "current_month": "{now.year}.{now.month:02d}",
@@ -407,6 +409,7 @@ def analyze():
             return jsonify({"error": "별과의 연결이 불안정해. 다시 시도해줘!"}), 200
 
         result = json.loads(response.text)
+        animal['modifier'] = result.get('animal_modifier', '')
         result['animal'] = animal
         result['compatibility'] = ANIMAL_COMPATIBILITY.get(animal['name'], {'good': [], 'bad': []})
         if 'fortune' in result and 'fortune_2026' not in result:

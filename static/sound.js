@@ -35,7 +35,7 @@ const sfx = (() => {
         filt.frequency.value = 1800;
         filt.Q.value = 0.4;
         const g = ac.createGain();
-        g.gain.setValueAtTime(0.25, t);
+        g.gain.setValueAtTime(0.55, t);
         g.gain.exponentialRampToValueAtTime(0.001, t + dur);
         src.connect(filt); filt.connect(g); g.connect(ac.destination);
         src.start(); src.stop(t + dur);
@@ -45,7 +45,7 @@ const sfx = (() => {
         osc.type  = 'sawtooth';
         osc.frequency.setValueAtTime(300, t);
         osc.frequency.exponentialRampToValueAtTime(40, t + dur);
-        og.gain.setValueAtTime(0.08, t);
+        og.gain.setValueAtTime(0.18, t);
         og.gain.exponentialRampToValueAtTime(0.001, t + dur);
         osc.connect(og); og.connect(ac.destination);
         osc.start(); osc.stop(t + dur);
@@ -64,18 +64,17 @@ const sfx = (() => {
         osc.frequency.linearRampToValueAtTime(130, t + 0.08);
         osc.frequency.exponentialRampToValueAtTime(70, t + dur);
         g.gain.setValueAtTime(0, t);
-        g.gain.linearRampToValueAtTime(0.13, t + 0.05);
+        g.gain.linearRampToValueAtTime(0.30, t + 0.05);
         g.gain.exponentialRampToValueAtTime(0.001, t + dur);
         osc.connect(g); g.connect(ac.destination);
         osc.start(); osc.stop(t + dur);
 
-        // 배음 — 살짝 따뜻하게
         const harm = ac.createOscillator();
         const hg   = ac.createGain();
         harm.type  = 'triangle';
         harm.frequency.setValueAtTime(180, t);
         harm.frequency.exponentialRampToValueAtTime(140, t + dur);
-        hg.gain.setValueAtTime(0.04, t);
+        hg.gain.setValueAtTime(0.10, t);
         hg.gain.exponentialRampToValueAtTime(0.001, t + dur);
         harm.connect(hg); hg.connect(ac.destination);
         harm.start(); harm.stop(t + dur);
@@ -87,25 +86,23 @@ const sfx = (() => {
         const t   = ac.currentTime;
         const dur = 0.35;
 
-        // 저음 하강 스윕
         const osc = ac.createOscillator();
         const g   = ac.createGain();
         osc.type  = 'sine';
         osc.frequency.setValueAtTime(160, t);
         osc.frequency.exponentialRampToValueAtTime(55, t + dur);
         g.gain.setValueAtTime(0, t);
-        g.gain.linearRampToValueAtTime(0.15, t + 0.04);
+        g.gain.linearRampToValueAtTime(0.34, t + 0.04);
         g.gain.exponentialRampToValueAtTime(0.001, t + dur);
         osc.connect(g); g.connect(ac.destination);
         osc.start(); osc.stop(t + dur);
 
-        // 중음 레이어
         const mid = ac.createOscillator();
         const mg  = ac.createGain();
         mid.type  = 'triangle';
         mid.frequency.setValueAtTime(320, t);
         mid.frequency.exponentialRampToValueAtTime(110, t + dur);
-        mg.gain.setValueAtTime(0.06, t);
+        mg.gain.setValueAtTime(0.14, t);
         mg.gain.exponentialRampToValueAtTime(0.001, t + dur);
         mid.connect(mg); mg.connect(ac.destination);
         mid.start(); mid.stop(t + dur);
@@ -124,7 +121,7 @@ const sfx = (() => {
         osc.frequency.linearRampToValueAtTime(160, t + 0.12);
         osc.frequency.exponentialRampToValueAtTime(220, t + dur);
         g.gain.setValueAtTime(0, t);
-        g.gain.linearRampToValueAtTime(0.11, t + 0.05);
+        g.gain.linearRampToValueAtTime(0.26, t + 0.05);
         g.gain.exponentialRampToValueAtTime(0.001, t + dur);
         osc.connect(g); g.connect(ac.destination);
         osc.start(); osc.stop(t + dur);
@@ -134,7 +131,7 @@ const sfx = (() => {
         harm.type  = 'triangle';
         harm.frequency.setValueAtTime(160, t);
         harm.frequency.linearRampToValueAtTime(440, t + dur);
-        hg.gain.setValueAtTime(0.03, t);
+        hg.gain.setValueAtTime(0.08, t);
         hg.gain.exponentialRampToValueAtTime(0.001, t + dur);
         harm.connect(hg); hg.connect(ac.destination);
         harm.start(); harm.stop(t + dur);
@@ -152,7 +149,7 @@ const sfx = (() => {
         osc.frequency.setValueAtTime(120, t);
         osc.frequency.exponentialRampToValueAtTime(60, t + dur);
         g.gain.setValueAtTime(0, t);
-        g.gain.linearRampToValueAtTime(0.14, t + 0.01);
+        g.gain.linearRampToValueAtTime(0.32, t + 0.01);
         g.gain.exponentialRampToValueAtTime(0.001, t + dur);
         osc.connect(g); g.connect(ac.destination);
         osc.start(); osc.stop(t + dur);
@@ -164,18 +161,16 @@ const sfx = (() => {
         const ac = getCtx();
         const t  = ac.currentTime;
 
-        // 베이스 드론
         const drone = ac.createOscillator();
         const dg    = ac.createGain();
         drone.type  = 'sine';
         drone.frequency.value = 50;
         dg.gain.setValueAtTime(0, t);
-        dg.gain.linearRampToValueAtTime(0.09, t + 1.0);
+        dg.gain.linearRampToValueAtTime(0.20, t + 1.0);
         drone.connect(dg); dg.connect(ac.destination);
         drone.start();
         loadingOscs.push(drone); loadingGains.push(dg);
 
-        // 중음 우웅 — LFO로 떨림
         const mid = ac.createOscillator();
         const mg  = ac.createGain();
         mid.type  = 'triangle';
@@ -184,17 +179,16 @@ const sfx = (() => {
         const lfo = ac.createOscillator();
         const lg  = ac.createGain();
         lfo.frequency.value = 0.5;
-        lg.gain.value = 0.025;
+        lg.gain.value = 0.05;
         lfo.connect(lg); lg.connect(mg.gain);
         lfo.start();
 
         mg.gain.setValueAtTime(0, t);
-        mg.gain.linearRampToValueAtTime(0.05, t + 1.2);
+        mg.gain.linearRampToValueAtTime(0.12, t + 1.2);
         mid.connect(mg); mg.connect(ac.destination);
         mid.start();
         loadingOscs.push(mid, lfo); loadingGains.push(mg);
 
-        // 느린 우웅 진동 레이어
         const swell = ac.createOscillator();
         const sg    = ac.createGain();
         swell.type  = 'sine';
@@ -203,12 +197,12 @@ const sfx = (() => {
         const lfo2 = ac.createOscillator();
         const lg2  = ac.createGain();
         lfo2.frequency.value = 0.3;
-        lg2.gain.value = 0.03;
+        lg2.gain.value = 0.06;
         lfo2.connect(lg2); lg2.connect(sg.gain);
         lfo2.start();
 
         sg.gain.setValueAtTime(0, t);
-        sg.gain.linearRampToValueAtTime(0.045, t + 2.0);
+        sg.gain.linearRampToValueAtTime(0.10, t + 2.0);
         swell.connect(sg); sg.connect(ac.destination);
         swell.start();
         loadingOscs.push(swell, lfo2); loadingGains.push(sg);
@@ -236,7 +230,6 @@ const sfx = (() => {
         const ac = getCtx();
         const t  = ac.currentTime;
 
-        // 메인 우웅 상승
         const osc = ac.createOscillator();
         const g   = ac.createGain();
         osc.type  = 'sine';
@@ -244,12 +237,11 @@ const sfx = (() => {
         osc.frequency.exponentialRampToValueAtTime(180, t + 0.7);
         osc.frequency.exponentialRampToValueAtTime(90, t + 1.3);
         g.gain.setValueAtTime(0, t);
-        g.gain.linearRampToValueAtTime(0.14, t + 0.4);
+        g.gain.linearRampToValueAtTime(0.32, t + 0.4);
         g.gain.exponentialRampToValueAtTime(0.001, t + 1.5);
         osc.connect(g); g.connect(ac.destination);
         osc.start(); osc.stop(t + 1.5);
 
-        // 배음 레이어
         const harm = ac.createOscillator();
         const hg   = ac.createGain();
         harm.type  = 'triangle';
@@ -257,7 +249,7 @@ const sfx = (() => {
         harm.frequency.exponentialRampToValueAtTime(360, t + 0.7);
         harm.frequency.exponentialRampToValueAtTime(180, t + 1.3);
         hg.gain.setValueAtTime(0, t + 0.1);
-        hg.gain.linearRampToValueAtTime(0.05, t + 0.5);
+        hg.gain.linearRampToValueAtTime(0.12, t + 0.5);
         hg.gain.exponentialRampToValueAtTime(0.001, t + 1.4);
         harm.connect(hg); hg.connect(ac.destination);
         harm.start(t + 0.1); harm.stop(t + 1.4);
@@ -268,24 +260,22 @@ const sfx = (() => {
         const ac = getCtx();
         const t  = ac.currentTime;
 
-        // 메인 하강 우웅
         const osc = ac.createOscillator();
         const g   = ac.createGain();
         osc.type  = 'sine';
         osc.frequency.setValueAtTime(200, t);
         osc.frequency.exponentialRampToValueAtTime(25, t + 1.8);
-        g.gain.setValueAtTime(0.16, t);
+        g.gain.setValueAtTime(0.36, t);
         g.gain.exponentialRampToValueAtTime(0.001, t + 1.8);
         osc.connect(g); g.connect(ac.destination);
         osc.start(); osc.stop(t + 1.8);
 
-        // 배음 레이어
         const harm = ac.createOscillator();
         const hg   = ac.createGain();
         harm.type  = 'triangle';
         harm.frequency.setValueAtTime(400, t);
         harm.frequency.exponentialRampToValueAtTime(50, t + 1.4);
-        hg.gain.setValueAtTime(0.06, t);
+        hg.gain.setValueAtTime(0.14, t);
         hg.gain.exponentialRampToValueAtTime(0.001, t + 1.4);
         harm.connect(hg); hg.connect(ac.destination);
         harm.start(); harm.stop(t + 1.4);
