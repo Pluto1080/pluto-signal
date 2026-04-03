@@ -78,6 +78,7 @@ function playStory(lines, callback) {
 
 /* [컷 1] 인트로 스토리 — 8개 대사 */
 function initTerminal() {
+    sfx.bgmPlay();
     playStory([
         { text: "...",          glitch: true },
         { text: ".....지직",    glitch: true },
@@ -472,6 +473,7 @@ function triggerTVOff() {
     const container  = document.getElementById('container');
     const endOverlay = document.getElementById('end-overlay');
 
+    sfx.bgmStop();
     content.classList.add('ending-glitch');
     sfx.tvOff();
 

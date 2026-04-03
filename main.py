@@ -4,7 +4,7 @@ import time
 import re
 from datetime import datetime
 import swisseph as swe
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, send_from_directory
 from google import genai
 import pytz
 from timezonefinder import TimezoneFinder
@@ -300,6 +300,10 @@ def calculate_aspects(natal_data, solar_return):
 @app.route('/')
 def index():
     return render_template('index.html')
+
+@app.route('/sound/<path:filename>')
+def serve_sound(filename):
+    return send_from_directory('sound', filename)
 # [SECTION 3: 기본 경로 라우팅 END]
 
 

@@ -297,7 +297,48 @@ const sfx = (() => {
         if (ctx.state === 'suspended') ctx.resume();
     }
 
-    return { glitch, textAppear, transition, reveal, click, startLoading, stopLoading, tvOn, tvOff, unlock };
+    /* ── BGM ── */
+    let bgmAudio = null;
+    let bgmFadeTimer = null;
+
+    function bgmPlay() {
+        if (!bgmAudio) {
+            bgmAudio = new Audio('/sound/Picnic_on_the_Far_Side.mp3');
+            bgmAudio.loop = true;
+            bgmAudio.volume = 0;
+        }
+
+        const tryPlay = () => {
+            bgmAudio.play().then(() => {
+                if (bgmFadeTimer) clearInterval(bgmFadeTimer);
+                bgmFadeTimer = setInterval(() => {
+                    bgmAudio.volume = Math.min(bgmAudio.volume + 0.01, 0.45);
+                    if (bgmAudio.volume >= 0.45) { clearInterval(bgmFadeTimer); bgmFadeTimer = null; }
+                }, 40);
+            }).catch(() => {
+                // 자동재생 차단 시 첫 인터랙션 때 재시도
+                document.addEventListener('click', tryPlay, { once: true });
+                document.addEventListener('touchstart', tryPlay, { once: true });
+            });
+        };
+
+        tryPlay();
+    }
+
+    function bgmStop() {
+        if (!bgmAudio || bgmAudio.paused) return;
+        if (bgmFadeTimer) clearInterval(bgmFadeTimer);
+        bgmFadeTimer = setInterval(() => {
+            bgmAudio.volume = Math.max(bgmAudio.volume - 0.015, 0);
+            if (bgmAudio.volume <= 0) {
+                clearInterval(bgmFadeTimer); bgmFadeTimer = null;
+                bgmAudio.pause();
+                bgmAudio.currentTime = 0;
+            }
+        }, 40);
+    }
+
+    return { glitch, textAppear, transition, reveal, click, startLoading, stopLoading, tvOn, tvOff, unlock, bgmPlay, bgmStop };
 })();
 
 /* ── AudioContext 활성화 — 매 인터랙션마다 resume 시도 ── */

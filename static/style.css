@@ -483,11 +483,11 @@ button.cyber-btn:hover { background: #00ff41; color: #000; box-shadow: 0 0 30px 
 
 .compat-list { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
 .compat-card {
-    display: flex; align-items: baseline; gap: 12px;
+    display: flex; flex-direction: column; gap: 4px;
     padding: 8px 14px; border-radius: 4px;
     border-left-width: 3px; border-left-style: solid;
 }
-.compat-animal { font-size: 1rem; font-weight: bold; letter-spacing: 1px; white-space: nowrap; }
+.compat-animal { font-size: 1rem; font-weight: bold; letter-spacing: 1px; }
 .compat-reason { font-size: 0.85rem; opacity: 0.85; line-height: 1.4; }
 .compat-good { border-color: #00ff41; color: #00ff41; background: rgba(0,255,65,0.08); }
 .compat-bad  { border-color: #ff4444; color: #ff4444; background: rgba(255,68,68,0.08); }
@@ -509,6 +509,14 @@ button.cyber-btn:hover { background: #00ff41; color: #000; box-shadow: 0 0 30px 
 
 
 /* [7] 로딩 화면 — 별과 별똥별 */
+#loading-text {
+    color: #ffff00 !important;
+    background: none !important;
+    -webkit-background-clip: unset !important;
+    background-clip: unset !important;
+    filter: drop-shadow(0 0 8px rgba(255,255,0,0.7)) !important;
+    text-shadow: 0 0 12px rgba(255,255,0,0.5) !important;
+}
 #screen-loading {
     position: absolute !important;
     top: 0; left: 0;
