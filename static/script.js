@@ -433,10 +433,10 @@ function showCompatScreen() {
     const badEl  = document.getElementById('compat-bad');
 
     goodEl.innerHTML = compat.good.map(a =>
-        `<span class="compat-tag compat-good">${a}</span>`
+        `<div class="compat-card compat-good"><span class="compat-animal">${a.name}</span><span class="compat-reason">${a.reason}</span></div>`
     ).join('');
     badEl.innerHTML = compat.bad.map(a =>
-        `<span class="compat-tag compat-bad">${a}</span>`
+        `<div class="compat-card compat-bad"><span class="compat-animal">${a.name}</span><span class="compat-reason">${a.reason}</span></div>`
     ).join('');
 
     switchScreen('screen-compat');

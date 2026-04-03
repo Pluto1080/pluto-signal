@@ -22,7 +22,7 @@ const sfx = (() => {
         return buf;
     }
 
-    /* ── 1. 지직 글리치 ── */
+    /* ── 1. 지직 글리치 — 핑크 텍스트 전용 ── */
     function glitch() {
         const ac  = getCtx();
         const dur = 0.2;
@@ -51,141 +51,167 @@ const sfx = (() => {
         osc.start(); osc.stop(t + dur);
     }
 
-    /* ── 2. 텍스트 등장 — 아이폰 알림 같은 저음 우웅~ ── */
+    /* ── 2. 텍스트 등장 — 부드러운 우웅~ ── */
     function textAppear() {
         const ac  = getCtx();
         const t   = ac.currentTime;
-        const dur = 0.18;
+        const dur = 0.28;
 
-        // 저음 메인 버즈
         const osc = ac.createOscillator();
         const g   = ac.createGain();
         osc.type  = 'sine';
-        osc.frequency.setValueAtTime(80, t);
-        osc.frequency.linearRampToValueAtTime(120, t + 0.05);
-        osc.frequency.linearRampToValueAtTime(60, t + dur);
+        osc.frequency.setValueAtTime(90, t);
+        osc.frequency.linearRampToValueAtTime(130, t + 0.08);
+        osc.frequency.exponentialRampToValueAtTime(70, t + dur);
         g.gain.setValueAtTime(0, t);
-        g.gain.linearRampToValueAtTime(0.12, t + 0.03);
+        g.gain.linearRampToValueAtTime(0.13, t + 0.05);
         g.gain.exponentialRampToValueAtTime(0.001, t + dur);
         osc.connect(g); g.connect(ac.destination);
         osc.start(); osc.stop(t + dur);
 
-        // 고음 얇은 레이어 (공기감)
-        const hi  = ac.createOscillator();
-        const hg  = ac.createGain();
-        hi.type   = 'sine';
-        hi.frequency.setValueAtTime(520, t);
-        hi.frequency.exponentialRampToValueAtTime(380, t + dur);
-        hg.gain.setValueAtTime(0.03, t);
+        // 배음 — 살짝 따뜻하게
+        const harm = ac.createOscillator();
+        const hg   = ac.createGain();
+        harm.type  = 'triangle';
+        harm.frequency.setValueAtTime(180, t);
+        harm.frequency.exponentialRampToValueAtTime(140, t + dur);
+        hg.gain.setValueAtTime(0.04, t);
         hg.gain.exponentialRampToValueAtTime(0.001, t + dur);
-        hi.connect(hg); hg.connect(ac.destination);
-        hi.start(); hi.stop(t + dur);
+        harm.connect(hg); hg.connect(ac.destination);
+        harm.start(); harm.stop(t + dur);
     }
 
-    /* ── 3. 화면 전환 ── */
+    /* ── 3. 화면 전환 — 깊은 우웅 스윕 ── */
     function transition() {
-        const ac = getCtx();
-        const t  = ac.currentTime;
+        const ac  = getCtx();
+        const t   = ac.currentTime;
+        const dur = 0.35;
 
-        const src  = ac.createBufferSource();
-        src.buffer = noise(0.3);
-        const filt = ac.createBiquadFilter();
-        filt.type  = 'highpass';
-        filt.frequency.setValueAtTime(300, t);
-        filt.frequency.exponentialRampToValueAtTime(9000, t + 0.18);
-        const g = ac.createGain();
-        g.gain.setValueAtTime(0.15, t);
-        g.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
-        src.connect(filt); filt.connect(g); g.connect(ac.destination);
-        src.start(); src.stop(t + 0.3);
-
-        const osc = ac.createOscillator();
-        const og  = ac.createGain();
-        osc.type  = 'sawtooth';
-        osc.frequency.setValueAtTime(250, t);
-        osc.frequency.exponentialRampToValueAtTime(30, t + 0.22);
-        og.gain.setValueAtTime(0.08, t);
-        og.gain.exponentialRampToValueAtTime(0.001, t + 0.22);
-        osc.connect(og); og.connect(ac.destination);
-        osc.start(); osc.stop(t + 0.22);
-    }
-
-    /* ── 4. 결과창 스캔 비프 ── */
-    function reveal() {
-        const ac = getCtx();
-        const t  = ac.currentTime;
+        // 저음 하강 스윕
         const osc = ac.createOscillator();
         const g   = ac.createGain();
         osc.type  = 'sine';
-        osc.frequency.setValueAtTime(380, t);
-        osc.frequency.linearRampToValueAtTime(760, t + 0.15);
-        g.gain.setValueAtTime(0.1, t);
-        g.gain.exponentialRampToValueAtTime(0.001, t + 0.2);
+        osc.frequency.setValueAtTime(160, t);
+        osc.frequency.exponentialRampToValueAtTime(55, t + dur);
+        g.gain.setValueAtTime(0, t);
+        g.gain.linearRampToValueAtTime(0.15, t + 0.04);
+        g.gain.exponentialRampToValueAtTime(0.001, t + dur);
         osc.connect(g); g.connect(ac.destination);
-        osc.start(); osc.stop(t + 0.2);
+        osc.start(); osc.stop(t + dur);
+
+        // 중음 레이어
+        const mid = ac.createOscillator();
+        const mg  = ac.createGain();
+        mid.type  = 'triangle';
+        mid.frequency.setValueAtTime(320, t);
+        mid.frequency.exponentialRampToValueAtTime(110, t + dur);
+        mg.gain.setValueAtTime(0.06, t);
+        mg.gain.exponentialRampToValueAtTime(0.001, t + dur);
+        mid.connect(mg); mg.connect(ac.destination);
+        mid.start(); mid.stop(t + dur);
     }
 
-    /* ── 5. 버튼 클릭 ── */
-    function click() {
-        const ac = getCtx();
-        const t  = ac.currentTime;
+    /* ── 4. 결과창 등장 — 따뜻한 우웅 상승 ── */
+    function reveal() {
+        const ac  = getCtx();
+        const t   = ac.currentTime;
+        const dur = 0.3;
+
         const osc = ac.createOscillator();
         const g   = ac.createGain();
-        osc.type  = 'square';
-        osc.frequency.setValueAtTime(700, t);
-        osc.frequency.exponentialRampToValueAtTime(180, t + 0.08);
-        g.gain.setValueAtTime(0.07, t);
-        g.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
+        osc.type  = 'sine';
+        osc.frequency.setValueAtTime(80, t);
+        osc.frequency.linearRampToValueAtTime(160, t + 0.12);
+        osc.frequency.exponentialRampToValueAtTime(220, t + dur);
+        g.gain.setValueAtTime(0, t);
+        g.gain.linearRampToValueAtTime(0.11, t + 0.05);
+        g.gain.exponentialRampToValueAtTime(0.001, t + dur);
         osc.connect(g); g.connect(ac.destination);
-        osc.start(); osc.stop(t + 0.08);
+        osc.start(); osc.stop(t + dur);
+
+        const harm = ac.createOscillator();
+        const hg   = ac.createGain();
+        harm.type  = 'triangle';
+        harm.frequency.setValueAtTime(160, t);
+        harm.frequency.linearRampToValueAtTime(440, t + dur);
+        hg.gain.setValueAtTime(0.03, t);
+        hg.gain.exponentialRampToValueAtTime(0.001, t + dur);
+        harm.connect(hg); hg.connect(ac.destination);
+        harm.start(); harm.stop(t + dur);
     }
 
-    /* ── 6. 로딩 앰비언트 ── */
+    /* ── 5. 버튼 클릭 — 짧은 웅 ── */
+    function click() {
+        const ac  = getCtx();
+        const t   = ac.currentTime;
+        const dur = 0.12;
+
+        const osc = ac.createOscillator();
+        const g   = ac.createGain();
+        osc.type  = 'sine';
+        osc.frequency.setValueAtTime(120, t);
+        osc.frequency.exponentialRampToValueAtTime(60, t + dur);
+        g.gain.setValueAtTime(0, t);
+        g.gain.linearRampToValueAtTime(0.14, t + 0.01);
+        g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+        osc.connect(g); g.connect(ac.destination);
+        osc.start(); osc.stop(t + dur);
+    }
+
+    /* ── 6. 로딩 앰비언트 — 깊은 드론 우웅~ ── */
     function startLoading() {
         stopLoading();
         const ac = getCtx();
         const t  = ac.currentTime;
 
-        // 저음 드론
+        // 베이스 드론
         const drone = ac.createOscillator();
         const dg    = ac.createGain();
         drone.type  = 'sine';
-        drone.frequency.value = 55;
+        drone.frequency.value = 50;
         dg.gain.setValueAtTime(0, t);
-        dg.gain.linearRampToValueAtTime(0.06, t + 0.8);
+        dg.gain.linearRampToValueAtTime(0.09, t + 1.0);
         drone.connect(dg); dg.connect(ac.destination);
         drone.start();
         loadingOscs.push(drone); loadingGains.push(dg);
 
-        // 중음 펄스 + LFO
+        // 중음 우웅 — LFO로 떨림
         const mid = ac.createOscillator();
         const mg  = ac.createGain();
-        mid.type  = 'sine';
-        mid.frequency.value = 220;
-        mg.gain.setValueAtTime(0, t);
-        mg.gain.linearRampToValueAtTime(0.03, t + 0.8);
+        mid.type  = 'triangle';
+        mid.frequency.value = 110;
 
         const lfo = ac.createOscillator();
         const lg  = ac.createGain();
-        lfo.frequency.value = 0.7;
-        lg.gain.value = 0.02;
+        lfo.frequency.value = 0.5;
+        lg.gain.value = 0.025;
         lfo.connect(lg); lg.connect(mg.gain);
         lfo.start();
 
+        mg.gain.setValueAtTime(0, t);
+        mg.gain.linearRampToValueAtTime(0.05, t + 1.2);
         mid.connect(mg); mg.connect(ac.destination);
         mid.start();
         loadingOscs.push(mid, lfo); loadingGains.push(mg);
 
-        // 고음 시머
-        const hi = ac.createOscillator();
-        const hg = ac.createGain();
-        hi.type  = 'sine';
-        hi.frequency.value = 1100;
-        hg.gain.setValueAtTime(0, t);
-        hg.gain.linearRampToValueAtTime(0.012, t + 1.5);
-        hi.connect(hg); hg.connect(ac.destination);
-        hi.start();
-        loadingOscs.push(hi); loadingGains.push(hg);
+        // 느린 우웅 진동 레이어
+        const swell = ac.createOscillator();
+        const sg    = ac.createGain();
+        swell.type  = 'sine';
+        swell.frequency.value = 75;
+
+        const lfo2 = ac.createOscillator();
+        const lg2  = ac.createGain();
+        lfo2.frequency.value = 0.3;
+        lg2.gain.value = 0.03;
+        lfo2.connect(lg2); lg2.connect(sg.gain);
+        lfo2.start();
+
+        sg.gain.setValueAtTime(0, t);
+        sg.gain.linearRampToValueAtTime(0.045, t + 2.0);
+        swell.connect(sg); sg.connect(ac.destination);
+        swell.start();
+        loadingOscs.push(swell, lfo2); loadingGains.push(sg);
     }
 
     function stopLoading() {
@@ -195,66 +221,74 @@ const sfx = (() => {
             try {
                 g.gain.cancelScheduledValues(t);
                 g.gain.setValueAtTime(g.gain.value, t);
-                g.gain.linearRampToValueAtTime(0, t + 0.4);
+                g.gain.linearRampToValueAtTime(0, t + 0.5);
             } catch (_) {}
         });
         loadingOscs.forEach(o => {
-            try { o.stop(t + 0.5); } catch (_) {}
+            try { o.stop(t + 0.6); } catch (_) {}
         });
         loadingOscs  = [];
         loadingGains = [];
     }
 
-    /* ── 7. TV 켜짐 ── */
+    /* ── 7. TV 켜짐 — 저음에서 웜업되는 우웅 ── */
     function tvOn() {
         const ac = getCtx();
         const t  = ac.currentTime;
 
-        // 저주파 웜업 험
+        // 메인 우웅 상승
         const osc = ac.createOscillator();
         const g   = ac.createGain();
-        osc.type  = 'sawtooth';
-        osc.frequency.setValueAtTime(20, t);
-        osc.frequency.exponentialRampToValueAtTime(200, t + 0.6);
-        osc.frequency.exponentialRampToValueAtTime(80, t + 1.2);
+        osc.type  = 'sine';
+        osc.frequency.setValueAtTime(30, t);
+        osc.frequency.exponentialRampToValueAtTime(180, t + 0.7);
+        osc.frequency.exponentialRampToValueAtTime(90, t + 1.3);
         g.gain.setValueAtTime(0, t);
-        g.gain.linearRampToValueAtTime(0.1, t + 0.3);
-        g.gain.exponentialRampToValueAtTime(0.001, t + 1.4);
+        g.gain.linearRampToValueAtTime(0.14, t + 0.4);
+        g.gain.exponentialRampToValueAtTime(0.001, t + 1.5);
         osc.connect(g); g.connect(ac.destination);
-        osc.start(); osc.stop(t + 1.4);
+        osc.start(); osc.stop(t + 1.5);
 
-        // 화이트 노이즈 플래시
-        const src  = ac.createBufferSource();
-        src.buffer = noise(0.15);
-        const ng   = ac.createGain();
-        ng.gain.setValueAtTime(0.15, t + 0.05);
-        ng.gain.exponentialRampToValueAtTime(0.001, t + 0.2);
-        src.connect(ng); ng.connect(ac.destination);
-        src.start(t + 0.05); src.stop(t + 0.2);
+        // 배음 레이어
+        const harm = ac.createOscillator();
+        const hg   = ac.createGain();
+        harm.type  = 'triangle';
+        harm.frequency.setValueAtTime(60, t + 0.1);
+        harm.frequency.exponentialRampToValueAtTime(360, t + 0.7);
+        harm.frequency.exponentialRampToValueAtTime(180, t + 1.3);
+        hg.gain.setValueAtTime(0, t + 0.1);
+        hg.gain.linearRampToValueAtTime(0.05, t + 0.5);
+        hg.gain.exponentialRampToValueAtTime(0.001, t + 1.4);
+        harm.connect(hg); hg.connect(ac.destination);
+        harm.start(t + 0.1); harm.stop(t + 1.4);
     }
 
-    /* ── 8. TV 꺼짐 ── */
+    /* ── 8. TV 꺼짐 — 깊게 가라앉는 우웅 ── */
     function tvOff() {
         const ac = getCtx();
         const t  = ac.currentTime;
 
+        // 메인 하강 우웅
         const osc = ac.createOscillator();
         const g   = ac.createGain();
-        osc.type  = 'sawtooth';
-        osc.frequency.setValueAtTime(14000, t);
-        osc.frequency.exponentialRampToValueAtTime(18, t + 1.6);
-        g.gain.setValueAtTime(0.12, t);
-        g.gain.exponentialRampToValueAtTime(0.001, t + 1.6);
+        osc.type  = 'sine';
+        osc.frequency.setValueAtTime(200, t);
+        osc.frequency.exponentialRampToValueAtTime(25, t + 1.8);
+        g.gain.setValueAtTime(0.16, t);
+        g.gain.exponentialRampToValueAtTime(0.001, t + 1.8);
         osc.connect(g); g.connect(ac.destination);
-        osc.start(); osc.stop(t + 1.6);
+        osc.start(); osc.stop(t + 1.8);
 
-        const src  = ac.createBufferSource();
-        src.buffer = noise(0.5);
-        const ng   = ac.createGain();
-        ng.gain.setValueAtTime(0.2, t);
-        ng.gain.exponentialRampToValueAtTime(0.001, t + 0.5);
-        src.connect(ng); ng.connect(ac.destination);
-        src.start(); src.stop(t + 0.5);
+        // 배음 레이어
+        const harm = ac.createOscillator();
+        const hg   = ac.createGain();
+        harm.type  = 'triangle';
+        harm.frequency.setValueAtTime(400, t);
+        harm.frequency.exponentialRampToValueAtTime(50, t + 1.4);
+        hg.gain.setValueAtTime(0.06, t);
+        hg.gain.exponentialRampToValueAtTime(0.001, t + 1.4);
+        harm.connect(hg); hg.connect(ac.destination);
+        harm.start(); harm.stop(t + 1.4);
     }
 
     /* ── unlock ── */
