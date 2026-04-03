@@ -306,9 +306,14 @@ function showAnimalResult(data) {
     document.getElementById('animal-keyword').innerText     = `# ${animal.keyword}`;
     document.getElementById('animal-description').innerText = animal.description;
 
-    playStory([
-        `오 너는 ${fullName}과 같은 느낌이야`
-    ], () => {
+    const storyLines = [`오 너는 ${animal.name}과 같은 느낌이야`];
+    if (animal.modifier) {
+        storyLines.push(`근데 있잖아..`);
+        storyLines.push(`${animal.name}이면 ${animal.name}인데`);
+        storyLines.push(`넌 ${animal.name} 중에 어떤 ${animal.name}일까?`);
+    }
+
+    playStory(storyLines, () => {
         switchScreen('screen-animal');
     });
 }
